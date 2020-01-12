@@ -12,6 +12,8 @@ This package retrieves data from your [Anka Cloud](https://veertu.com) and creat
 *Check out the flags section for additional options* 
 
 ##### Building the binary yourself
+Prerequisite: Go >= 1.11
+
 1. Clone this repository
 2. Execute build.sh
 3. Use the binary generated in bin folder
@@ -21,7 +23,7 @@ Flag | Value Type | Default | Mandatory | Comments
 ---- | ---------- | ------- | --------- | --------
 controller_address | string | | Yes | Controller's Address
 port | integer | 2112 | No | Port to use
-disable_interval_optimizer | Boolean | False | No | Disavles automatic interval optimizer
+disable_interval_optimizer | Boolean | False | No | Disable automatic interval optimizer
 interval | Integer | 15 | No | Interval between Controller requests (Seconds)
 
 # Running with Docker Compose

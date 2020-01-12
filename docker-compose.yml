@@ -5,11 +5,11 @@ services:
     ports:
       - "2112:2112"
     environment:
-      - CONTROLLER_ADDR: ***ENTER CONTROLLER ADDRESS HERE***
-      
+      - CONTROLLER_ADDR= #ENTER CONTROLLER ADDRESS
+
       # Controller requests interval is optimized according to incoming /metrics request. To disable, un comment the next line
-      # - DISABLE_INTERVAL_OPTIMIZER: --disable-optimize-interval
+      # - DISABLE_INTERVAL_OPTIMIZER= --disable-optimize-interval
       
       # Optional variables:
-      # - ANKA_PROMETHEUS_PORT: --port 2112
-      # - ANKA_PROMETHEUS_INTERVAL: --intervalSeconds ***ENTER INT HERE***
+      # - ANKA_PROMETHEUS_PORT= --port 2112
+      # - ANKA_PROMETHEUS_INTERVAL= --intervalSeconds ***ENTER INT HERE***
