@@ -17,14 +17,19 @@ type Client struct {
 	errorTimeoutSeconds		int
 }
 
-func NewClient(addr string, interval int) (*Client, error) {
+func NewClient(addr string, interval int, certs TLSCerts) (*Client, error) {
+	communicator, err := NewCommunicator(addr, certs)
+	if err != nil {
+		return nil, err
+	}
+
 	c := &Client{
 		events: map[events.Event][]func(interface{}) error {
 			events.EVENT_NODE_UPDATED: make( []func(interface{}) error, 0),
 			events.EVENT_REGISTRY_DATA_UPDATED: make( []func(interface{}) error, 0),
 			events.EVENT_VM_DATA_UPDATED: make( []func(interface{}) error, 0),
 		},
-		communicator: NewCommunicator(addr),
+		communicator: communicator,
 		timeoutSeconds: int64(interval),
 		errorTimeoutSeconds: 5,
 	}

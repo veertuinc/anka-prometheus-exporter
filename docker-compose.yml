@@ -4,6 +4,8 @@ services:
     build: .
     ports:
       - "2112:2112"
+    # volumes:
+    #   - **HOST CERTS FOLDER**:/certs
     environment:
       - CONTROLLER_ADDR= #ENTER CONTROLLER ADDRESS
 
@@ -13,3 +15,11 @@ services:
       # Optional variables:
       # - ANKA_PROMETHEUS_PORT= --port 2112
       # - ANKA_PROMETHEUS_INTERVAL= --intervalSeconds ***ENTER INT HERE***
+
+
+      # TLS Options:
+      # - USE_TLS= --tls
+      # - SKIP_TLS= --skip_tls_verification
+      # - CA_CERT= --ca_cert /certs/**ENTER CA CERT FILE NAME HERE**
+      # - CLIENT_CERT= --client_cert /certs/**ENTER CLIENT CERT FILE NAME HERE**
+      # - CLIENT_KEY= --client_cert_key /certs/**ENTER CLIENT KEY FILE NAME HERE**

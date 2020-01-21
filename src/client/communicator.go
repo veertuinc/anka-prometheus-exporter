@@ -13,10 +13,15 @@ type Communicator struct {
 	controllerAddress string
 }
 
-func NewCommunicator(addr string) *Communicator {
+func NewCommunicator(addr string, certs TLSCerts) (*Communicator, error) {
+
+	if err := setUpTLS(certs); err != nil {
+		return nil, err
+	}
+	
 	return &Communicator{
 		controllerAddress: addr,
-	}
+	}, nil
 }
 
 func (this *Communicator) TestConnection() error {
