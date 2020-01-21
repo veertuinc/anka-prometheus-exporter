@@ -27,9 +27,9 @@ disable_interval_optimizer | Boolean | False | No | Disable automatic interval o
 interval | Integer | 15 | No | Interval between Controller requests (Seconds)
 tls | Boolean | False | No | Enable TLS
 skip_tls_verification | Boolean | False | No | Skips certificate verification (for self signed certs)
-ca_cert | String | "" | No | Path to CA certificate PEM/x509 file
-client_cert | String | "" | No | Path to client certificate PEM/x509 file
-client_cert_key | String | "" | No | Path to client key PEM/x509 file
+ca_cert | String |  | No | Path to CA certificate PEM/x509 file
+client_cert | String |  | No | Path to client certificate PEM/x509 file
+client_cert_key | String |  | No | Path to client key PEM/x509 file
 
 # Running with Docker Compose
 1. Add your controller's address to docker-compose.yml (MANDATORY)
