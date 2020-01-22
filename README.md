@@ -40,8 +40,8 @@ client_cert_key | String |  | No | Path to client key PEM/x509 file
 Point prometheus to the machine running this package. Default port is 2112 (/metrics endpoint is used)
 
 # Using TLS Options
--tls is not required if controller's certificate is valid and no client authentication is configured
-For all other TLS configuration options, -tls must be set
+--tls is not required if controller's certificate is valid and no client authentication is configured
+For all other TLS configuration options, --tls must be set
 
-For self signed certificates, you can either use -skip_tls_verification or provide your ca cert with -ca_cert
-If client authentication is set on the controller, use -client_cert and -client_cert_key
+For self signed certificates, you can either use --skip_tls_verification or provide your ca cert with --ca_cert
+If client authentication is set on the controller, use --client_cert and --client_cert_key
