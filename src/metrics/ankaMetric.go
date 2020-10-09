@@ -2,7 +2,7 @@ package metrics
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/veertuinc/anka-prometheus/events"	
+	"github.com/veertuinc/anka-prometheus/src/events"
 )
 
 type AnkaMetric interface {
@@ -12,8 +12,9 @@ type AnkaMetric interface {
 }
 
 type BaseAnkaMetric struct {
-	event	events.Event
-	metric	prometheus.Collector
+	name   string
+	event  events.Event
+	metric prometheus.Collector
 }
 
 func (this BaseAnkaMetric) GetEvent() events.Event {

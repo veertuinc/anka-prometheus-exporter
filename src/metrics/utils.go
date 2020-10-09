@@ -1,7 +1,7 @@
 package metrics
 
 import (
-	"github.com/veertuinc/anka-prometheus/types"
+	"github.com/veertuinc/anka-prometheus/src/types"
 	"fmt"
 	"github.com/prometheus/client_golang/prometheus"
 )

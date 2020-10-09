@@ -2,11 +2,12 @@ package client
 
 import (
 	"encoding/json"
-	"net/http"
-	"io/ioutil"
-	"fmt"
 	"errors"
-	"github.com/veertuinc/anka-prometheus/types"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+
+	"github.com/veertuinc/anka-prometheus/src/types"
 )
 
 type Communicator struct {
@@ -18,7 +19,7 @@ func NewCommunicator(addr string, certs TLSCerts) (*Communicator, error) {
 	if err := setUpTLS(certs); err != nil {
 		return nil, err
 	}
-	
+
 	return &Communicator{
 		controllerAddress: addr,
 	}, nil
@@ -39,7 +40,7 @@ func (this *Communicator) TestConnection() error {
 	if err = json.Unmarshal(body, &resp); err != nil {
 		return err
 	}
-	if resp.Status == "OK" { 
+	if resp.Status == "OK" {
 		return nil
 	} else {
 		return errors.New(resp.Message)

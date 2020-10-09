@@ -1,12 +1,14 @@
 package main
 
 import (
-	"fmt"
 	"flag"
-	"github.com/veertuinc/anka-prometheus/client"
-	"github.com/veertuinc/anka-prometheus/server"
-	"github.com/veertuinc/anka-prometheus/metrics"
+	"fmt"
+
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/veertuinc/anka-prometheus/src/client"
+	"github.com/veertuinc/anka-prometheus/src/log"
+	"github.com/veertuinc/anka-prometheus/src/metrics"
+	"github.com/veertuinc/anka-prometheus/src/server"
 )
 
 const (
@@ -40,12 +42,16 @@ func main() {
 		return
 	}
 
-	clientTLSCerts := client.TLSCerts {
-		UseTLS: useTLS,
-		ClientCert: clientCertPath,
-		ClientCertKey: clientCertKeyPath,
-		CACert: caFilePath,
-		SkipTLSVerification:skipTLSVerification,
+	var log = log.Init()
+
+	log.Info("Starting Prometheus Exporter for Anka")
+
+	clientTLSCerts := client.TLSCerts{
+		UseTLS:              useTLS,
+		ClientCert:          clientCertPath,
+		ClientCertKey:       clientCertKeyPath,
+		CACert:              caFilePath,
+		SkipTLSVerification: skipTLSVerification,
 	}
 
 	client, err := client.NewClient(controllerAddress, intervalSeconds, clientTLSCerts)
@@ -57,11 +63,12 @@ func main() {
 
 	prometheusRegistry := prometheus.NewRegistry()
 
+	// Create each metric that we later populate
 	for _, m := range metrics.MetricsHolder {
 		prometheusRegistry.Register(m.GetPrometheusMetric())
 		client.Register(m.GetEvent(), m.GetEventHandler())
 	}
-	
+
 	srv := server.NewServer(prometheusRegistry, port)
 	if !disableOptimizeInterval {
 		srv.SetIntervalUpdateFunc(client.UpdateInterval)

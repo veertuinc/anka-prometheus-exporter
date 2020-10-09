@@ -45,3 +45,7 @@ For all other TLS configuration options, --tls must be set
 
 For self signed certificates, you can either use --skip_tls_verification or provide your ca cert with --ca_cert
 If client authentication is set on the controller, use --client_cert and --client_cert_key
+
+# Development
+
+- metrics/metric_*.go

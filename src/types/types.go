@@ -1,7 +1,8 @@
 package types
 
 type NodeState string
-const ( 
+
+const (
 	NodeInactive       = "Offline"
 	NodeInvalidLicense = "Inactive (Invalid License)"
 	NodeActive         = "Active"
@@ -9,6 +10,7 @@ const (
 )
 
 type InstanceState string
+
 const (
 	StateScheduling  = "Scheduling"
 	StateStarting    = "Pulling"
@@ -22,42 +24,45 @@ const (
 )
 
 type NodeInfo struct {
-	NodeID         string               `json:"node_id"`
-	NodeName       string               `json:"node_name"`
-	CPU            uint                 `json:"cpu_count"`
-	RAM            uint                 `json:"ram"`
-	VMCount        uint                 `json:"vm_count"`
-	VCPUCount      uint                 `json:"vcpu_count"`
-	VRAM           uint                 `json:"vram"`
-	CPUUtilization float32              `json:"cpu_util"`
-	RAMUtilization float32              `json:"ram_util"`
-	State          NodeState 			`json:"state"`
-	Capacity       uint                 `json:"capacity"`
+	NodeID         string    `json:"node_id"`
+	NodeName       string    `json:"node_name"`
+	CPU            uint      `json:"cpu_count"`
+	RAM            uint      `json:"ram"`
+	VMCount        uint      `json:"vm_count"`
+	VCPUCount      uint      `json:"vcpu_count"`
+	VRAM           uint      `json:"vram"`
+	CPUUtilization float32   `json:"cpu_util"`
+	RAMUtilization float32   `json:"ram_util"`
+	FreeDiskSpace  uint      `json:"free_disk_space"`
+	AnkaDiskUsage  uint      `json:"anka_disk_usage"`
+	DiskSize       uint      `json:"disk_size"`
+	State          NodeState `json:"state"`
+	Capacity       uint      `json:"capacity"`
 }
 
 type RegistryInfo struct {
-	Total uint64 	`json:"total"`
-	Free  uint64	`json:"free"`
+	Total uint64 `json:"total"`
+	Free  uint64 `json:"free"`
 }
 
 type InstanceInfo struct {
-	InstanceID		string		`json:"instance_id"`
-	Vm			 	VmData		`json:"vm"`
+	InstanceID string `json:"instance_id"`
+	Vm         VmData `json:"vm"`
 }
 
 type VmData struct {
-	State		InstanceState		`json:"instance_state"`
+	State InstanceState `json:"instance_state"`
 }
 
 type Response interface {
 	GetStatus() string
 	GetMessage() string
-	GetBody()	interface{}
+	GetBody() interface{}
 }
 
 type DefaultResponse struct {
-	Status  string 		`json:"status"`
-	Message string 		`json:"message"`
+	Status  string `json:"status"`
+	Message string `json:"message"`
 }
 
 func (this *DefaultResponse) GetStatus() string {
@@ -70,7 +75,7 @@ func (this *DefaultResponse) GetMessage() string {
 
 type NodesResponse struct {
 	DefaultResponse
-	Body []NodeInfo		`json:"body,omtiempty"`
+	Body []NodeInfo `json:"body,omtiempty"`
 }
 
 func (this *NodesResponse) GetBody() interface{} {
@@ -79,7 +84,7 @@ func (this *NodesResponse) GetBody() interface{} {
 
 type RegistryResponse struct {
 	DefaultResponse
-	Body RegistryInfo		`json:"body,omtiempty"`
+	Body RegistryInfo `json:"body,omtiempty"`
 }
 
 func (this *RegistryResponse) GetBody() interface{} {
@@ -88,7 +93,7 @@ func (this *RegistryResponse) GetBody() interface{} {
 
 type InstancesResponse struct {
 	DefaultResponse
-	Body	[]InstanceInfo	`json:"body,omtiempty"`
+	Body []InstanceInfo `json:"body,omtiempty"`
 }
 
 func (this *InstancesResponse) GetBody() interface{} {
