@@ -1,25 +1,17 @@
-Created and maintained by Veertu Inc.
+# Anka Prometheus Exporter
 
-License: [MIT](https://choosealicense.com/licenses/mit/)
+> Created and maintained by Veertu Inc.
 
-# General Purpose
-This package retrieves data from your [Anka Cloud](https://veertu.com) and creates an endpoint for Prometheus to monitor
+This package retrieves data from your [Anka Build Cloud](https://veertu.com) and exports it for Prometheus at http://localhost/metrics.
 
-# Running with Binary
-1. Download the appropriate binary (anka_prometheus_XXXXX) from the releases page
-2. Execute: ./anka_prometheus_XXXXX --controller_address ENTER-ADDRESS-HERE
+## Usage 
 
-*Check out the flags section for additional options* 
+1. [Download the appropriate binary (anka-prometheus-exporter) from the releases page](https://github.com/veertuinc/anka-prometheus-exporter/releases)
+2. Execute: `./anka-prometheus-exporter --controller_address http://{controller IP or URL}`
 
-##### Building the binary yourself
-Prerequisite: Go >= 1.11
+---
 
-1. Clone this repository
-2. Execute build.sh
-3. Use the binary generated in bin folder
-
-##### Flags
-Flag | Value Type | Default | Mandatory | Comments
+Opt / Flag | Value Type | Default | Required | Comments
 ---- | ---------- | ------- | --------- | --------
 controller_address | string | | Yes | Controller's Address
 port | integer | 2112 | No | Port to use
@@ -31,17 +23,93 @@ ca_cert | String |  | No | Path to CA certificate PEM/x509 file
 client_cert | String |  | No | Path to client certificate PEM/x509 file
 client_cert_key | String |  | No | Path to client key PEM/x509 file
 
-# Running with Docker Compose
-1. Add your controller's address to docker-compose.yml (MANDATORY)
+> `LOG_LEVEL` can be set using an environment variable
+
+---
+
+## Adding a Prometheus target
+
+Once running, add the scrape endpoint to your prometheus.yml:
+
+> `host.docker.internal` is only needed if running on the same host as your prometheus container
+
+```yaml
+scrape_configs:
+. . .
+  - job_name: 'anka build cloud'
+    static_configs:
+      - targets: ['host.docker.internal:2112']
+```
+
+## Running with Docker Compose
+1. Add your controller's address to the [docker-compose.yml](./docker-compose.yml) (Required)
 2. Edit docker-compose.yml for other configuration options
-2. Run docker-compose up -d
+3. Run docker-compose up -d
 
-# Integrating Prometheus
-Point prometheus to the machine running this package. Default port is 2112 (/metrics endpoint is used)
+## Using TLS
+The `--tls` flag is not required if your controller certificate is valid and no client authentication is configured.
+For all other TLS configuration options, `--tls` must be set.
 
-# Using TLS Options
---tls is not required if controller's certificate is valid and no client authentication is configured
-For all other TLS configuration options, --tls must be set
+For self signed certificates, you can either use `--skip_tls_verification` or provide your ca-cert with `--ca_cert`.
+If client authentication is set on the controller, use `--client_cert` and `--client_cert_key`
 
-For self signed certificates, you can either use --skip_tls_verification or provide your ca cert with --ca_cert
-If client authentication is set on the controller, use --client_cert and --client_cert_key
+---
+
+## Exposed Metrics
+
+Metric name | Description
+---- | ----------
+anka_instance_state_count | Count of Instances in a particular State (label: state)
+anka_instance_state_per_template_count | Count of Instances in a particular state, per Template (label: state, template_name)
+anka_instance_state_per_group_count | Count of Instances in a particular state, per Group (label: state, group_name)
+-- | --
+anka_node_instance_count | Count of Instances running on the Node
+anka_node_instance_capacity | Total Instance slots (capacity) on the Node
+anka_node_states_count | Count of Nodes in a particular state (label: state)
+anka_node_disk_free_space | Amount of free disk space on the Node in Bytes
+anka_node_disk_total_space | Amount of total available disk space on the Node in Bytes
+anka_node_disk_anka_used_space | Amount of disk space used by Anka on the Node in Bytes
+anka_node_cpu_core_count | Number of CPU Cores in Node
+anka_node_cpu_util | CPU utilization in node
+anka_node_ram_gb | Total RAM available for the Node in GB
+anka_node_ram_util | Total RAM utilized for the Node
+anka_node_virtual_cpu_count | Total Virtual CPU cores for the Node
+anka_node_virtual_ram_gb | Total Virtual RAM for the Node in GB
+-- | --
+anka_node_group_nodes_count | Count of Nodes in a particular Group
+anka_node_group_states_count | Count of Groups in a particular State (labels: group, state)
+anka_node_group_instance_count | Count of Instances slots in use for the Group (and Nodes)
+anka_node_group_disk_free_space | Amount of free disk space for the Group (and Nodes) in Bytes
+anka_node_group_disk_total_space | Amount of total available disk space for the Group (and Nodes) in Bytes
+anka_node_group_disk_anka_used_space | Amount of disk space used by Anka for the Group (and Nodes) in Bytes
+anka_node_group_cpu_core_count | Number of CPU Cores for the Group (and Nodes)
+anka_node_group_cpu_util | CPU utilization for the Group (and Nodes)
+anka_node_group_ram_gb | Total RAM available for the Group (and Nodes) in GB
+anka_node_group_ram_util | Total RAM utilized for the Group (and Nodes)
+anka_node_group_virtual_cpu_count | Total Virtual CPU cores for the Group (and Nodes)
+anka_node_group_virtual_ram_gb | Total Virtual RAM for the Group (and Nodes) in GB
+anka_node_group_instance_capacity | Total Instance slots (capacity) for the Group (and Nodes)
+-- | --
+anka_nodes_count | Count of total Anka Nodes
+anka_nodes_instance_count | Count of Instance slots in use across all Nodes
+anka_nodes_instance_capacity | Count of total Instance Capacity across all Nodes
+anka_nodes_disk_free_space | Amount of free disk space across all Nodes in Bytes
+anka_nodes_disk_total_space | Amount of total available disk space across all Nodes in Bytes
+anka_nodes_disk_anka_used_space | Amount of disk space used by Anka across all Nodes in Bytes
+anka_nodes_cpu_core_count | Count of CPU Cores across all Nodes
+anka_nodes_cpu_util | Total CPU utilization across all Nodes
+anka_nodes_ram_gb | Total RAM available across all Nodes in GB
+anka_nodes_ram_util | Total RAM utilized across all Nodes
+anka_nodes_virtual_cpu_count | Total Virtual CPU cores across all Nodes
+anka_nodes_virtual_ram_gb | Total Virtual RAM across all Nodes
+-- | --
+anka_registry_disk_free_space | Anka Build Cloud Registry free disk space
+anka_registry_disk_used_space | Anka Build Cloud Registry used disk space
+
+---
+
+# Development
+
+```bash
+make build-and-run
+```

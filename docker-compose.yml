@@ -1,25 +1,24 @@
 version: '3'
 services:
-  anka-prometheus:
+  anka-prometheus-exporter:
     build: .
     ports:
       - "2112:2112"
     # volumes:
     #   - **HOST CERTS FOLDER**:/certs
     environment:
-      - CONTROLLER_ADDR= #ENTER CONTROLLER ADDRESS
+      CONTROLLER_ADDR: # Replace this with your CONTROLLER URL | Example: "http://host.docker.internal:8090"
 
-      # Controller requests interval is optimized according to incoming /metrics request. To disable, un comment the next line
-      # - DISABLE_INTERVAL_OPTIMIZER= --disable_optimize_interval
-      
+      # Controller requests interval is optimized according to incoming /metrics request. To disable, uncomment the next line
+      # DISABLE_INTERVAL_OPTIMIZER: "--disable_optimize_interval"
+
       # Optional variables:
-      # - ANKA_PROMETHEUS_PORT= --port 2112
-      # - ANKA_PROMETHEUS_INTERVAL= --interval ***ENTER NUM OF SECONDS HERE***
-
+      # ANKA_PROMETHEUS_PORT: "--port 2112"
+      # ANKA_PROMETHEUS_INTERVAL: "--interval ***ENTER NUM OF SECONDS HERE***"
 
       # TLS Options:
-      # - USE_TLS= --tls
-      # - SKIP_TLS= --skip_tls_verification
-      # - CA_CERT= --ca_cert /certs/**ENTER CA CERT FILE NAME HERE**
-      # - CLIENT_CERT= --client_cert /certs/**ENTER CLIENT CERT FILE NAME HERE**
-      # - CLIENT_KEY= --client_cert_key /certs/**ENTER CLIENT KEY FILE NAME HERE**
+      # USE_TLS: "--tls"
+      # SKIP_TLS: "--skip_tls_verification"
+      # CA_CERT: "--ca_cert /certs/**ENTER CA CERT FILE NAME HERE**"
+      # CLIENT_CERT: "--client_cert /certs/**ENTER CLIENT CERT FILE NAME HERE**"
+      # CLIENT_KEY: "--client_cert_key /certs/**ENTER CLIENT KEY FILE NAME HERE**"

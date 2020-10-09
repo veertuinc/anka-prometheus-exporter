@@ -1,18 +1,90 @@
 package metrics
 
 import (
-	"github.com/veertuinc/anka-prometheus/types"
 	"fmt"
+
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/veertuinc/anka-prometheus-exporter/src/types"
 )
 
+func uniqueThisStringArray(arr []string) []string {
+	occured := map[string]bool{}
+	result := []string{}
+	for e := range arr {
+		if occured[arr[e]] != true {
+			occured[arr[e]] = true
+			result = append(result, arr[e])
+		}
+	}
+	return result
+}
+
+func CountVMState(checkForState string, data []types.InstanceInfo) int {
+	counter := 0
+	for _, instanceData := range data {
+		if instanceData.Vm.State == checkForState {
+			counter++
+		}
+	}
+	return counter
+}
+
+func CountInstanceTemplateState(templateWeWant string, stateWeWant string, data []types.InstanceInfo) int {
+	counter := 0
+	for _, instanceData := range data {
+		if instanceData.Vm.State == stateWeWant {
+			if instanceData.Vm.TemplateUUID == templateWeWant {
+				counter++
+			}
+		}
+	}
+	return counter
+}
+
+func CountInstanceGroupState(groupWeWant string, stateWeWant string, data []types.InstanceInfo) int {
+	counter := 0
+	for _, instanceData := range data {
+		if instanceData.Vm.State == stateWeWant {
+			if instanceData.Vm.GroupUUID == groupWeWant {
+				counter++
+			}
+		}
+	}
+	return counter
+}
+
+func CountNodeGroupState(groupIdWeWant string, stateWeWant string, nodesData []types.Node) int {
+	counter := 0
+	for _, node := range nodesData {
+		if node.State == stateWeWant {
+			for _, group := range node.Groups {
+				if group.Id == groupIdWeWant {
+					counter++
+				}
+			}
+		}
+	}
+	return counter
+}
+
+func CountNodeGroupNodes(GroupIdWeWant string, nodesData []types.Node) int {
+	counter := 0
+	for _, node := range nodesData {
+		for _, group := range node.Groups {
+			if group.Id == GroupIdWeWant {
+				counter++
+			}
+		}
+	}
+	return counter
+}
 
 func CreateGaugeMetric(name string, help string) prometheus.Gauge {
 	m := prometheus.NewGauge(
 		prometheus.GaugeOpts{
 			Name: name,
 			Help: help,
-	})
+		})
 	return m
 }
 
@@ -21,11 +93,11 @@ func CreateGaugeMetricVec(name string, help string, labels []string) *prometheus
 		prometheus.GaugeOpts{
 			Name: name,
 			Help: help,
-	}, labels)
+		}, labels)
 }
 
-func ConvertToNodeData(d interface{}) ([]types.NodeInfo, error) {
-	data, ok := d.([]types.NodeInfo)
+func ConvertToNodeData(d interface{}) ([]types.Node, error) {
+	data, ok := d.([]types.Node)
 	if !ok {
 		return nil, fmt.Errorf("could not convert incoming data to required node information. original data: ", d)
 	}

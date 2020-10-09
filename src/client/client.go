@@ -3,37 +3,41 @@ package client
 import (
 	"fmt"
 	"time"
-	"github.com/veertuinc/anka-prometheus/events"
+
+	"github.com/veertuinc/anka-prometheus-exporter/src/events"
+	"github.com/veertuinc/anka-prometheus-exporter/src/log"
 )
 
 const (
-	MAX_INTERVAL_SECONDS = 60
+	MAX_INTERVAL_SECONDS = 10
 )
 
 type Client struct {
-	events map[events.Event][]func(interface{}) error
-	communicator  *Communicator
-	timeoutSeconds	int64
-	errorTimeoutSeconds		int
+	events              map[events.Event][]func(interface{}) error
+	communicator        *Communicator
+	timeoutSeconds      int64
+	errorTimeoutSeconds int
 }
 
 func NewClient(addr string, interval int, certs TLSCerts) (*Client, error) {
+	var log = log.Init()
 	communicator, err := NewCommunicator(addr, certs)
 	if err != nil {
 		return nil, err
 	}
 
 	c := &Client{
-		events: map[events.Event][]func(interface{}) error {
-			events.EVENT_NODE_UPDATED: make( []func(interface{}) error, 0),
-			events.EVENT_REGISTRY_DATA_UPDATED: make( []func(interface{}) error, 0),
-			events.EVENT_VM_DATA_UPDATED: make( []func(interface{}) error, 0),
+		events: map[events.Event][]func(interface{}) error{
+			events.EVENT_NODE_UPDATED:          make([]func(interface{}) error, 0),
+			events.EVENT_REGISTRY_DATA_UPDATED: make([]func(interface{}) error, 0),
+			events.EVENT_VM_DATA_UPDATED:       make([]func(interface{}) error, 0),
 		},
-		communicator: communicator,
-		timeoutSeconds: int64(interval),
-		errorTimeoutSeconds: 5,
+		communicator:        communicator,
+		timeoutSeconds:      int64(interval),
+		errorTimeoutSeconds: 10,
 	}
 	if err := c.communicator.TestConnection(); err != nil {
+		log.Fatal(err)
 		return nil, err
 	}
 	return c, nil
@@ -64,24 +68,21 @@ func (this *Client) UpdateInterval(i int64) {
 	}
 }
 
+// Loops over each eventHandler inside of the metrics/metric_*.go files and populates the values for each metric
 func (this *Client) initDataLoop(f func() (interface{}, error), ev events.Event) {
+	var log = log.Init()
 	for {
 		data, err := f()
 		if err != nil {
-			fmt.Println("Could not get data. Error: ", err)
+			log.Errorf("could not get data: %+v", err)
 			time.Sleep(time.Duration(this.errorTimeoutSeconds) * time.Second)
 			continue
 		}
-		
-		this.executeEventHandlers(ev, data)
-		time.Sleep(time.Duration(this.timeoutSeconds) * time.Second)
-	}
-}
-
-func (this *Client) executeEventHandlers(ev events.Event, data interface{}) {
-	for _, eventHandler := range this.events[ev] {
-		if err := eventHandler(data); err != nil {
-			fmt.Println("ignoring event handler failure for event id ", ev, "Error: ", err)
+		for _, eventHandler := range this.events[ev] {
+			if err := eventHandler(data); err != nil {
+				log.Errorf("ignoring event handler failure for event id %+v - Error: %+v", ev, err)
+			}
 		}
+		time.Sleep(time.Duration(this.timeoutSeconds) * time.Second)
 	}
 }
