@@ -10,6 +10,40 @@ type InstanceMetric struct {
 	BaseAnkaMetric
 }
 
+func CountVMState(checkForState string, data []types.InstanceInfo) int {
+	counter := 0
+	for _, instanceData := range data {
+		if instanceData.Vm.State == checkForState {
+			counter++
+		}
+	}
+	return counter
+}
+
+func CountInstanceTemplateState(templateWeWant string, stateWeWant string, data []types.InstanceInfo) int {
+	counter := 0
+	for _, instanceData := range data {
+		if instanceData.Vm.State == stateWeWant {
+			if instanceData.Vm.TemplateUUID == templateWeWant {
+				counter++
+			}
+		}
+	}
+	return counter
+}
+
+func CountInstanceGroupState(groupWeWant string, stateWeWant string, data []types.InstanceInfo) int {
+	counter := 0
+	for _, instanceData := range data {
+		if instanceData.Vm.State == stateWeWant {
+			if instanceData.Vm.GroupUUID == groupWeWant {
+				counter++
+			}
+		}
+	}
+	return counter
+}
+
 func (this InstanceMetric) GetEventHandler() func(interface{}) error {
 	return func(instancesData interface{}) error {
 		instances, err := ConvertToInstancesData(instancesData)

@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	MAX_INTERVAL_SECONDS = 10
+	MAX_INTERVAL_SECONDS = 60
 )
 
 type Client struct {
