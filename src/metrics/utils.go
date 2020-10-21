@@ -2,10 +2,19 @@ package metrics
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/veertuinc/anka-prometheus-exporter/src/types"
 )
+
+func getEnv(key, fallback string) string {
+	value := os.Getenv(key)
+	if len(value) == 0 {
+		return fallback
+	}
+	return value
+}
 
 func uniqueThisStringArray(arr []string) []string {
 	occured := map[string]bool{}

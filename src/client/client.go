@@ -2,6 +2,8 @@ package client
 
 import (
 	"fmt"
+	"reflect"
+	"runtime"
 	"time"
 
 	"github.com/veertuinc/anka-prometheus-exporter/src/events"
@@ -20,7 +22,8 @@ type Client struct {
 }
 
 func NewClient(addr string, interval int, certs TLSCerts) (*Client, error) {
-	var log = log.Init()
+	var log = log.GetLogger()
+
 	communicator, err := NewCommunicator(addr, certs)
 	if err != nil {
 		return nil, err
@@ -70,8 +73,11 @@ func (this *Client) UpdateInterval(i int64) {
 
 // Loops over each eventHandler inside of the metrics/metric_*.go files and populates the values for each metric
 func (this *Client) initDataLoop(f func() (interface{}, error), ev events.Event) {
-	var log = log.Init()
+	var log = log.GetLogger()
 	for {
+		if log.GetLevel().String() == "debug" {
+			log.Debugln("Requesting data for: " + runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name())
+		}
 		data, err := f()
 		if err != nil {
 			log.Errorf("could not get data: %+v", err)

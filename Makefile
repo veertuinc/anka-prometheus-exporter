@@ -12,7 +12,7 @@ build-and-run:
 	kill -15 $$(pgrep "[a]nka-prometheus") || true
 	$(MAKE) build-mac
 	./bin/$(BIN)_$(OS_TYPE)_$(ARCH) --controller_address http://anka.controller:8090
-
+	
 build-linux:
 	GOOS=linux OS_TYPE=linux $(MAKE) build
 
