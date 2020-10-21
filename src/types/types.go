@@ -22,16 +22,16 @@ var InstanceStates = [...]string{
 type Node struct {
 	NodeID         string      `json:"node_id"`
 	NodeName       string      `json:"node_name"`
-	CPU            uint        `json:"cpu_count"`
-	RAM            uint        `json:"ram"`
-	VMCount        uint        `json:"vm_count"`
-	VCPUCount      uint        `json:"vcpu_count"`
-	VRAM           uint        `json:"vram"`
-	CPUUtilization float32     `json:"cpu_util"`
-	RAMUtilization float32     `json:"ram_util"`
-	FreeDiskSpace  uint        `json:"free_disk_space"`
-	AnkaDiskUsage  uint        `json:"anka_disk_usage"`
-	DiskSize       uint        `json:"disk_size"`
+	CPU            uint        `json:"cpu_count,omitempty"`
+	RAM            uint        `json:"ram,omitempty"`
+	VMCount        uint        `json:"vm_count,omitempty"`
+	VCPUCount      uint        `json:"vcpu_count,omitempty"`
+	VRAM           uint        `json:"vram,omitempty"`
+	CPUUtilization float32     `json:"cpu_util,omitempty"`
+	RAMUtilization float32     `json:"ram_util,omitempty"`
+	FreeDiskSpace  uint        `json:"free_disk_space,omitempty"`
+	AnkaDiskUsage  uint        `json:"anka_disk_usage,omitempty"`
+	DiskSize       uint        `json:"disk_size,omitempty"`
 	State          string      `json:"state"`
 	Capacity       uint        `json:"capacity"`
 	Groups         []NodeGroup `json:"groups"`

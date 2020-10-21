@@ -20,32 +20,6 @@ func CountNodeState(checkForState string, data []types.Node) int {
 	return counter
 }
 
-func CountNodeGroupNodes(GroupIdWeWant string, nodesData []types.Node) int {
-	counter := 0
-	for _, node := range nodesData {
-		for _, group := range node.Groups {
-			if group.Id == GroupIdWeWant {
-				counter++
-			}
-		}
-	}
-	return counter
-}
-
-func CountNodeGroupState(groupIdWeWant string, stateWeWant string, nodesData []types.Node) int {
-	counter := 0
-	for _, node := range nodesData {
-		if node.State == stateWeWant {
-			for _, group := range node.Groups {
-				if group.Id == groupIdWeWant {
-					counter++
-				}
-			}
-		}
-	}
-	return counter
-}
-
 func (this NodeMetric) GetEventHandler() func(interface{}) error {
 	return func(d interface{}) error {
 		data, err := ConvertToNodeData(d)
