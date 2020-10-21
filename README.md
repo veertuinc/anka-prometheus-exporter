@@ -13,21 +13,21 @@ This package retrieves data from your [Anka Build Cloud](https://veertu.com) and
 
 ```bash
 Usage of anka-prometheus-exporter:
-  --controller_address string
+  --controller-address string
         Controller address to monitor (url as arg) (required)
-  --ca_cert string
+  --ca-cert string
         Path to ca PEM/x509 file (cert file path as arg)
-  --client_cert string
+  --client-cert string
         Path to client cert PEM/x509 file (cert file path as arg)
-  --client_cert_key string
+  --client-cert-key string
         Path to client key PEM/x509 file (cert file path as arg)
-  --disable_interval_optimizer
+  --disable-interval-optimizer
         Optimize interval according to /metric api requests receieved (no args)
   --interval int
         Seconds to wait between data requests to controller (int as arg) (default 15)
   --port int
         Port to server /metrics endpoint (int as arg) (default 2112)
-  --skip_tls_verification
+  --skip-tls-verification
         Skip TLS verification (no args)
   --tls
         Enable TLS (no args)

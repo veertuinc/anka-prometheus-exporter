@@ -33,15 +33,15 @@ func main() {
 	var skipTLSVerification bool
 	var useTLS bool
 
-	flag.StringVar(&controllerAddress, "controller_address", "", "Controller address to monitor (url as arg) (required)")
+	flag.StringVar(&controllerAddress, "controller-address", "", "Controller address to monitor (url as arg) (required)")
 	flag.IntVar(&intervalSeconds, "interval", DEFAULT_INTERVAL_SECONDS, "Seconds to wait between data requests to controller (int as arg)")
 	flag.IntVar(&port, "port", 2112, "Port to server /metrics endpoint (int as arg)")
-	flag.BoolVar(&disableOptimizeInterval, "disable_interval_optimizer", false, "Optimize interval according to /metric api requests receieved (no args)")
+	flag.BoolVar(&disableOptimizeInterval, "disable-interval-optimizer", false, "Optimize interval according to /metric api requests receieved (no args)")
 	flag.BoolVar(&useTLS, "tls", false, "Enable TLS (no args)")
-	flag.BoolVar(&skipTLSVerification, "skip_tls_verification", false, "Skip TLS verification (no args)")
-	flag.StringVar(&caFilePath, "ca_cert", "", "Path to ca PEM/x509 file (cert file path as arg)")
-	flag.StringVar(&clientCertPath, "client_cert", "", "Path to client cert PEM/x509 file (cert file path as arg)")
-	flag.StringVar(&clientCertKeyPath, "client_cert_key", "", "Path to client key PEM/x509 file (cert file path as arg)")
+	flag.BoolVar(&skipTLSVerification, "skip-tls-verification", false, "Skip TLS verification (no args)")
+	flag.StringVar(&caFilePath, "ca-cert", "", "Path to ca PEM/x509 file (cert file path as arg)")
+	flag.StringVar(&clientCertPath, "client-cert", "", "Path to client cert PEM/x509 file (cert file path as arg)")
+	flag.StringVar(&clientCertKeyPath, "client-cert-key", "", "Path to client key PEM/x509 file (cert file path as arg)")
 	flag.Parse()
 
 	if controllerAddress == "" {
