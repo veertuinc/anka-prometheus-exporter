@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	DEFAULT_INTERVAL_SECONDS = 10
+	DEFAULT_INTERVAL_SECONDS = 15
 )
 
 var (
@@ -33,7 +33,7 @@ func main() {
 	var skipTLSVerification bool
 	var useTLS bool
 
-	flag.StringVar(&controllerAddress, "controller_address", "", "Controller address to monitor (url as arg)")
+	flag.StringVar(&controllerAddress, "controller_address", "", "Controller address to monitor (url as arg) (required)")
 	flag.IntVar(&intervalSeconds, "interval", DEFAULT_INTERVAL_SECONDS, "Seconds to wait between data requests to controller (int as arg)")
 	flag.IntVar(&port, "port", 2112, "Port to server /metrics endpoint (int as arg)")
 	flag.BoolVar(&disableOptimizeInterval, "disable_interval_optimizer", false, "Optimize interval according to /metric api requests receieved (no args)")
@@ -44,24 +44,14 @@ func main() {
 	flag.StringVar(&clientCertKeyPath, "client_cert_key", "", "Path to client key PEM/x509 file (cert file path as arg)")
 	flag.Parse()
 
-	if len(flag.Args()) > 0 {
-		log.Fatalln("One of your flags included a value when one wasn't needed. The value we found:", flag.Args()[0])
-	}
-
 	if controllerAddress == "" {
 		fmt.Println("Controller address not supplied")
 		return
 	}
 
-	// fmt.Printf("%+v\n", flag.Lookup("controller_address"))
-	// fmt.Printf("%+v\n", flag.Lookup("interval"))
-	// fmt.Printf("%+v\n", flag.Lookup("port"))
-	// fmt.Printf("%+v\n", flag.Lookup("disable_interval_optimizer"))
-	// fmt.Printf("%+v\n", flag.Lookup("tls"))
-	// fmt.Printf("%+v\n", flag.Lookup("skip_tls_verification"))
-	// fmt.Printf("%+v\n", flag.Lookup("ca_cert"))
-	// fmt.Printf("%+v\n", flag.Lookup("client_cert"))
-	// fmt.Printf("%+v\n", flag.Lookup("client_cert_key"))
+	if len(flag.Args()) > 0 {
+		log.Fatalf("One of your flags included a value when one wasn't needed. The value we found: %s", flag.Args()[0])
+	}
 
 	log.Infof("Starting Prometheus Exporter for Anka (%s)", version)
 

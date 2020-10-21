@@ -11,17 +11,27 @@ This package retrieves data from your [Anka Build Cloud](https://veertu.com) and
 
 ---
 
-Opt / Flag | Value Type | Default | Required | Comments
----- | ---------- | ------- | --------- | --------
-controller_address | string | | Yes | Controller's Address
-port | integer | 2112 | No | Port to use
-disable_interval_optimizer | Boolean | False | No | Disable automatic interval optimizer
-interval | Integer | 15 | No | Interval between Controller requests (Seconds)
-tls | Boolean | False | No | Enable TLS
-skip_tls_verification | Boolean | False | No | Skips certificate verification (for self signed certs)
-ca_cert | String |  | No | Path to CA certificate PEM/x509 file
-client_cert | String |  | No | Path to client certificate PEM/x509 file
-client_cert_key | String |  | No | Path to client key PEM/x509 file
+```bash
+Usage of anka-prometheus-exporter:
+  --controller_address string
+        Controller address to monitor (url as arg) (required)
+  --ca_cert string
+        Path to ca PEM/x509 file (cert file path as arg)
+  --client_cert string
+        Path to client cert PEM/x509 file (cert file path as arg)
+  --client_cert_key string
+        Path to client key PEM/x509 file (cert file path as arg)
+  --disable_interval_optimizer
+        Optimize interval according to /metric api requests receieved (no args)
+  --interval int
+        Seconds to wait between data requests to controller (int as arg) (default 15)
+  --port int
+        Port to server /metrics endpoint (int as arg) (default 2112)
+  --skip_tls_verification
+        Skip TLS verification (no args)
+  --tls
+        Enable TLS (no args)
+```
 
 > `LOG_LEVEL` can be set using an environment variable
 
