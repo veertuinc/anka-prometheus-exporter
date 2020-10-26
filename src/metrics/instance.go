@@ -57,6 +57,7 @@ func (this InstanceMetric) GetEventHandler() func(interface{}) error {
 		}
 
 		// Collect templateUUIDs and GroupUUIDs
+		// TODO: Get template name and group name and include it as a label in the metrics
 		// TODO: Make sure all groups, even if not used show up (API call?)
 		// TODO: Make sure all templates, even if not used show up (API call?)
 		var instanceTemplates []string
