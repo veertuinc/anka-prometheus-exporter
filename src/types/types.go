@@ -7,18 +7,6 @@ var NodeStates = [...]string{
 	"Updating",
 }
 
-var InstanceStates = [...]string{
-	"Scheduling",
-	"Pulling",
-	"Started",
-	"Stopping",
-	"Stopped",
-	"Terminating",
-	"Terminated",
-	"Error",
-	"Pushing",
-}
-
 type Node struct {
 	NodeID         string      `json:"node_id"`
 	NodeName       string      `json:"node_name"`

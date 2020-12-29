@@ -6,47 +6,7 @@ import (
 	"github.com/veertuinc/anka-prometheus-exporter/src/types"
 )
 
-type NodeGroupMetric struct {
-	BaseAnkaMetric
-}
-
-func uniqueNodeGroupsArray(arr []types.NodeGroup) []types.NodeGroup {
-	occured := map[types.NodeGroup]bool{}
-	result := []types.NodeGroup{}
-	for e := range arr {
-		if occured[arr[e]] != true {
-			occured[arr[e]] = true
-			result = append(result, arr[e])
-		}
-	}
-	return result
-}
-
-func CountNodeGroupNodes(GroupIdWeWant string, nodesData []types.Node) int {
-	counter := 0
-	for _, node := range nodesData {
-		for _, group := range node.Groups {
-			if group.Id == GroupIdWeWant {
-				counter++
-			}
-		}
-	}
-	return counter
-}
-
-func CountNodeGroupState(groupIdWeWant string, stateWeWant string, nodesData []types.Node) int {
-	counter := 0
-	for _, node := range nodesData {
-		if node.State == stateWeWant {
-			for _, group := range node.Groups {
-				if group.Id == groupIdWeWant {
-					counter++
-				}
-			}
-		}
-	}
-	return counter
-}
+type NodeGroupMetric BaseAnkaMetric
 
 func (this NodeGroupMetric) GetEventHandler() func(interface{}) error {
 	return func(nodesData interface{}) error {

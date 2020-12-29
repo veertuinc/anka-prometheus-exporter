@@ -28,6 +28,78 @@ func uniqueThisStringArray(arr []string) []string {
 	return result
 }
 
+func uniqueNodeGroupsArray(arr []types.NodeGroup) []types.NodeGroup {
+	occured := map[types.NodeGroup]bool{}
+	result := []types.NodeGroup{}
+	for e := range arr {
+		if occured[arr[e]] != true {
+			occured[arr[e]] = true
+			result = append(result, arr[e])
+		}
+	}
+	return result
+}
+
+func CountNodeGroupNodes(GroupIdWeWant string, nodesData []types.Node) int {
+	counter := 0
+	for _, node := range nodesData {
+		for _, group := range node.Groups {
+			if group.Id == GroupIdWeWant {
+				counter++
+			}
+		}
+	}
+	return counter
+}
+
+func CountNodeGroupState(groupIdWeWant string, stateWeWant string, nodesData []types.Node) int {
+	counter := 0
+	for _, node := range nodesData {
+		if node.State == stateWeWant {
+			for _, group := range node.Groups {
+				if group.Id == groupIdWeWant {
+					counter++
+				}
+			}
+		}
+	}
+	return counter
+}
+
+func CountVMState(checkForState string, data []types.InstanceInfo) int {
+	counter := 0
+	for _, instanceData := range data {
+		if instanceData.Vm.State == checkForState {
+			counter++
+		}
+	}
+	return counter
+}
+
+func CountInstanceTemplateState(templateWeWant string, stateWeWant string, data []types.InstanceInfo) int {
+	counter := 0
+	for _, instanceData := range data {
+		if instanceData.Vm.State == stateWeWant {
+			if instanceData.Vm.TemplateUUID == templateWeWant {
+				counter++
+			}
+		}
+	}
+	return counter
+}
+
+func CountInstanceGroupState(groupWeWant string, stateWeWant string, data []types.InstanceInfo) int {
+	counter := 0
+	for _, instanceData := range data {
+		if instanceData.Vm.State == stateWeWant {
+			if instanceData.Vm.GroupUUID == groupWeWant {
+				counter++
+			}
+		}
+	}
+	return counter
+}
+
 func CreateGaugeMetric(name string, help string) prometheus.Gauge {
 	m := prometheus.NewGauge(
 		prometheus.GaugeOpts{

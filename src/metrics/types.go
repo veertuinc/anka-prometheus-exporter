@@ -12,7 +12,6 @@ type AnkaMetric interface {
 }
 
 type BaseAnkaMetric struct {
-	name   string
 	event  events.Event
 	metric prometheus.Collector
 }
@@ -23,4 +22,16 @@ func (this BaseAnkaMetric) GetEvent() events.Event {
 
 func (this BaseAnkaMetric) GetPrometheusMetric() prometheus.Collector {
 	return this.metric
+}
+
+var InstanceStates = [...]string{
+	"Scheduling",
+	"Pulling",
+	"Started",
+	"Stopping",
+	"Stopped",
+	"Terminating",
+	"Terminated",
+	"Error",
+	"Pushing",
 }
