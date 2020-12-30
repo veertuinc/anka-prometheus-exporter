@@ -1,13 +1,13 @@
 package types
 
-var NodeStates = [...]string{
+var NodeStates = []string{
 	"Offline",
 	"Inactive (Invalid License)",
 	"Active",
 	"Updating",
 }
 
-var InstanceStates = [...]string{
+var InstanceStates = []string{
 	"Scheduling",
 	"Pulling",
 	"Started",

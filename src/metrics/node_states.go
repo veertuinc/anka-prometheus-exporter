@@ -12,16 +12,6 @@ type NodeStatesMetric struct {
 	HandleData func(types.Node, *prometheus.GaugeVec, prometheus.Labels)
 }
 
-func CountNodeState(checkForState string, data []types.Node) int {
-	counter := 0
-	for _, nodeData := range data {
-		if nodeData.State == checkForState {
-			counter++
-		}
-	}
-	return counter
-}
-
 func (this NodeStatesMetric) GetEventHandler() func(interface{}) error {
 	return func(d interface{}) error {
 		data, err := ConvertToNodeData(d)
@@ -32,10 +22,13 @@ func (this NodeStatesMetric) GetEventHandler() func(interface{}) error {
 		if err != nil {
 			return err
 		}
-		// TODO: don't loop over states, instead create a map with counts and just increment
+		var stateIntMap = intMapFromStringSlice(types.NodeStates)
+		for _, nodeData := range data {
+			stateIntMap[nodeData.State] = stateIntMap[nodeData.State] + 1
+		}
 		for _, state := range types.NodeStates {
 			metric.With(prometheus.Labels{"state": state}).Set(float64(0))
-			metric.With(prometheus.Labels{"state": state}).Set(float64(CountNodeState(state, data)))
+			metric.With(prometheus.Labels{"state": state}).Set(float64(stateIntMap[state]))
 		}
 		return nil
 	}

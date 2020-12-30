@@ -46,8 +46,15 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 		},
 		HandleData: func(nodes []types.Node, nodeGroups []types.NodeGroup, metric *prometheus.GaugeVec) {
 			for _, focusGroup := range nodeGroups { // EACH GROUP
-				metric.With(prometheus.Labels{"group_name": focusGroup.Name}).Set(float64(0))
-				metric.With(prometheus.Labels{"group_name": focusGroup.Name}).Set(float64(CountNodeGroupNodes(focusGroup.Id, nodes)))
+				counter := 0
+				for _, node := range nodes {
+					for _, nodeGroup := range node.Groups {
+						if focusGroup.Id == nodeGroup.Id {
+							counter++
+						}
+					}
+				}
+				metric.With(prometheus.Labels{"group_name": focusGroup.Name}).Set(float64(counter))
 			}
 		},
 	},
@@ -57,10 +64,19 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			event:  events.EVENT_NODE_UPDATED,
 		},
 		HandleData: func(nodes []types.Node, nodeGroups []types.NodeGroup, metric *prometheus.GaugeVec) {
-			for _, state := range types.NodeStates {
-				for _, focusGroup := range nodeGroups { // EACH GROUP
-					metric.With(prometheus.Labels{"group_name": focusGroup.Name, "state": state}).Set(float64(0))
-					metric.With(prometheus.Labels{"group_name": focusGroup.Name, "state": state}).Set(float64(CountNodeGroupState(focusGroup.Id, state, nodes)))
+			for _, focusGroup := range nodeGroups { // EACH GROUP
+				for _, state := range types.NodeStates {
+					counter := 0
+					for _, node := range nodes {
+						if node.State == state {
+							for _, nodeGroup := range node.Groups {
+								if focusGroup.Id == nodeGroup.Id {
+									counter++
+								}
+							}
+						}
+					}
+					metric.With(prometheus.Labels{"group_name": focusGroup.Name, "state": state}).Set(float64(counter))
 				}
 			}
 		},

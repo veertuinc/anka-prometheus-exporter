@@ -16,6 +16,14 @@ func getEnv(key, fallback string) string {
 	return value
 }
 
+func intMapFromStringSlice(stringSlice []string) map[string]int {
+	intMap := map[string]int{}
+	for _, item := range stringSlice {
+		intMap[item] = 0
+	}
+	return intMap
+}
+
 func uniqueThisStringArray(arr []string) []string {
 	occured := map[string]bool{}
 	result := []string{}
@@ -38,32 +46,6 @@ func uniqueNodeGroupsArray(arr []types.NodeGroup) []types.NodeGroup {
 		}
 	}
 	return result
-}
-
-func CountNodeGroupNodes(GroupIdWeWant string, nodesData []types.Node) int {
-	counter := 0
-	for _, node := range nodesData {
-		for _, group := range node.Groups {
-			if group.Id == GroupIdWeWant {
-				counter++
-			}
-		}
-	}
-	return counter
-}
-
-func CountNodeGroupState(groupIdWeWant string, stateWeWant string, nodesData []types.Node) int {
-	counter := 0
-	for _, node := range nodesData {
-		if node.State == stateWeWant {
-			for _, group := range node.Groups {
-				if group.Id == groupIdWeWant {
-					counter++
-				}
-			}
-		}
-	}
-	return counter
 }
 
 func CreateGaugeMetric(name string, help string) prometheus.Gauge {

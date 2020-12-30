@@ -10,16 +10,6 @@ type InstanceStateMetric struct {
 	BaseAnkaMetric
 }
 
-func CountInstanceState(checkForState string, data []types.Instance) int {
-	counter := 0
-	for _, instanceData := range data {
-		if instanceData.Vm.State == checkForState {
-			counter++
-		}
-	}
-	return counter
-}
-
 func (this InstanceStateMetric) GetEventHandler() func(interface{}) error {
 	return func(instancesData interface{}) error {
 		instances, err := ConvertToInstancesData(instancesData)
@@ -30,8 +20,12 @@ func (this InstanceStateMetric) GetEventHandler() func(interface{}) error {
 		if err != nil {
 			return err
 		}
+		var stateIntMap = intMapFromStringSlice(types.InstanceStates)
+		for _, instance := range instances {
+			stateIntMap[instance.Vm.State] = stateIntMap[instance.Vm.State] + 1
+		}
 		for _, state := range types.InstanceStates {
-			metric.With(prometheus.Labels{"state": state}).Set(float64(CountInstanceState(state, instances)))
+			metric.With(prometheus.Labels{"state": state}).Set(float64(stateIntMap[state]))
 		}
 		return nil
 	}
