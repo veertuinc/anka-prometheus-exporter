@@ -7,6 +7,18 @@ var NodeStates = [...]string{
 	"Updating",
 }
 
+var InstanceStates = [...]string{
+	"Scheduling",
+	"Pulling",
+	"Started",
+	"Stopping",
+	"Stopped",
+	"Terminating",
+	"Terminated",
+	"Error",
+	"Pushing",
+}
+
 type Node struct {
 	NodeID         string      `json:"node_id"`
 	NodeName       string      `json:"node_name"`
@@ -32,12 +44,12 @@ type NodeGroup struct {
 	FallBackGroupId string `json:"fallback_group_id"`
 }
 
-type RegistryInfo struct {
+type Registry struct {
 	Total uint64 `json:"total"`
 	Free  uint64 `json:"free"`
 }
 
-type InstanceInfo struct {
+type Instance struct {
 	InstanceID string `json:"instance_id"`
 	Vm         VmData `json:"vm"`
 }
@@ -78,7 +90,7 @@ func (this *NodesResponse) GetBody() interface{} {
 
 type RegistryResponse struct {
 	DefaultResponse
-	Body RegistryInfo `json:"body,omtiempty"`
+	Body Registry `json:"body,omtiempty"`
 }
 
 func (this *RegistryResponse) GetBody() interface{} {
@@ -87,7 +99,7 @@ func (this *RegistryResponse) GetBody() interface{} {
 
 type InstancesResponse struct {
 	DefaultResponse
-	Body []InstanceInfo `json:"body,omtiempty"`
+	Body []Instance `json:"body,omtiempty"`
 }
 
 func (this *InstancesResponse) GetBody() interface{} {

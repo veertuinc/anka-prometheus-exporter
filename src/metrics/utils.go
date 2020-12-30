@@ -66,40 +66,6 @@ func CountNodeGroupState(groupIdWeWant string, stateWeWant string, nodesData []t
 	return counter
 }
 
-func CountVMState(checkForState string, data []types.InstanceInfo) int {
-	counter := 0
-	for _, instanceData := range data {
-		if instanceData.Vm.State == checkForState {
-			counter++
-		}
-	}
-	return counter
-}
-
-func CountInstanceTemplateState(templateWeWant string, stateWeWant string, data []types.InstanceInfo) int {
-	counter := 0
-	for _, instanceData := range data {
-		if instanceData.Vm.State == stateWeWant {
-			if instanceData.Vm.TemplateUUID == templateWeWant {
-				counter++
-			}
-		}
-	}
-	return counter
-}
-
-func CountInstanceGroupState(groupWeWant string, stateWeWant string, data []types.InstanceInfo) int {
-	counter := 0
-	for _, instanceData := range data {
-		if instanceData.Vm.State == stateWeWant {
-			if instanceData.Vm.GroupUUID == groupWeWant {
-				counter++
-			}
-		}
-	}
-	return counter
-}
-
 func CreateGaugeMetric(name string, help string) prometheus.Gauge {
 	m := prometheus.NewGauge(
 		prometheus.GaugeOpts{
@@ -125,16 +91,16 @@ func ConvertToNodeData(d interface{}) ([]types.Node, error) {
 	return data, nil
 }
 
-func ConvertToRegistryData(d interface{}) (*types.RegistryInfo, error) {
-	data, ok := d.(types.RegistryInfo)
+func ConvertToRegistryData(d interface{}) (*types.Registry, error) {
+	data, ok := d.(types.Registry)
 	if !ok {
 		return nil, fmt.Errorf("could not convert incoming data to required registry information. original data: ", d)
 	}
 	return &data, nil
 }
 
-func ConvertToInstancesData(d interface{}) ([]types.InstanceInfo, error) {
-	data, ok := d.([]types.InstanceInfo)
+func ConvertToInstancesData(d interface{}) ([]types.Instance, error) {
+	data, ok := d.([]types.Instance)
 	if !ok {
 		return nil, fmt.Errorf("could not convert incoming data to required instances information. original data: ", d)
 	}

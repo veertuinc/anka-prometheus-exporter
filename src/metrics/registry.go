@@ -1,16 +1,19 @@
 package metrics
 
 import (
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/veertuinc/anka-prometheus-exporter/src/events"
+	"github.com/veertuinc/anka-prometheus-exporter/src/types"
 )
 
 type RegistryMetric struct {
 	BaseAnkaMetric
+	HandleData func(*types.Registry, prometheus.Gauge)
 }
 
 func (this RegistryMetric) GetEventHandler() func(interface{}) error {
 	return func(d interface{}) error {
-		data, err := ConvertToRegistryData(d)
+		registryData, err := ConvertToRegistryData(d)
 		if err != nil {
 			return err
 		}
@@ -18,24 +21,37 @@ func (this RegistryMetric) GetEventHandler() func(interface{}) error {
 		if err != nil {
 			return err
 		}
-		if this.name == "anka_registry_disk_free_space" {
-			metric.Set(float64(data.Free))
-		} else if this.name == "anka_registry_disk_used_space" {
-			metric.Set(float64(data.Total))
-		}
+		this.HandleData(
+			registryData,
+			metric,
+		)
 		return nil
 	}
 }
 
+var ankaRegistryMetrics = []RegistryMetric{
+	RegistryMetric{
+		BaseAnkaMetric: BaseAnkaMetric{
+			metric: CreateGaugeMetric("anka_registry_disk_free_space", "Anka Build Cloud Registry free disk space"),
+			event:  events.EVENT_REGISTRY_DATA_UPDATED,
+		},
+		HandleData: func(registry *types.Registry, metric prometheus.Gauge) {
+			metric.Set(float64(registry.Free))
+		},
+	},
+	RegistryMetric{
+		BaseAnkaMetric: BaseAnkaMetric{
+			metric: CreateGaugeMetric("anka_registry_disk_used_space", "Anka Build Cloud Registry used disk space"),
+			event:  events.EVENT_REGISTRY_DATA_UPDATED,
+		},
+		HandleData: func(registry *types.Registry, metric prometheus.Gauge) {
+			metric.Set(float64(registry.Total))
+		},
+	},
+}
+
 func init() {
-	AddMetric(RegistryMetric{BaseAnkaMetric{
-		name:   "anka_registry_disk_free_space",
-		metric: CreateGaugeMetric("anka_registry_disk_free_space", "Anka Build Cloud Registry free disk space"),
-		event:  events.EVENT_REGISTRY_DATA_UPDATED,
-	}})
-	AddMetric(RegistryMetric{BaseAnkaMetric{
-		name:   "anka_registry_disk_used_space",
-		metric: CreateGaugeMetric("anka_registry_disk_used_space", "Anka Build Cloud Registry used disk space"),
-		event:  events.EVENT_REGISTRY_DATA_UPDATED,
-	}})
+	for _, registryMetric := range ankaRegistryMetrics {
+		AddMetric(registryMetric)
+	}
 }

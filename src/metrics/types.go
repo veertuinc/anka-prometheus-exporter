@@ -23,15 +23,3 @@ func (this BaseAnkaMetric) GetEvent() events.Event {
 func (this BaseAnkaMetric) GetPrometheusMetric() prometheus.Collector {
 	return this.metric
 }
-
-var InstanceStates = [...]string{
-	"Scheduling",
-	"Pulling",
-	"Started",
-	"Stopping",
-	"Stopped",
-	"Terminating",
-	"Terminated",
-	"Error",
-	"Pushing",
-}
