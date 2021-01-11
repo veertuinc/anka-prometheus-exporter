@@ -54,14 +54,14 @@ scrape_configs:
 ## Running with Docker Compose
 1. Add your controller's address to the [docker-compose.yml](./docker-compose.yml) (Required)
 2. Edit docker-compose.yml for other configuration options
-3. Run docker-compose up -d
+3. Run docker-compose up -d (if already built, run `docker-compose up --build --force-recreate --remove-orphans -d`)
 
 ## Using TLS
 The `--tls` flag is not required if your controller certificate is valid and no client authentication is configured.
 For all other TLS configuration options, `--tls` must be set.
 
-For self signed certificates, you can either use `--skip_tls_verification` or provide your ca-cert with `--ca_cert`.
-If client authentication is set on the controller, use `--client_cert` and `--client_cert_key`
+For self signed certificates, you can either use `--skip-tls-verification` or provide your ca-cert with `--ca-cert`.
+If client authentication is set on the controller, use `--client-cert` and `--client-cert-key`
 
 ---
 
