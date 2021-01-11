@@ -54,7 +54,7 @@ scrape_configs:
 ## Running with Docker Compose
 1. Add your controller's address to the [docker-compose.yml](./docker-compose.yml) (Required)
 2. Edit docker-compose.yml for other configuration options
-3. Run docker-compose up -d
+3. Run docker-compose up -d (if already built, run `docker-compose up --build --force-recreate --remove-orphans -d`)
 
 ## Using TLS
 The `--tls` flag is not required if your controller certificate is valid and no client authentication is configured.
