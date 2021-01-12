@@ -58,6 +58,7 @@ type VmData struct {
 	State        string `json:"instance_state"`
 	TemplateUUID string `json:"vmid"`
 	GroupUUID    string `json:"group_id"`
+	NodeUUID     string `json:"node_id"`
 }
 
 type Response interface {
