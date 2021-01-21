@@ -1,13 +1,13 @@
 package types
 
-var NodeStates = [...]string{
+var NodeStates = []string{
 	"Offline",
 	"Inactive (Invalid License)",
 	"Active",
 	"Updating",
 }
 
-var InstanceStates = [...]string{
+var InstanceStates = []string{
 	"Scheduling",
 	"Pulling",
 	"Started",
@@ -44,12 +44,12 @@ type NodeGroup struct {
 	FallBackGroupId string `json:"fallback_group_id"`
 }
 
-type RegistryInfo struct {
+type Registry struct {
 	Total uint64 `json:"total"`
 	Free  uint64 `json:"free"`
 }
 
-type InstanceInfo struct {
+type Instance struct {
 	InstanceID string `json:"instance_id"`
 	Vm         VmData `json:"vm"`
 }
@@ -58,6 +58,7 @@ type VmData struct {
 	State        string `json:"instance_state"`
 	TemplateUUID string `json:"vmid"`
 	GroupUUID    string `json:"group_id"`
+	NodeUUID     string `json:"node_id"`
 }
 
 type Response interface {
@@ -90,7 +91,7 @@ func (this *NodesResponse) GetBody() interface{} {
 
 type RegistryResponse struct {
 	DefaultResponse
-	Body RegistryInfo `json:"body,omtiempty"`
+	Body Registry `json:"body,omtiempty"`
 }
 
 func (this *RegistryResponse) GetBody() interface{} {
@@ -99,7 +100,7 @@ func (this *RegistryResponse) GetBody() interface{} {
 
 type InstancesResponse struct {
 	DefaultResponse
-	Body []InstanceInfo `json:"body,omtiempty"`
+	Body []Instance `json:"body,omtiempty"`
 }
 
 func (this *InstancesResponse) GetBody() interface{} {

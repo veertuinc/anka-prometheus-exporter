@@ -75,6 +75,7 @@ anka_instance_state_per_group_count | Count of Instances in a particular state, 
 -- | --
 anka_node_instance_count | Count of Instances running on the Node
 anka_node_instance_capacity | Total Instance slots (capacity) on the Node
+anka_node_states | Node state (1 = current state) (label: id, name, state)
 anka_node_states_count | Count of Nodes in a particular state (label: state)
 anka_node_disk_free_space | Amount of free disk space on the Node in Bytes
 anka_node_disk_total_space | Amount of total available disk space on the Node in Bytes

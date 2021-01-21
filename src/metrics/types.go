@@ -12,7 +12,6 @@ type AnkaMetric interface {
 }
 
 type BaseAnkaMetric struct {
-	name   string
 	event  events.Event
 	metric prometheus.Collector
 }
