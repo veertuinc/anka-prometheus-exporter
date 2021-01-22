@@ -13,6 +13,10 @@ build-and-run:
 	$(MAKE) build-mac
 	./bin/$(BIN)_$(OS_TYPE)_$(ARCH) --controller-address http://anka.controller:8090
 
+clean:
+	rm -f $(BIN)*
+	rm -f ./bin/$(BIN)*
+	
 build-linux:
 	GOOS=linux OS_TYPE=linux $(MAKE) build
 
