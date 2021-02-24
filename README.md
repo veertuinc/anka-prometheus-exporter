@@ -114,7 +114,8 @@ anka_nodes_ram_util | Total RAM utilized across all Nodes
 anka_nodes_virtual_cpu_count | Total Virtual CPU cores across all Nodes
 anka_nodes_virtual_ram_gb | Total Virtual RAM across all Nodes
 -- | --
-anka_registry_disk_free_space | Anka Build Cloud Registry free disk space
+anka_registry_disk_total_space | Anka Build Cloud Registry total disk space
+anka_registry_disk_free_space| Anka Build Cloud Registry free disk space
 anka_registry_disk_used_space | Anka Build Cloud Registry used disk space
 
 ---

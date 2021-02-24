@@ -41,11 +41,22 @@ var ankaRegistryMetrics = []RegistryMetric{
 	},
 	RegistryMetric{
 		BaseAnkaMetric: BaseAnkaMetric{
-			metric: CreateGaugeMetric("anka_registry_disk_used_space", "Anka Build Cloud Registry used disk space"),
+			metric: CreateGaugeMetric("anka_registry_disk_total_space", "Anka Build Cloud Registry total disk size"),
 			event:  events.EVENT_REGISTRY_DATA_UPDATED,
 		},
 		HandleData: func(registry *types.Registry, metric prometheus.Gauge) {
 			metric.Set(float64(registry.Total))
+		},
+	},
+	RegistryMetric{
+		BaseAnkaMetric: BaseAnkaMetric{
+			metric: CreateGaugeMetric("anka_registry_disk_used_space", "Anka Build Cloud Registry used disk space"),
+			event:  events.EVENT_REGISTRY_DATA_UPDATED,
+		},
+		HandleData: func(registry *types.Registry, metric prometheus.Gauge) {
+			var used uint64 = 0
+			used = registry.Total - registry.Free
+			metric.Set(float64(used))
 		},
 	},
 }
