@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"reflect"
 	"runtime"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/veertuinc/anka-prometheus-exporter/src/events"
@@ -19,6 +21,7 @@ type Client struct {
 	communicator        *Communicator
 	timeoutSeconds      int64
 	errorTimeoutSeconds int
+	eventsMutex         sync.Mutex
 }
 
 func NewClient(addr string, interval int, certs TLSCerts) (*Client, error) {
@@ -53,7 +56,10 @@ func (this *Client) Init() {
 }
 
 func (this *Client) Register(ev events.Event, eventHandler func(interface{}) error) error {
-	if val, ok := this.events[ev]; ok {
+	this.eventsMutex.Lock()
+	defer this.eventsMutex.Unlock()
+	val, ok := this.events[ev]
+	if ok {
 		this.events[ev] = append(val, eventHandler)
 	} else {
 		return fmt.Errorf("no such event id: ", ev)
@@ -64,9 +70,9 @@ func (this *Client) Register(ev events.Event, eventHandler func(interface{}) err
 func (this *Client) UpdateInterval(i int64) {
 	if i > 1 {
 		if i > MAX_INTERVAL_SECONDS {
-			this.timeoutSeconds = MAX_INTERVAL_SECONDS
+			atomic.StoreInt64(&this.timeoutSeconds, MAX_INTERVAL_SECONDS)
 		} else {
-			this.timeoutSeconds = i - 1
+			atomic.StoreInt64(&this.timeoutSeconds, i-1)
 		}
 	}
 }
@@ -84,11 +90,14 @@ func (this *Client) initDataLoop(f func() (interface{}, error), ev events.Event)
 			time.Sleep(time.Duration(this.errorTimeoutSeconds) * time.Second)
 			continue
 		}
-		for _, eventHandler := range this.events[ev] {
+		this.eventsMutex.Lock()
+		events := this.events[ev]
+		this.eventsMutex.Unlock()
+		for _, eventHandler := range events {
 			if err := eventHandler(data); err != nil {
 				log.Errorf("ignoring event handler failure for event id %+v - Error: %+v", ev, err)
 			}
 		}
-		time.Sleep(time.Duration(this.timeoutSeconds) * time.Second)
+		time.Sleep(time.Duration(atomic.LoadInt64(&this.timeoutSeconds)) * time.Second)
 	}
 }

@@ -5,7 +5,7 @@ OS_TYPE ?= $(shell uname -s | tr '[:upper:]' '[:lower:]')
 
 # CGO_ENABLED=0 needed to fix "sh: anka-prometheus-exporter: not found" in docker
 build:
-	CGO_ENABLED=0 GOARCH=$(ARCH) go build -ldflags "-X main.version=$(VERSION)" -o bin/$(BIN)_$(OS_TYPE)_$(ARCH)
+	GOARCH=$(ARCH) go build -race -ldflags "-X main.version=$(VERSION)" -o bin/$(BIN)_$(OS_TYPE)_$(ARCH)
 	chmod +x bin/$(BIN)_$(OS_TYPE)_$(ARCH)
 
 build-and-run:

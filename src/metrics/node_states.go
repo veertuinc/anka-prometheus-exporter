@@ -61,6 +61,7 @@ var ankaNodeStatesMetrics = []NodeStatesMetric{
 					}
 				}
 			}
+			checkAndHandleResetOfMetric(len(nodes), "anka_node_states", metric)
 		},
 	},
 }
