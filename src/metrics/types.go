@@ -16,6 +16,11 @@ type BaseAnkaMetric struct {
 	metric prometheus.Collector
 }
 
+type HandleDataResult struct {
+	Count      int
+	MetricName string
+}
+
 func (this BaseAnkaMetric) GetEvent() events.Event {
 	return this.event
 }

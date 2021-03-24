@@ -3,6 +3,9 @@ package metrics
 import (
 	"fmt"
 	"os"
+	"sync"
+	"sync/atomic"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/veertuinc/anka-prometheus-exporter/src/types"
@@ -103,4 +106,26 @@ func ConvertMetricToGaugeVec(m prometheus.Collector) (*prometheus.GaugeVec, erro
 		return nil, fmt.Errorf("could not convert metric to gauge vector type")
 	}
 	return data, nil
+}
+
+const DEFAULT_REFRESH_METRIC_SECONDS = 600
+
+var mutex = &sync.Mutex{}
+var lastRefreshTime int64
+var metricCountMap = make(map[string]int)
+
+func checkAndHandleResetOfMetric(count int, metricName string, metric *prometheus.GaugeVec) {
+	mutex.Lock()
+	val, ok := metricCountMap[metricName]
+	mutex.Unlock()
+	if ok { // Check if key exists
+		// Check if the count has changed OR if the lastRefreshTime is Greater Than or Eq to 10 minutes
+		if val != 0 && (count != val || (time.Now().Unix()-atomic.LoadInt64(&lastRefreshTime)) >= DEFAULT_REFRESH_METRIC_SECONDS) {
+			metric.Reset()
+		}
+	}
+	mutex.Lock()
+	metricCountMap[metricName] = count
+	mutex.Unlock()
+	atomic.StoreInt64(&lastRefreshTime, time.Now().Unix())
 }

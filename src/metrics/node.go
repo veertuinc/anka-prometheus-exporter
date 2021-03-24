@@ -14,7 +14,7 @@ type NodeMetric struct {
 
 func (this NodeMetric) GetEventHandler() func(interface{}) error {
 	return func(d interface{}) error {
-		data, err := ConvertToNodeData(d)
+		nodes, err := ConvertToNodeData(d)
 		if err != nil {
 			return err
 		}
@@ -22,7 +22,8 @@ func (this NodeMetric) GetEventHandler() func(interface{}) error {
 		if err != nil {
 			return err
 		}
-		for _, nodeData := range data { // Loop over each node
+		go checkAndHandleResetOfMetric(len(nodes), "node_metrics", metric)
+		for _, nodeData := range nodes { // Loop over each node
 			this.HandleData(
 				nodeData,
 				metric,
