@@ -18,12 +18,7 @@ clean:
 	rm -f ./bin/$(BIN)*
 	
 build-linux:
-	GOOS=linux OS_TYPE=linux $(MAKE) build
+	CGO_ENABLED=1 GOOS=linux OS_TYPE=linux $(MAKE) build
 
 build-mac:
 	GOOS=darwin $(MAKE) build
-
-gorelease:
-	git tag -d v$(VERSION) || true
-	git tag -a "v$(VERSION)" -m "Version $(VERSION)"
-	goreleaser release --rm-dist --debug
