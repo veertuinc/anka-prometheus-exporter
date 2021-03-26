@@ -114,18 +114,28 @@ var mutex = &sync.Mutex{}
 var lastRefreshTime int64
 var metricCountMap = make(map[string]int)
 
-func checkAndHandleResetOfMetric(count int, metricName string, metric *prometheus.GaugeVec) {
+func checkAndHandleReset(count int, metricName string) bool {
 	mutex.Lock()
 	val, ok := metricCountMap[metricName]
 	mutex.Unlock()
 	if ok { // Check if key exists
 		// Check if the count has changed OR if the lastRefreshTime is Greater Than or Eq to 10 minutes
 		if val != 0 && (count != val || (time.Now().Unix()-atomic.LoadInt64(&lastRefreshTime)) >= DEFAULT_REFRESH_METRIC_SECONDS) {
-			metric.Reset()
+			mutex.Lock()
+			delete(metricCountMap, metricName)
+			mutex.Unlock()
+			atomic.StoreInt64(&lastRefreshTime, time.Now().Unix())
+			return true
 		}
 	}
 	mutex.Lock()
 	metricCountMap[metricName] = count
 	mutex.Unlock()
-	atomic.StoreInt64(&lastRefreshTime, time.Now().Unix())
+	return false
+}
+
+func checkAndHandleResetOfGuageVecMetric(count int, metricName string, metric *prometheus.GaugeVec) {
+	if ok := checkAndHandleReset(count, metricName); ok {
+		metric.Reset()
+	}
 }
