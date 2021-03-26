@@ -52,16 +52,18 @@ var ankaNodeStatesMetrics = []NodeStatesMetric{
 			event:  events.EVENT_NODE_UPDATED,
 		},
 		HandleData: func(nodes []types.Node, metric *prometheus.GaugeVec) {
+			checkAndHandleResetOfGuageVecMetric(len(nodes), "anka_node_states", metric)
 			for _, node := range nodes {
-				for _, state := range types.NodeStates {
-					if state == node.State {
-						metric.With(prometheus.Labels{"id": node.NodeID, "name": node.NodeName, "state": node.State}).Set(float64(1))
-					} else {
-						metric.With(prometheus.Labels{"id": node.NodeID, "name": node.NodeName, "state": state}).Set(float64(0))
+				if node.NodeName != "" {
+					for _, state := range types.NodeStates {
+						if state == node.State {
+							metric.With(prometheus.Labels{"id": node.NodeID, "name": node.NodeName, "state": node.State}).Set(float64(1))
+						} else {
+							metric.With(prometheus.Labels{"id": node.NodeID, "name": node.NodeName, "state": state}).Set(float64(0))
+						}
 					}
 				}
 			}
-			checkAndHandleResetOfMetric(len(nodes), "anka_node_states", metric)
 		},
 	},
 }
