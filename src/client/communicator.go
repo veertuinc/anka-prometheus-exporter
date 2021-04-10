@@ -64,7 +64,16 @@ func (this *Communicator) GetVmsData() (interface{}, error) {
 	if err != nil {
 		return nil, fmt.Errorf("getting vms data error: %s", err)
 	}
-	return d, nil
+	s, err := this.GetRegistryVms()
+	if err != nil {
+		return nil, fmt.Errorf("getting vms registry data error: %s", err)
+	}
+	m := d.([]types.Instance)
+	for k, v := range m {
+		i := v.Vm.TemplateUUID
+		m[k].Vm.TemplateNAME = s[i]
+	}
+	return m, nil
 }
 
 func (this *Communicator) GetRegistryData() (interface{}, error) {
@@ -75,6 +84,21 @@ func (this *Communicator) GetRegistryData() (interface{}, error) {
 		return nil, fmt.Errorf("getting registry data error: %s", err)
 	}
 	return d, nil
+}
+
+func (this *Communicator) GetRegistryVms() (map[string]string, error) {
+	endpoint := "/api/v1/registry/vm"
+	resp := &types.RegistryVmResponse{}
+	d, err := this.getData(endpoint, resp)
+	if err != nil {
+		return nil, fmt.Errorf("getting registry vms error: %s", err)
+	}
+	m := d.([]types.Vms)
+	VmsData := make(map[string]string)
+	for _, v := range m {
+		VmsData[v.VmID] = v.TemplateNAME
+	}
+	return VmsData, nil
 }
 
 func (this *Communicator) getData(endpoint string, repsObject types.Response) (interface{}, error) {
