@@ -70,7 +70,7 @@ If client authentication is set on the controller, use `--client-cert` and `--cl
 Metric name | Description
 ---- | ----------
 anka_instance_state_count | Count of Instances in a particular State (label: state)
-anka_instance_state_per_template_count | Count of Instances in a particular state, per Template (label: state, template_name, template_uuid)
+anka_instance_state_per_template_count | Count of Instances in a particular state, per Template (label: state, template_uuid, template_name)
 anka_instance_state_per_group_count | Count of Instances in a particular state, per Group (label: state, group_name)
 -- | --
 anka_node_instance_count | Count of Instances running on the Node
