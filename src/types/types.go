@@ -57,8 +57,15 @@ type Instance struct {
 type VmData struct {
 	State        string `json:"instance_state"`
 	TemplateUUID string `json:"vmid"`
+	TemplateNAME string `json:"name"` 
 	GroupUUID    string `json:"group_id"`
 	NodeUUID     string `json:"node_id"`
+}
+
+type Vms struct {
+	TemplateNAME   string `json:"name"`
+	VmID		   string `json:"id"`
+	Size           int64  `json:"size"`
 }
 
 type Response interface {
@@ -97,6 +104,16 @@ type RegistryResponse struct {
 func (this *RegistryResponse) GetBody() interface{} {
 	return this.Body
 }
+
+type RegistryVmResponse struct {
+	DefaultResponse
+	Body []Vms `json:"body,omtiempty"`
+}
+
+func (this *RegistryVmResponse) GetBody() interface{} {
+	return this.Body
+}
+
 
 type InstancesResponse struct {
 	DefaultResponse
