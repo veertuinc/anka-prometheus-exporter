@@ -1,5 +1,5 @@
 // Copyright 2013 Ian Schenck. Use of this source code is governed by
-// a license that can be found in the LICENSE file.
+// a license that can be found at https://github.com/ianschenck/envflag/blob/master/LICENSE
 
 /*
 	Package envflag adds environment variable flags to the flag package.
