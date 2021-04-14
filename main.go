@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/veertuinc/anka-prometheus-exporter/envflag"
 	"github.com/veertuinc/anka-prometheus-exporter/src/client"
 	"github.com/veertuinc/anka-prometheus-exporter/src/log"
 	"github.com/veertuinc/anka-prometheus-exporter/src/metrics"
@@ -42,15 +43,26 @@ func main() {
 	flag.StringVar(&caFilePath, "ca-cert", "", "Path to ca PEM/x509 file (cert file path as arg)")
 	flag.StringVar(&clientCertPath, "client-cert", "", "Path to client cert PEM/x509 file (cert file path as arg)")
 	flag.StringVar(&clientCertKeyPath, "client-cert-key", "", "Path to client key PEM/x509 file (cert file path as arg)")
+
+	envPrefix := "ANKA_PROMETHEUS_EXPORTER_"
+	envflag.StringVar(&controllerAddress, "CONTROLLER_ADDRESS", "", "Controller address to monitor (url as arg) (required)")
+	envflag.IntVar(&intervalSeconds, "INTERVAL", DEFAULT_INTERVAL_SECONDS, "Seconds to wait between data requests to controller (int as arg)")
+	envflag.IntVar(&port, "PORT", 2112, "Port to server /metrics endpoint (int as arg)")
+	envflag.BoolVar(&disableOptimizeInterval, "DISABLE_INTERVAL_OPTIMIZER", false, "Optimize interval according to /metric api requests receieved (no args)")
+	envflag.BoolVar(&useTLS, "TLS", false, "Enable TLS (no args)")
+	envflag.BoolVar(&skipTLSVerification, "SKIP_TLS_VERIFICATION", false, "Skip TLS verification (no args)")
+	envflag.StringVar(&caFilePath, "CA_CERT", "", "Path to ca PEM/x509 file (cert file path as arg)")
+	envflag.StringVar(&clientCertPath, "CLIENT_CERT", "", "Path to client cert PEM/x509 file (cert file path as arg)")
+	envflag.StringVar(&clientCertKeyPath, "CLIENT_CERT_KEY", "", "Path to client key PEM/x509 file (cert file path as arg)")
 	flag.Parse()
+	envflag.ParsePrefix(envPrefix)
 
 	if controllerAddress == "" {
-		fmt.Println("Controller address not supplied")
-		return
+		log.Fatalf(fmt.Errorf("controller address not supplied (%sCONTROLLER_ADDRESS=\"http://{address}:{port}\" or --controller-address http://{address}:{port})", envPrefix).Error())
 	}
 
 	if len(flag.Args()) > 0 {
-		log.Fatalf("One of your flags included a value when one wasn't needed. The value we found: %s", flag.Args()[0])
+		log.Fatalf("one of your flags included a value when one wasn't needed: %s", flag.Args()[0])
 	}
 
 	log.Infof("Starting Prometheus Exporter for Anka (%s)", version)
@@ -65,8 +77,7 @@ func main() {
 
 	client, err := client.NewClient(controllerAddress, intervalSeconds, clientTLSCerts)
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatalf(err.Error())
 	}
 	client.Init()
 
