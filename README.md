@@ -6,9 +6,21 @@ This package retrieves data from your [Anka Build Cloud](https://veertu.com) and
 
 ## Usage 
 
-### Binary
-1. [Download the appropriate binary (anka-prometheus-exporter) from the releases page](https://github.com/veertuinc/anka-prometheus-exporter/releases)
-2. Execute: `./anka-prometheus-exporter --controller_address http://{controller IP or URL}`
+### Available ENVs
+
+> ENVs take priority over flags
+
+| ENV | Flag |
+| --- | ---  |
+| ANKA_PROMETHEUS_EXPORTER_CONTROLLER_ADDRESS | --controller-address |
+| ANKA_PROMETHEUS_EXPORTER_INTERVAL | --interval |
+| ANKA_PROMETHEUS_EXPORTER_PORT | --port |
+| ANKA_PROMETHEUS_EXPORTER_DISABLE_INTERVAL_OPTIMIZER | --disable-interval-optimizer |
+| ANKA_PROMETHEUS_EXPORTER_TLS | -tls |
+| ANKA_PROMETHEUS_EXPORTER_SKIP_TLS_VERIFICATION | --skip-tls-verification |
+| ANKA_PROMETHEUS_EXPORTER_CA_CERT | --ca-cert |
+| ANKA_PROMETHEUS_EXPORTER_CLIENT_CERT | --client-cert |
+| ANKA_PROMETHEUS_EXPORTER_CLIENT_CERT_KEY | --client-cert-key |
 
 ```bash
 Usage of anka-prometheus-exporter:
@@ -34,7 +46,11 @@ Usage of anka-prometheus-exporter:
 
 > `LOG_LEVEL` can be set using an environment variable
 
-### Docker
+### Using the Binary
+1. [Download the appropriate binary (anka-prometheus-exporter) from the releases page](https://github.com/veertuinc/anka-prometheus-exporter/releases)
+2. Execute: `./anka-prometheus-exporter --controller_address http://{controller IP or URL}`
+
+### Using Docker
 
 1. Create a `docker-compose.yml`:
 ```
@@ -43,28 +59,12 @@ services:
   anka-prometheus-exporter:
     image: anka-prometheus-exporter:latest
     container_name: anka-prometheus-exporter
-    # volumes:
-    #   - {HOST CERTS FOLDER}:/certs
     ports:
       - "2112:2112"
     environment:
        - ANKA_PROMETHEUS_EXPORTER_CONTROLLER_ADDRESS # Defaults to using what is under the user executing docker-compose up; you can specify ="http://Your Controller URL and Port Here" if not set in user's env
 ```
 2. `docker-compose pull && docker-compose up --remove-orphans -d`
-
-#### Available ENVs:
-
-| ENV | Flag |
-| --- | ---  |
-| ANKA_PROMETHEUS_EXPORTER_CONTROLLER_ADDRESS | -controller-address |
-| ANKA_PROMETHEUS_EXPORTER_INTERVAL | -interval |
-| ANKA_PROMETHEUS_EXPORTER_PORT | -port |
-| ANKA_PROMETHEUS_EXPORTER_DISABLE_INTERVAL_OPTIMIZER | -disable-interval-optimizer |
-| ANKA_PROMETHEUS_EXPORTER_TLS | -tls |
-| ANKA_PROMETHEUS_EXPORTER_SKIP_TLS_VERIFICATION | -skip-tls-verification |
-| ANKA_PROMETHEUS_EXPORTER_CA_CERT | -ca-cert |
-| ANKA_PROMETHEUS_EXPORTER_CLIENT_CERT | -client-cert |
-| ANKA_PROMETHEUS_EXPORTER_CLIENT_CERT_KEY | -client-cert-key |
 
 ---
 

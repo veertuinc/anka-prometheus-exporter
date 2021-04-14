@@ -3,8 +3,6 @@ services:
   anka-prometheus-exporter:
     image: anka-prometheus-exporter:latest
     container_name: anka-prometheus-exporter
-    # volumes:
-    #   - {HOST CERTS FOLDER}:/certs
     ports:
       - "2112:2112"
     environment:
