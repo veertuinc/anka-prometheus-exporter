@@ -57,7 +57,7 @@ Usage of anka-prometheus-exporter:
 version: '3.1'
 services:
   anka-prometheus-exporter:
-    image: anka-prometheus-exporter:latest
+    image: veertu/anka-prometheus-exporter:latest
     container_name: anka-prometheus-exporter
     ports:
       - "2112:2112"

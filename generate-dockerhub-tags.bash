@@ -8,5 +8,5 @@ LINUX_BINARY="$SCRIPT_DIR/bin/${NAME}_linux_amd64"
 cp -f $LINUX_BINARY $DOCKERFILE_PATH/$NAME
 cd $DOCKERFILE_PATH
 # docker build --no-cache -t $NAME:latest .
-docker buildx build --platform linux/amd64,linux/arm64,linux/386 -t veertu/$NAME:latest -t veertu/$NAME:v$(cat VERSION) --push .
+docker buildx build --platform linux/amd64,linux/arm64,linux/386 -t veertu/$NAME:latest -t veertu/$NAME:v$(cat $SCRIPT_DIR/VERSION) --push .
 rm -f "$DOCKERFILE_PATH/$NAME"
