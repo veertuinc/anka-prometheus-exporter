@@ -93,7 +93,11 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			for _, focusGroup := range nodeGroups { // EACH GROUP
 				var count uint = 0
 				for _, node := range nodes {
-					count = count + node.Capacity
+					for _, group := range node.Groups {
+						if group.Id == focusGroup.Id {
+							count = count + node.Capacity
+						}
+					}
 				}
 				metric.With(prometheus.Labels{"group_name": focusGroup.Name}).Set(float64(count))
 			}
@@ -109,7 +113,11 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			for _, focusGroup := range nodeGroups { // EACH GROUP
 				var count uint = 0
 				for _, node := range nodes {
-					count = count + node.VMCount
+					for _, group := range node.Groups {
+						if group.Id == focusGroup.Id {
+							count = count + node.VMCount
+						}
+					}
 				}
 				metric.With(prometheus.Labels{"group_name": focusGroup.Name}).Set(float64(count))
 			}
@@ -125,7 +133,11 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			for _, focusGroup := range nodeGroups { // EACH GROUP
 				var count uint = 0
 				for _, node := range nodes {
-					count = count + node.FreeDiskSpace
+					for _, group := range node.Groups {
+						if group.Id == focusGroup.Id {
+							count = count + node.FreeDiskSpace
+						}
+					}
 				}
 				metric.With(prometheus.Labels{"group_name": focusGroup.Name}).Set(float64(count))
 			}
@@ -141,7 +153,11 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			for _, focusGroup := range nodeGroups { // EACH GROUP
 				var count uint = 0
 				for _, node := range nodes {
-					count = count + node.DiskSize
+					for _, group := range node.Groups {
+						if group.Id == focusGroup.Id {
+							count = count + node.DiskSize
+						}
+					}
 				}
 				metric.With(prometheus.Labels{"group_name": focusGroup.Name}).Set(float64(count))
 			}
@@ -157,7 +173,11 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			for _, focusGroup := range nodeGroups { // EACH GROUP
 				var count uint = 0
 				for _, node := range nodes {
-					count = count + node.AnkaDiskUsage
+					for _, group := range node.Groups {
+						if group.Id == focusGroup.Id {
+							count = count + node.AnkaDiskUsage
+						}
+					}
 				}
 				metric.With(prometheus.Labels{"group_name": focusGroup.Name}).Set(float64(count))
 			}
@@ -173,7 +193,11 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			for _, focusGroup := range nodeGroups { // EACH GROUP
 				var count uint = 0
 				for _, node := range nodes {
-					count = count + node.CPU
+					for _, group := range node.Groups {
+						if group.Id == focusGroup.Id {
+							count = count + node.CPU
+						}
+					}
 				}
 				metric.With(prometheus.Labels{"group_name": focusGroup.Name}).Set(float64(count))
 			}
@@ -189,7 +213,11 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			for _, focusGroup := range nodeGroups { // EACH GROUP
 				var count float32 = 0
 				for _, node := range nodes {
-					count = count + node.CPUUtilization
+					for _, group := range node.Groups {
+						if group.Id == focusGroup.Id {
+							count = count + node.CPUUtilization
+						}
+					}
 				}
 				metric.With(prometheus.Labels{"group_name": focusGroup.Name}).Set(float64(count))
 			}
@@ -205,7 +233,11 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			for _, focusGroup := range nodeGroups { // EACH GROUP
 				var count uint = 0
 				for _, node := range nodes {
-					count = count + node.RAM
+					for _, group := range node.Groups {
+						if group.Id == focusGroup.Id {
+							count = count + node.RAM
+						}
+					}
 				}
 				metric.With(prometheus.Labels{"group_name": focusGroup.Name}).Set(float64(count))
 			}
@@ -221,7 +253,11 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			for _, focusGroup := range nodeGroups { // EACH GROUP
 				var count float32 = 0
 				for _, node := range nodes {
-					count = count + node.RAMUtilization
+					for _, group := range node.Groups {
+						if group.Id == focusGroup.Id {
+							count = count + node.RAMUtilization
+						}
+					}
 				}
 				metric.With(prometheus.Labels{"group_name": focusGroup.Name}).Set(float64(count))
 			}
@@ -237,7 +273,11 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			for _, focusGroup := range nodeGroups { // EACH GROUP
 				var count uint = 0
 				for _, node := range nodes {
-					count = count + node.VCPUCount
+					for _, group := range node.Groups {
+						if group.Id == focusGroup.Id {
+							count = count + node.VCPUCount
+						}
+					}
 				}
 				metric.With(prometheus.Labels{"group_name": focusGroup.Name}).Set(float64(count))
 			}
@@ -253,7 +293,11 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			for _, focusGroup := range nodeGroups { // EACH GROUP
 				var count uint = 0
 				for _, node := range nodes {
-					count = count + node.VRAM
+					for _, group := range node.Groups {
+						if group.Id == focusGroup.Id {
+							count = count + node.VRAM
+						}
+					}
 				}
 				metric.With(prometheus.Labels{"group_name": focusGroup.Name}).Set(float64(count))
 			}
