@@ -6,14 +6,14 @@ import (
 	"github.com/veertuinc/anka-prometheus-exporter/src/types"
 )
 
-type RegistryMetric struct {
+type RegistryDiskMetric struct {
 	BaseAnkaMetric
-	HandleData func(*types.Registry, prometheus.Gauge)
+	HandleData func(*types.RegistryDisk, prometheus.Gauge)
 }
 
-func (this RegistryMetric) GetEventHandler() func(interface{}) error {
+func (this RegistryDiskMetric) GetEventHandler() func(interface{}) error {
 	return func(d interface{}) error {
-		registryData, err := ConvertToRegistryData(d)
+		registryDiskData, err := ConvertToRegistryDiskData(d)
 		if err != nil {
 			return err
 		}
@@ -22,38 +22,38 @@ func (this RegistryMetric) GetEventHandler() func(interface{}) error {
 			return err
 		}
 		this.HandleData(
-			registryData,
+			registryDiskData,
 			metric,
 		)
 		return nil
 	}
 }
 
-var ankaRegistryMetrics = []RegistryMetric{
-	RegistryMetric{
+var ankaRegistryDiskMetrics = []RegistryDiskMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetric("anka_registry_disk_free_space", "Anka Build Cloud Registry free disk space"),
-			event:  events.EVENT_REGISTRY_DATA_UPDATED,
+			event:  events.EVENT_REGISTRY_DISK_DATA_UPDATED,
 		},
-		HandleData: func(registry *types.Registry, metric prometheus.Gauge) {
+		HandleData: func(registry *types.RegistryDisk, metric prometheus.Gauge) {
 			metric.Set(float64(registry.Free))
 		},
 	},
-	RegistryMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetric("anka_registry_disk_total_space", "Anka Build Cloud Registry total disk size"),
-			event:  events.EVENT_REGISTRY_DATA_UPDATED,
+			event:  events.EVENT_REGISTRY_DISK_DATA_UPDATED,
 		},
-		HandleData: func(registry *types.Registry, metric prometheus.Gauge) {
+		HandleData: func(registry *types.RegistryDisk, metric prometheus.Gauge) {
 			metric.Set(float64(registry.Total))
 		},
 	},
-	RegistryMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetric("anka_registry_disk_used_space", "Anka Build Cloud Registry used disk space"),
-			event:  events.EVENT_REGISTRY_DATA_UPDATED,
+			event:  events.EVENT_REGISTRY_DISK_DATA_UPDATED,
 		},
-		HandleData: func(registry *types.Registry, metric prometheus.Gauge) {
+		HandleData: func(registry *types.RegistryDisk, metric prometheus.Gauge) {
 			var used uint64 = 0
 			used = registry.Total - registry.Free
 			metric.Set(float64(used))
@@ -62,7 +62,7 @@ var ankaRegistryMetrics = []RegistryMetric{
 }
 
 func init() {
-	for _, registryMetric := range ankaRegistryMetrics {
-		AddMetric(registryMetric)
+	for _, RegistryDiskMetric := range ankaRegistryDiskMetrics {
+		AddMetric(RegistryDiskMetric)
 	}
 }

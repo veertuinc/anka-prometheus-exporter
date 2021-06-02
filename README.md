@@ -143,6 +143,11 @@ anka_nodes_virtual_ram_gb | Total Virtual RAM across all Nodes
 anka_registry_disk_total_space | Anka Build Cloud Registry total disk space
 anka_registry_disk_free_space| Anka Build Cloud Registry free disk space
 anka_registry_disk_used_space | Anka Build Cloud Registry used disk space
+-- | --
+anka_registry_template_count | Count of VM Templates in the Registry
+anka_registry_template_disk_used | Total disk usage of the Template in the Registry
+anka_registry_template_tag_disk_used | Total disk used by the Template's Tag in the Registry
+anka_registry_template_tags_count | Count of Tags in the Registry for the Template
 
 ---
 
