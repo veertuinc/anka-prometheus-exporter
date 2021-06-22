@@ -44,7 +44,7 @@ type NodeGroup struct {
 	FallBackGroupId string `json:"fallback_group_id"`
 }
 
-type Registry struct {
+type RegistryDisk struct {
 	Total uint64 `json:"total"`
 	Free  uint64 `json:"free"`
 }
@@ -57,15 +57,9 @@ type Instance struct {
 type VmData struct {
 	State        string `json:"instance_state"`
 	TemplateUUID string `json:"vmid"`
-	TemplateNAME string `json:"name"` 
+	TemplateNAME string `json:"name"`
 	GroupUUID    string `json:"group_id"`
 	NodeUUID     string `json:"node_id"`
-}
-
-type Vms struct {
-	TemplateNAME   string `json:"name"`
-	VmID		   string `json:"id"`
-	Size           int64  `json:"size"`
 }
 
 type Response interface {
@@ -89,35 +83,57 @@ func (this *DefaultResponse) GetMessage() string {
 
 type NodesResponse struct {
 	DefaultResponse
-	Body []Node `json:"body,omtiempty"`
+	Body []Node `json:"body,omitempty"`
 }
 
 func (this *NodesResponse) GetBody() interface{} {
 	return this.Body
 }
 
-type RegistryResponse struct {
+type RegistryDiskResponse struct {
 	DefaultResponse
-	Body Registry `json:"body,omtiempty"`
+	Body RegistryDisk `json:"body,omitempty"`
 }
 
-func (this *RegistryResponse) GetBody() interface{} {
+func (this *RegistryDiskResponse) GetBody() interface{} {
 	return this.Body
 }
 
-type RegistryVmResponse struct {
+type Template struct {
+	UUID string `json:"id"`
+	Name string `json:"name"`
+	Size uint   `json:"size"`
+	Tags []TemplateTag
+}
+type RegistryTemplateResponse struct {
 	DefaultResponse
-	Body []Vms `json:"body,omtiempty"`
+	Body []Template `json:"body,omitempty"`
 }
 
-func (this *RegistryVmResponse) GetBody() interface{} {
+func (this *RegistryTemplateResponse) GetBody() interface{} {
 	return this.Body
 }
 
+type TemplateTag struct {
+	Name string `json:"tag"`
+	Size uint   `json:"size"`
+}
+
+type RegistryTemplateTags struct {
+	Versions []TemplateTag `json:"versions,omitempty"`
+}
+type RegistryTemplateTagsResponse struct {
+	DefaultResponse
+	Body RegistryTemplateTags `json:"body,omitempty"`
+}
+
+func (this *RegistryTemplateTagsResponse) GetBody() interface{} {
+	return this.Body
+}
 
 type InstancesResponse struct {
 	DefaultResponse
-	Body []Instance `json:"body,omtiempty"`
+	Body []Instance `json:"body,omitempty"`
 }
 
 func (this *InstancesResponse) GetBody() interface{} {

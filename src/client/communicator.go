@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/veertuinc/anka-prometheus-exporter/src/state"
 	"github.com/veertuinc/anka-prometheus-exporter/src/types"
 )
 
@@ -64,41 +65,53 @@ func (this *Communicator) GetVmsData() (interface{}, error) {
 	if err != nil {
 		return nil, fmt.Errorf("getting vms data error: %s", err)
 	}
-	s, err := this.GetRegistryVms()
-	if err != nil {
-		return nil, fmt.Errorf("getting vms registry data error: %s", err)
+	templatesMap := state.GetState().GetTemplatesMap()
+	instances := d.([]types.Instance)
+	for i, v := range instances {
+		template, ok := templatesMap[v.Vm.TemplateUUID]
+		if !ok {
+			continue
+		}
+		instances[i].Vm.TemplateNAME = template.Name
 	}
-	m := d.([]types.Instance)
-	for k, v := range m {
-		i := v.Vm.TemplateUUID
-		m[k].Vm.TemplateNAME = s[i]
-	}
-	return m, nil
+	return instances, nil
 }
 
-func (this *Communicator) GetRegistryData() (interface{}, error) {
+func (this *Communicator) GetRegistryDiskData() (interface{}, error) {
 	endpoint := "/api/v1/registry/disk"
-	resp := &types.RegistryResponse{}
+	resp := &types.RegistryDiskResponse{}
 	d, err := this.getData(endpoint, resp)
 	if err != nil {
-		return nil, fmt.Errorf("getting registry data error: %s", err)
+		return nil, fmt.Errorf("getting registry disk data error: %s", err)
 	}
 	return d, nil
 }
 
-func (this *Communicator) GetRegistryVms() (map[string]string, error) {
+func (this *Communicator) GetRegistryTemplatesData() (interface{}, error) {
 	endpoint := "/api/v1/registry/vm"
-	resp := &types.RegistryVmResponse{}
-	d, err := this.getData(endpoint, resp)
+	resp := &types.RegistryTemplateResponse{}
+	templates, err := this.getData(endpoint, resp)
 	if err != nil {
-		return nil, fmt.Errorf("getting registry vms error: %s", err)
+		return nil, fmt.Errorf("getting registry templates error: %s", err)
 	}
-	m := d.([]types.Vms)
-	VmsData := make(map[string]string)
-	for _, v := range m {
-		VmsData[v.VmID] = v.TemplateNAME
+	templatesArray := templates.([]types.Template)
+	templatesMap := state.GetState().GetTemplatesMap()
+	for i, template := range templatesArray {
+		if templatesMap[template.UUID].Size != template.Size {
+			endpoint := "/api/v1/registry/vm?id=" + template.UUID
+			resp := &types.RegistryTemplateTagsResponse{}
+			tagsData, err := this.getData(endpoint, resp)
+			if err != nil {
+				return nil, fmt.Errorf("getting registry template %s/%s tags error: %s", template.UUID, template.Name, err)
+			}
+			tags := tagsData.(types.RegistryTemplateTags)
+			templatesArray[i].Tags = tags.Versions
+		} else {
+			templatesArray[i].Tags = templatesMap[template.UUID].Tags
+		}
 	}
-	return VmsData, nil
+	state.GetState().SetTemplatesMap(templatesArray)
+	return templatesArray, nil
 }
 
 func (this *Communicator) getData(endpoint string, repsObject types.Response) (interface{}, error) {

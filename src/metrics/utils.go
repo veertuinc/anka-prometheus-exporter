@@ -76,12 +76,20 @@ func ConvertToNodeData(d interface{}) ([]types.Node, error) {
 	return data, nil
 }
 
-func ConvertToRegistryData(d interface{}) (*types.Registry, error) {
-	data, ok := d.(types.Registry)
+func ConvertToRegistryDiskData(d interface{}) (*types.RegistryDisk, error) {
+	data, ok := d.(types.RegistryDisk)
 	if !ok {
-		return nil, fmt.Errorf("could not convert incoming data to required registry information. original data: ", d)
+		return nil, fmt.Errorf("could not convert incoming data to required registry disk information. original data: ", d)
 	}
 	return &data, nil
+}
+
+func ConvertToRegistryTemplatesData(d interface{}) ([]types.Template, error) {
+	data, ok := d.([]types.Template)
+	if !ok {
+		return nil, fmt.Errorf("could not convert incoming data to required registry template information. original data: ", d)
+	}
+	return data, nil
 }
 
 func ConvertToInstancesData(d interface{}) ([]types.Instance, error) {

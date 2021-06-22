@@ -34,9 +34,10 @@ func NewClient(addr string, interval int, certs TLSCerts) (*Client, error) {
 
 	c := &Client{
 		events: map[events.Event][]func(interface{}) error{
-			events.EVENT_NODE_UPDATED:          make([]func(interface{}) error, 0),
-			events.EVENT_REGISTRY_DATA_UPDATED: make([]func(interface{}) error, 0),
-			events.EVENT_VM_DATA_UPDATED:       make([]func(interface{}) error, 0),
+			events.EVENT_NODE_UPDATED:               make([]func(interface{}) error, 0),
+			events.EVENT_REGISTRY_DISK_DATA_UPDATED: make([]func(interface{}) error, 0),
+			events.EVENT_VM_DATA_UPDATED:            make([]func(interface{}) error, 0),
+			events.EVENT_REGISTRY_TEMPLATES_UPDATED: make([]func(interface{}) error, 0),
 		},
 		communicator:        communicator,
 		timeoutSeconds:      int64(interval),
@@ -50,9 +51,13 @@ func NewClient(addr string, interval int, certs TLSCerts) (*Client, error) {
 }
 
 func (this *Client) Init() {
+	// We must first populate the data from the Controller API that is going to be stored in state before we attempt to create metrics from it
+	// Order matters here since GetVmsData for example relies on RegistryTemplatesData
+	this.communicator.GetRegistryTemplatesData()
 	go this.initDataLoop(this.communicator.GetNodesData, events.EVENT_NODE_UPDATED)
 	go this.initDataLoop(this.communicator.GetVmsData, events.EVENT_VM_DATA_UPDATED)
-	go this.initDataLoop(this.communicator.GetRegistryData, events.EVENT_REGISTRY_DATA_UPDATED)
+	go this.initDataLoop(this.communicator.GetRegistryDiskData, events.EVENT_REGISTRY_DISK_DATA_UPDATED)
+	go this.initDataLoop(this.communicator.GetRegistryTemplatesData, events.EVENT_REGISTRY_TEMPLATES_UPDATED)
 }
 
 func (this *Client) Register(ev events.Event, eventHandler func(interface{}) error) error {
