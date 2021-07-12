@@ -16,9 +16,15 @@ build-and-run:
 clean:
 	rm -f $(BIN)*
 	rm -f ./bin/$(BIN)*
+	rm -f docker/scratch/$(BIN)_*
 	
 build-linux:
 	GOOS=linux OS_TYPE=linux $(MAKE) build
 
 build-mac:
 	GOOS=darwin $(MAKE) build RACE="-race"
+
+docker-build-scratch:
+	$(MAKE) build-linux
+	mv ./bin/$(BIN)_linux_$(ARCH) docker/scratch/
+	docker build ./docker/scratch -t $(BIN)-scratch
