@@ -16,7 +16,6 @@ type Communicator struct {
 }
 
 func NewCommunicator(addr string, certs TLSCerts) (*Communicator, error) {
-
 	if err := setUpTLS(certs); err != nil {
 		return nil, err
 	}
@@ -26,9 +25,9 @@ func NewCommunicator(addr string, certs TLSCerts) (*Communicator, error) {
 	}, nil
 }
 
-func (this *Communicator) TestConnection() error {
+func (c *Communicator) TestConnection() error {
 	endpoint := "/api/v1/status"
-	r, err := this.getResponse(endpoint)
+	r, err := c.getResponse(endpoint)
 	if err != nil {
 		return err
 	}
@@ -41,29 +40,30 @@ func (this *Communicator) TestConnection() error {
 	if err = json.Unmarshal(body, &resp); err != nil {
 		return err
 	}
-	if resp.Status == "OK" {
-		return nil
-	} else {
+
+	if resp.Status != "OK" {
 		return errors.New(resp.Message)
 	}
+
+	return nil
 }
 
-func (this *Communicator) GetNodesData() (interface{}, error) {
+func (c *Communicator) GetNodesData() (interface{}, error) {
 	endpoint := "/api/v1/node"
 	resp := &types.NodesResponse{}
-	d, err := this.getData(endpoint, resp)
+	d, err := c.getData(endpoint, resp)
 	if err != nil {
-		return nil, fmt.Errorf("getting node data error: %s", err)
+		return nil, fmt.Errorf("getting node data error: %w", err)
 	}
 	return d, nil
 }
 
-func (this *Communicator) GetVmsData() (interface{}, error) {
+func (c *Communicator) GetVmsData() (interface{}, error) {
 	endpoint := "/api/v1/vm"
 	resp := &types.InstancesResponse{}
-	d, err := this.getData(endpoint, resp)
+	d, err := c.getData(endpoint, resp)
 	if err != nil {
-		return nil, fmt.Errorf("getting vms data error: %s", err)
+		return nil, fmt.Errorf("getting vms data error: %w", err)
 	}
 	templatesMap := state.GetState().GetTemplatesMap()
 	instances := d.([]types.Instance)
@@ -77,22 +77,22 @@ func (this *Communicator) GetVmsData() (interface{}, error) {
 	return instances, nil
 }
 
-func (this *Communicator) GetRegistryDiskData() (interface{}, error) {
+func (c *Communicator) GetRegistryDiskData() (interface{}, error) {
 	endpoint := "/api/v1/registry/disk"
 	resp := &types.RegistryDiskResponse{}
-	d, err := this.getData(endpoint, resp)
+	d, err := c.getData(endpoint, resp)
 	if err != nil {
-		return nil, fmt.Errorf("getting registry disk data error: %s", err)
+		return nil, fmt.Errorf("getting registry disk data error: %w", err)
 	}
 	return d, nil
 }
 
-func (this *Communicator) GetRegistryTemplatesData() (interface{}, error) {
+func (c *Communicator) GetRegistryTemplatesData() (interface{}, error) {
 	endpoint := "/api/v1/registry/vm"
 	resp := &types.RegistryTemplateResponse{}
-	templates, err := this.getData(endpoint, resp)
+	templates, err := c.getData(endpoint, resp)
 	if err != nil {
-		return nil, fmt.Errorf("getting registry templates error: %s", err)
+		return nil, fmt.Errorf("getting registry templates error: %w", err)
 	}
 	templatesArray := templates.([]types.Template)
 	templatesMap := state.GetState().GetTemplatesMap()
@@ -100,9 +100,9 @@ func (this *Communicator) GetRegistryTemplatesData() (interface{}, error) {
 		if templatesMap[template.UUID].Size != template.Size {
 			endpoint := "/api/v1/registry/vm?id=" + template.UUID
 			resp := &types.RegistryTemplateTagsResponse{}
-			tagsData, err := this.getData(endpoint, resp)
+			tagsData, err := c.getData(endpoint, resp)
 			if err != nil {
-				return nil, fmt.Errorf("getting registry template %s/%s tags error: %s", template.UUID, template.Name, err)
+				return nil, fmt.Errorf("getting registry template %s/%s tags error: %w", template.UUID, template.Name, err)
 			}
 			tags := tagsData.(types.RegistryTemplateTags)
 			templatesArray[i].Tags = tags.Versions
@@ -114,30 +114,37 @@ func (this *Communicator) GetRegistryTemplatesData() (interface{}, error) {
 	return templatesArray, nil
 }
 
-func (this *Communicator) getData(endpoint string, repsObject types.Response) (interface{}, error) {
-	r, err := this.getResponse(endpoint)
+func (c *Communicator) getData(endpoint string, repsObject types.Response) (interface{}, error) {
+	r, err := c.getResponse(endpoint)
 	if err != nil {
 		return nil, err
 	}
+
 	defer r.Body.Close()
+
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		return nil, err
 	}
+
 	if err = json.Unmarshal(body, &repsObject); err != nil {
 		return nil, err
 	}
+
 	if repsObject.GetStatus() != "OK" {
 		return nil, errors.New(repsObject.GetMessage())
 	}
+
 	return repsObject.GetBody(), nil
 }
 
-func (this *Communicator) getResponse(endpoint string) (*http.Response, error) {
-	url := fmt.Sprintf("%s%s", this.controllerAddress, endpoint)
+func (c *Communicator) getResponse(endpoint string) (*http.Response, error) {
+	url := fmt.Sprintf("%s%s", c.controllerAddress, endpoint)
+
 	r, err := http.Get(url)
 	if err != nil {
 		return nil, err
 	}
+
 	return r, nil
 }

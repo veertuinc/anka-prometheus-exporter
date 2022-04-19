@@ -11,25 +11,23 @@ type NodeGroupMetric struct {
 	HandleData func([]types.Node, []types.NodeGroup, *prometheus.GaugeVec)
 }
 
-func (this NodeGroupMetric) GetEventHandler() func(interface{}) error {
+func (m NodeGroupMetric) GetEventHandler() func(interface{}) error {
 	return func(nodesData interface{}) error {
 		nodes, err := ConvertToNodeData(nodesData)
 		if err != nil {
 			return err
 		}
-		metric, err := ConvertMetricToGaugeVec(this.metric)
+		metric, err := ConvertMetricToGaugeVec(m.metric)
 		if err != nil {
 			return err
 		}
 		// TODO: make an API call for all groups
 		var nodeGroups []types.NodeGroup
 		for _, node := range nodes { // EACH GROUP
-			for _, group := range node.Groups {
-				nodeGroups = append(nodeGroups, group)
-			}
+			nodeGroups = append(nodeGroups, node.Groups...)
 		}
 		nodeGroups = uniqueNodeGroupsArray(nodeGroups)
-		this.HandleData(
+		m.HandleData(
 			nodes,
 			nodeGroups,
 			metric,
@@ -39,10 +37,10 @@ func (this NodeGroupMetric) GetEventHandler() func(interface{}) error {
 }
 
 var ankaNodeGroupMetrics = []NodeGroupMetric{
-	NodeGroupMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_group_nodes_count", "Count of Nodes in a particular Group", []string{"group_name"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, nodeGroups []types.NodeGroup, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric((len(nodeGroups) + len(nodes)), "anka_node_group_nodes_count", metric)
@@ -59,10 +57,10 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			}
 		},
 	},
-	NodeGroupMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_group_states_count", "Count of Groups in a particular state (labels: group, state)", []string{"group_name", "state"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, nodeGroups []types.NodeGroup, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric((len(nodeGroups) + len(nodes)), "anka_node_group_states_count", metric)
@@ -83,10 +81,10 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			}
 		},
 	},
-	NodeGroupMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_group_instance_capacity", "Total Instance slots (capacity) for the Group and its Nodes", []string{"group_name"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, nodeGroups []types.NodeGroup, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric((len(nodeGroups) + len(nodes)), "anka_node_group_instance_capacity", metric)
@@ -95,7 +93,7 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 				for _, node := range nodes {
 					for _, group := range node.Groups {
 						if group.Id == focusGroup.Id {
-							count = count + node.Capacity
+							count += node.Capacity
 						}
 					}
 				}
@@ -103,10 +101,10 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			}
 		},
 	},
-	NodeGroupMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_group_instance_count", "Count of Instances slots in use for the Group (and Nodes)", []string{"group_name"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, nodeGroups []types.NodeGroup, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric((len(nodeGroups) + len(nodes)), "anka_node_group_instance_count", metric)
@@ -123,19 +121,19 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			}
 		},
 	},
-	NodeGroupMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_group_disk_free_space", "Amount of free disk space for the Group (and Nodes) in Bytes", []string{"group_name"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, nodeGroups []types.NodeGroup, metric *prometheus.GaugeVec) {
-			checkAndHandleResetOfGuageVecMetric((len(nodeGroups) + len(nodes)), "anka_node_group_disk_free_space", metric)
+			checkAndHandleResetOfGuageVecMetric(len(nodeGroups)+len(nodes), "anka_node_group_disk_free_space", metric)
 			for _, focusGroup := range nodeGroups { // EACH GROUP
 				var count uint = 0
 				for _, node := range nodes {
 					for _, group := range node.Groups {
 						if group.Id == focusGroup.Id {
-							count = count + node.FreeDiskSpace
+							count += node.FreeDiskSpace
 						}
 					}
 				}
@@ -143,10 +141,10 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			}
 		},
 	},
-	NodeGroupMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_group_disk_total_space", "Amount of total available disk space for the Group (and Nodes) in Bytes", []string{"group_name"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, nodeGroups []types.NodeGroup, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric((len(nodeGroups) + len(nodes)), "anka_node_group_disk_total_space", metric)
@@ -155,7 +153,7 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 				for _, node := range nodes {
 					for _, group := range node.Groups {
 						if group.Id == focusGroup.Id {
-							count = count + node.DiskSize
+							count += node.DiskSize
 						}
 					}
 				}
@@ -163,10 +161,10 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			}
 		},
 	},
-	NodeGroupMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_group_disk_anka_used_space", "Amount of disk space used by Anka for the Group (and Nodes) in Bytes", []string{"group_name"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, nodeGroups []types.NodeGroup, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric((len(nodeGroups) + len(nodes)), "anka_node_group_disk_anka_used_space", metric)
@@ -175,7 +173,7 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 				for _, node := range nodes {
 					for _, group := range node.Groups {
 						if group.Id == focusGroup.Id {
-							count = count + node.AnkaDiskUsage
+							count += node.AnkaDiskUsage
 						}
 					}
 				}
@@ -183,10 +181,10 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			}
 		},
 	},
-	NodeGroupMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_group_cpu_core_count", "Number of CPU Cores for the Group (and Nodes)", []string{"group_name"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, nodeGroups []types.NodeGroup, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric((len(nodeGroups) + len(nodes)), "anka_node_group_cpu_core_count", metric)
@@ -195,7 +193,7 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 				for _, node := range nodes {
 					for _, group := range node.Groups {
 						if group.Id == focusGroup.Id {
-							count = count + node.CPU
+							count += node.CPU
 						}
 					}
 				}
@@ -203,10 +201,10 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			}
 		},
 	},
-	NodeGroupMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_group_cpu_util", "CPU utilization for the Group (and Nodes)", []string{"group_name"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, nodeGroups []types.NodeGroup, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric((len(nodeGroups) + len(nodes)), "anka_node_group_cpu_util", metric)
@@ -215,7 +213,7 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 				for _, node := range nodes {
 					for _, group := range node.Groups {
 						if group.Id == focusGroup.Id {
-							count = count + node.CPUUtilization
+							count += node.CPUUtilization
 						}
 					}
 				}
@@ -223,19 +221,19 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			}
 		},
 	},
-	NodeGroupMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_group_ram_gb", "Total RAM available for the Group (and Nodes) in GB", []string{"group_name"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, nodeGroups []types.NodeGroup, metric *prometheus.GaugeVec) {
-			checkAndHandleResetOfGuageVecMetric((len(nodeGroups) + len(nodes)), "anka_node_group_ram_gb", metric)
+			checkAndHandleResetOfGuageVecMetric(len(nodeGroups)+len(nodes), "anka_node_group_ram_gb", metric)
 			for _, focusGroup := range nodeGroups { // EACH GROUP
 				var count uint = 0
 				for _, node := range nodes {
 					for _, group := range node.Groups {
 						if group.Id == focusGroup.Id {
-							count = count + node.RAM
+							count += node.RAM
 						}
 					}
 				}
@@ -243,10 +241,10 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			}
 		},
 	},
-	NodeGroupMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_group_ram_util", "Total RAM utilized for the Group (and Nodes)", []string{"group_name"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, nodeGroups []types.NodeGroup, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric((len(nodeGroups) + len(nodes)), "anka_node_group_ram_util", metric)
@@ -255,7 +253,7 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 				for _, node := range nodes {
 					for _, group := range node.Groups {
 						if group.Id == focusGroup.Id {
-							count = count + node.RAMUtilization
+							count += node.RAMUtilization
 						}
 					}
 				}
@@ -263,10 +261,10 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			}
 		},
 	},
-	NodeGroupMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_group_virtual_cpu_count", "Total Virtual CPU cores for the Group (and Nodes)", []string{"group_name"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, nodeGroups []types.NodeGroup, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric((len(nodeGroups) + len(nodes)), "anka_node_group_virtual_cpu_count", metric)
@@ -275,7 +273,7 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 				for _, node := range nodes {
 					for _, group := range node.Groups {
 						if group.Id == focusGroup.Id {
-							count = count + node.VCPUCount
+							count += node.VCPUCount
 						}
 					}
 				}
@@ -283,10 +281,10 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 			}
 		},
 	},
-	NodeGroupMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_group_virtual_ram_gb", "Total Virtual RAM for the Group (and Nodes) in GB", []string{"group_name"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, nodeGroups []types.NodeGroup, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric((len(nodeGroups) + len(nodes)), "anka_node_group_virtual_ram_gb", metric)
@@ -295,7 +293,7 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 				for _, node := range nodes {
 					for _, group := range node.Groups {
 						if group.Id == focusGroup.Id {
-							count = count + node.VRAM
+							count += node.VRAM
 						}
 					}
 				}

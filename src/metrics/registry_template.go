@@ -12,17 +12,17 @@ type RegistryTemplateMetric struct {
 	HandleData func([]types.Template, *prometheus.GaugeVec)
 }
 
-func (this RegistryTemplateMetric) GetEventHandler() func(interface{}) error {
+func (m RegistryTemplateMetric) GetEventHandler() func(interface{}) error {
 	return func(d interface{}) error {
 		templates, err := ConvertToRegistryTemplatesData(d)
 		if err != nil {
 			return err
 		}
-		metric, err := ConvertMetricToGaugeVec(this.metric)
+		metric, err := ConvertMetricToGaugeVec(m.metric)
 		if err != nil {
 			return err
 		}
-		this.HandleData(
+		m.HandleData(
 			templates,
 			metric,
 		)
@@ -34,7 +34,7 @@ var ankaRegistryTemplateMetrics = []RegistryTemplateMetric{
 	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_registry_template_tags_count", "Count of Tags in the Registry for the Template", []string{"template_uuid", "template_name"}),
-			event:  events.EVENT_REGISTRY_TEMPLATES_UPDATED,
+			event:  events.EventRegistryTemplatesUpdated,
 		},
 		HandleData: func(templates []types.Template, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric(len(templates), "anka_registry_template_tags_count", metric)
@@ -46,7 +46,7 @@ var ankaRegistryTemplateMetrics = []RegistryTemplateMetric{
 	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_registry_template_disk_used", "Total disk usage of the Template in the Registry", []string{"template_uuid", "template_name"}),
-			event:  events.EVENT_REGISTRY_TEMPLATES_UPDATED,
+			event:  events.EventRegistryTemplatesUpdated,
 		},
 		HandleData: func(templates []types.Template, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric(len(templates), "anka_registry_template_disk_used", metric)
@@ -58,7 +58,7 @@ var ankaRegistryTemplateMetrics = []RegistryTemplateMetric{
 	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_registry_template_tag_disk_used", "Total disk used by the Template's Tag in the Registry", []string{"template_uuid", "template_name", "tag_name"}),
-			event:  events.EVENT_REGISTRY_TEMPLATES_UPDATED,
+			event:  events.EventRegistryTemplatesUpdated,
 		},
 		HandleData: func(templates []types.Template, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric(len(templates), "anka_registry_template_tag_disk_used", metric)

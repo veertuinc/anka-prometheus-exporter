@@ -33,7 +33,7 @@ var ankaRegistryDiskMetrics = []RegistryDiskMetric{
 	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetric("anka_registry_disk_free_space", "Anka Build Cloud Registry free disk space"),
-			event:  events.EVENT_REGISTRY_DISK_DATA_UPDATED,
+			event:  events.EventRegistryDiskDataUpdated,
 		},
 		HandleData: func(registry *types.RegistryDisk, metric prometheus.Gauge) {
 			metric.Set(float64(registry.Free))
@@ -42,7 +42,7 @@ var ankaRegistryDiskMetrics = []RegistryDiskMetric{
 	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetric("anka_registry_disk_total_space", "Anka Build Cloud Registry total disk size"),
-			event:  events.EVENT_REGISTRY_DISK_DATA_UPDATED,
+			event:  events.EventRegistryDiskDataUpdated,
 		},
 		HandleData: func(registry *types.RegistryDisk, metric prometheus.Gauge) {
 			metric.Set(float64(registry.Total))
@@ -51,11 +51,10 @@ var ankaRegistryDiskMetrics = []RegistryDiskMetric{
 	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetric("anka_registry_disk_used_space", "Anka Build Cloud Registry used disk space"),
-			event:  events.EVENT_REGISTRY_DISK_DATA_UPDATED,
+			event:  events.EventRegistryDiskDataUpdated,
 		},
 		HandleData: func(registry *types.RegistryDisk, metric prometheus.Gauge) {
-			var used uint64 = 0
-			used = registry.Total - registry.Free
+			used := registry.Total - registry.Free
 			metric.Set(float64(used))
 		},
 	},

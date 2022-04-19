@@ -31,10 +31,10 @@ func (this NodeMetric) GetEventHandler() func(interface{}) error {
 }
 
 var ankaNodeMetrics = []NodeMetric{
-	NodeMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_instance_count", "Count of Instances running on the Node", []string{"id", "name"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric(len(nodes), "anka_node_instance_count", metric)
@@ -45,10 +45,10 @@ var ankaNodeMetrics = []NodeMetric{
 			}
 		},
 	},
-	NodeMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_instance_capacity", "Total Instance slots (capacity) on the Node", []string{"id", "name"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric(len(nodes), "anka_node_instance_capacity", metric)
@@ -59,10 +59,10 @@ var ankaNodeMetrics = []NodeMetric{
 			}
 		},
 	},
-	NodeMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_disk_free_space", "Amount of free disk space on the Node in Bytes", []string{"id", "name"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric(len(nodes), "anka_node_disk_free_space", metric)
@@ -73,10 +73,10 @@ var ankaNodeMetrics = []NodeMetric{
 			}
 		},
 	},
-	NodeMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_disk_total_space", "Amount of total available disk space on the Node in Bytes", []string{"id", "name"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric(len(nodes), "anka_node_disk_total_space", metric)
@@ -87,10 +87,10 @@ var ankaNodeMetrics = []NodeMetric{
 			}
 		},
 	},
-	NodeMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_disk_anka_used_space", "Amount of disk space used by Anka on the Node in Bytes", []string{"id", "name"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric(len(nodes), "anka_node_disk_anka_used_space", metric)
@@ -101,10 +101,10 @@ var ankaNodeMetrics = []NodeMetric{
 			}
 		},
 	},
-	NodeMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_cpu_core_count", "Number of CPU Cores in Node", []string{"id", "name"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric(len(nodes), "anka_node_cpu_core_count", metric)
@@ -115,10 +115,10 @@ var ankaNodeMetrics = []NodeMetric{
 			}
 		},
 	},
-	NodeMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_cpu_util", "CPU utilization in node", []string{"id", "name"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric(len(nodes), "anka_node_cpu_util", metric)
@@ -129,10 +129,10 @@ var ankaNodeMetrics = []NodeMetric{
 			}
 		},
 	},
-	NodeMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_ram_gb", "Total RAM available for the Node in GB", []string{"id", "name"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric(len(nodes), "anka_node_ram_gb", metric)
@@ -143,10 +143,10 @@ var ankaNodeMetrics = []NodeMetric{
 			}
 		},
 	},
-	NodeMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_ram_util", "Total RAM utilized for the Node", []string{"id", "name"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric(len(nodes), "anka_node_ram_util", metric)
@@ -157,10 +157,10 @@ var ankaNodeMetrics = []NodeMetric{
 			}
 		},
 	},
-	NodeMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_virtual_cpu_count", "Total Virtual CPU cores for the Node", []string{"id", "name"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric(len(nodes), "anka_node_virtual_cpu_count", metric)
@@ -171,10 +171,10 @@ var ankaNodeMetrics = []NodeMetric{
 			}
 		},
 	},
-	NodeMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_virtual_ram_gb", "Total Virtual RAM for the Node in GB", []string{"id", "name"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric(len(nodes), "anka_node_virtual_ram_gb", metric)

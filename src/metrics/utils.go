@@ -28,11 +28,11 @@ func intMapFromStringSlice(stringSlice []string) map[string]int {
 }
 
 func uniqueThisStringArray(arr []string) []string {
-	occured := map[string]bool{}
-	result := []string{}
+	occurred := map[string]bool{}
+	var result []string
 	for e := range arr {
-		if occured[arr[e]] != true {
-			occured[arr[e]] = true
+		if !occurred[arr[e]] {
+			occurred[arr[e]] = true
 			result = append(result, arr[e])
 		}
 	}
@@ -40,11 +40,11 @@ func uniqueThisStringArray(arr []string) []string {
 }
 
 func uniqueNodeGroupsArray(arr []types.NodeGroup) []types.NodeGroup {
-	occured := map[types.NodeGroup]bool{}
-	result := []types.NodeGroup{}
+	occurred := map[types.NodeGroup]bool{}
+	var result []types.NodeGroup
 	for e := range arr {
-		if occured[arr[e]] != true {
-			occured[arr[e]] = true
+		if !occurred[arr[e]] {
+			occurred[arr[e]] = true
 			result = append(result, arr[e])
 		}
 	}
@@ -71,7 +71,7 @@ func CreateGaugeMetricVec(name string, help string, labels []string) *prometheus
 func ConvertToNodeData(d interface{}) ([]types.Node, error) {
 	data, ok := d.([]types.Node)
 	if !ok {
-		return nil, fmt.Errorf("could not convert incoming data to required node information. original data: ", d)
+		return nil, fmt.Errorf("could not convert incoming data to required node information. original data: %v", d)
 	}
 	return data, nil
 }
@@ -79,7 +79,7 @@ func ConvertToNodeData(d interface{}) ([]types.Node, error) {
 func ConvertToRegistryDiskData(d interface{}) (*types.RegistryDisk, error) {
 	data, ok := d.(types.RegistryDisk)
 	if !ok {
-		return nil, fmt.Errorf("could not convert incoming data to required registry disk information. original data: ", d)
+		return nil, fmt.Errorf("could not convert incoming data to required registry disk information. original data: %v", d)
 	}
 	return &data, nil
 }
@@ -87,7 +87,7 @@ func ConvertToRegistryDiskData(d interface{}) (*types.RegistryDisk, error) {
 func ConvertToRegistryTemplatesData(d interface{}) ([]types.Template, error) {
 	data, ok := d.([]types.Template)
 	if !ok {
-		return nil, fmt.Errorf("could not convert incoming data to required registry template information. original data: ", d)
+		return nil, fmt.Errorf("could not convert incoming data to required registry template information. original data: %v", d)
 	}
 	return data, nil
 }
@@ -95,7 +95,7 @@ func ConvertToRegistryTemplatesData(d interface{}) ([]types.Template, error) {
 func ConvertToInstancesData(d interface{}) ([]types.Instance, error) {
 	data, ok := d.([]types.Instance)
 	if !ok {
-		return nil, fmt.Errorf("could not convert incoming data to required instances information. original data: ", d)
+		return nil, fmt.Errorf("could not convert incoming data to required instances information. original data: %v", d)
 	}
 	return data, nil
 }
@@ -116,7 +116,7 @@ func ConvertMetricToGaugeVec(m prometheus.Collector) (*prometheus.GaugeVec, erro
 	return data, nil
 }
 
-const DEFAULT_REFRESH_METRIC_SECONDS = 600
+const DefaultRefreshMetricSeconds = 600
 
 var mutex = &sync.Mutex{}
 var lastRefreshTime int64
@@ -128,7 +128,7 @@ func checkAndHandleReset(count int, metricName string) bool {
 	mutex.Unlock()
 	if ok { // Check if key exists
 		// Check if the count has changed OR if the lastRefreshTime is Greater Than or Eq to 10 minutes
-		if val != 0 && (count != val || (time.Now().Unix()-atomic.LoadInt64(&lastRefreshTime)) >= DEFAULT_REFRESH_METRIC_SECONDS) {
+		if val != 0 && (count != val || (time.Now().Unix()-atomic.LoadInt64(&lastRefreshTime)) >= DefaultRefreshMetricSeconds) {
 			mutex.Lock()
 			delete(metricCountMap, metricName)
 			mutex.Unlock()

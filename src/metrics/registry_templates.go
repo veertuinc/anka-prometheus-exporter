@@ -34,7 +34,7 @@ var ankaRegistryTemplatesMetrics = []RegistryTemplatesMetric{
 	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetric("anka_registry_template_count", "Count of VM Templates in the Registry"),
-			event:  events.EVENT_REGISTRY_TEMPLATES_UPDATED,
+			event:  events.EventRegistryTemplatesUpdated,
 		},
 		HandleData: func(templates []types.Template, metric prometheus.Gauge) {
 			metric.Set(float64(len(templates)))

@@ -73,12 +73,12 @@ type DefaultResponse struct {
 	Message string `json:"message"`
 }
 
-func (this *DefaultResponse) GetStatus() string {
-	return this.Status
+func (r *DefaultResponse) GetStatus() string {
+	return r.Status
 }
 
-func (this *DefaultResponse) GetMessage() string {
-	return this.Message
+func (r *DefaultResponse) GetMessage() string {
+	return r.Message
 }
 
 type NodesResponse struct {
@@ -86,8 +86,8 @@ type NodesResponse struct {
 	Body []Node `json:"body,omitempty"`
 }
 
-func (this *NodesResponse) GetBody() interface{} {
-	return this.Body
+func (r *NodesResponse) GetBody() interface{} {
+	return r.Body
 }
 
 type RegistryDiskResponse struct {
@@ -95,8 +95,8 @@ type RegistryDiskResponse struct {
 	Body RegistryDisk `json:"body,omitempty"`
 }
 
-func (this *RegistryDiskResponse) GetBody() interface{} {
-	return this.Body
+func (r *RegistryDiskResponse) GetBody() interface{} {
+	return r.Body
 }
 
 type Template struct {
@@ -110,8 +110,8 @@ type RegistryTemplateResponse struct {
 	Body []Template `json:"body,omitempty"`
 }
 
-func (this *RegistryTemplateResponse) GetBody() interface{} {
-	return this.Body
+func (r *RegistryTemplateResponse) GetBody() interface{} {
+	return r.Body
 }
 
 type TemplateTag struct {
@@ -127,8 +127,8 @@ type RegistryTemplateTagsResponse struct {
 	Body RegistryTemplateTags `json:"body,omitempty"`
 }
 
-func (this *RegistryTemplateTagsResponse) GetBody() interface{} {
-	return this.Body
+func (r *RegistryTemplateTagsResponse) GetBody() interface{} {
+	return r.Body
 }
 
 type InstancesResponse struct {
@@ -136,6 +136,6 @@ type InstancesResponse struct {
 	Body []Instance `json:"body,omitempty"`
 }
 
-func (this *InstancesResponse) GetBody() interface{} {
-	return this.Body
+func (r *InstancesResponse) GetBody() interface{} {
+	return r.Body
 }

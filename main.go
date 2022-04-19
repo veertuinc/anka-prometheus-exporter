@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	DEFAULT_INTERVAL_SECONDS = 15
+	DefaultIntervalSeconds = 15
 )
 
 var (
@@ -21,8 +21,7 @@ var (
 )
 
 func main() {
-
-	var log = log.GetLogger()
+	var logger = log.GetLogger()
 
 	var controllerAddress string
 	var intervalSeconds int
@@ -35,7 +34,7 @@ func main() {
 	var useTLS bool
 
 	flag.StringVar(&controllerAddress, "controller-address", "", "Controller address to monitor (url as arg) (required)")
-	flag.IntVar(&intervalSeconds, "interval", DEFAULT_INTERVAL_SECONDS, "Seconds to wait between data requests to controller (int as arg)")
+	flag.IntVar(&intervalSeconds, "interval", DefaultIntervalSeconds, "Seconds to wait between data requests to controller (int as arg)")
 	flag.IntVar(&port, "port", 2112, "Port to server /metrics endpoint (int as arg)")
 	flag.BoolVar(&disableOptimizeInterval, "disable-interval-optimizer", false, "Optimize interval according to /metric api requests receieved (no args)")
 	flag.BoolVar(&useTLS, "tls", false, "Enable TLS (no args)")
@@ -46,7 +45,7 @@ func main() {
 
 	envPrefix := "ANKA_PROMETHEUS_EXPORTER_"
 	envflag.StringVar(&controllerAddress, "CONTROLLER_ADDRESS", "", "Controller address to monitor (url as arg) (required)")
-	envflag.IntVar(&intervalSeconds, "INTERVAL", DEFAULT_INTERVAL_SECONDS, "Seconds to wait between data requests to controller (int as arg)")
+	envflag.IntVar(&intervalSeconds, "INTERVAL", DefaultIntervalSeconds, "Seconds to wait between data requests to controller (int as arg)")
 	envflag.IntVar(&port, "PORT", 2112, "Port to server /metrics endpoint (int as arg)")
 	envflag.BoolVar(&disableOptimizeInterval, "DISABLE_INTERVAL_OPTIMIZER", false, "Optimize interval according to /metric api requests receieved (no args)")
 	envflag.BoolVar(&useTLS, "TLS", false, "Enable TLS (no args)")
@@ -58,14 +57,14 @@ func main() {
 	envflag.ParsePrefix(envPrefix)
 
 	if controllerAddress == "" {
-		log.Fatalf(fmt.Errorf("controller address not supplied (%sCONTROLLER_ADDRESS=\"http://{address}:{port}\" or --controller-address http://{address}:{port})", envPrefix).Error())
+		logger.Fatalf(fmt.Errorf("controller address not supplied (%sCONTROLLER_ADDRESS=\"http://{address}:{port}\" or --controller-address http://{address}:{port})", envPrefix).Error())
 	}
 
 	if len(flag.Args()) > 0 {
-		log.Fatalf("one of your flags included a value when one wasn't needed: %s", flag.Args()[0])
+		logger.Fatalf("one of your flags included a value when one wasn't needed: %s", flag.Args()[0])
 	}
 
-	log.Infof("Starting Prometheus Exporter for Anka (%s)", version)
+	logger.Infof("Starting Prometheus Exporter for Anka (%s)", version)
 
 	clientTLSCerts := client.TLSCerts{
 		UseTLS:              useTLS,
@@ -77,7 +76,7 @@ func main() {
 
 	client, err := client.NewClient(controllerAddress, intervalSeconds, clientTLSCerts)
 	if err != nil {
-		log.Fatalf(err.Error())
+		logger.Fatalf(err.Error())
 	}
 	client.Init()
 
@@ -85,8 +84,8 @@ func main() {
 
 	// Create each metric that we later populate
 	for _, m := range metrics.MetricsHolder {
-		prometheusRegistry.Register(m.GetPrometheusMetric())
-		client.Register(m.GetEvent(), m.GetEventHandler())
+		prometheusRegistry.Register(m.GetPrometheusMetric()) // TODO: error should be handled here
+		client.Register(m.GetEvent(), m.GetEventHandler())   // TODO: error should be handled here
 	}
 
 	srv := server.NewServer(prometheusRegistry, port)

@@ -1,15 +1,15 @@
 package client
 
 import (
-	"crypto/x509"
 	"crypto/tls"
-	"net/http"
-	"io/ioutil"
+	"crypto/x509"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 )
 
 type TLSCerts struct {
-	UseTLS				bool
+	UseTLS              bool
 	ClientCert          string
 	ClientCertKey       string
 	CACert              string
@@ -23,7 +23,7 @@ func appendRootCert(certFilePath string, caCertPool *x509.CertPool) error {
 	}
 	ok := caCertPool.AppendCertsFromPEM(cert)
 	if !ok {
-		return fmt.Errorf("Could not add %v to Root Certificates", certFilePath)
+		return fmt.Errorf("could not add %v to Root Certificates", certFilePath)
 	}
 	return nil
 }
@@ -54,8 +54,8 @@ func setUpTLS(certs TLSCerts) error {
 	}
 
 	tlsConfig := &tls.Config{
-		Certificates:  certificates,
-		RootCAs:       caCertPool,
+		Certificates: certificates,
+		RootCAs:      caCertPool,
 	}
 	if certs.SkipTLSVerification {
 		tlsConfig.InsecureSkipVerify = true
@@ -63,5 +63,4 @@ func setUpTLS(certs TLSCerts) error {
 
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = tlsConfig
 	return nil
-	
 }

@@ -22,7 +22,7 @@ func (this InstanceStateMetric) GetEventHandler() func(interface{}) error {
 		}
 		var stateIntMap = intMapFromStringSlice(types.InstanceStates)
 		for _, instance := range instances {
-			stateIntMap[instance.Vm.State] = stateIntMap[instance.Vm.State] + 1
+			stateIntMap[instance.Vm.State]++
 		}
 		for _, state := range types.InstanceStates {
 			metric.With(prometheus.Labels{"state": state}).Set(float64(stateIntMap[state]))
@@ -35,7 +35,6 @@ func init() { // runs on exporter init only (updates are made with the above Eve
 
 	AddMetric(InstanceStateMetric{BaseAnkaMetric{
 		metric: CreateGaugeMetricVec("anka_instance_state_count", "Count of Instances in a particular State (label: state)", []string{"state"}),
-		event:  events.EVENT_VM_DATA_UPDATED,
+		event:  events.EventVmDataUpdated,
 	}})
-
 }

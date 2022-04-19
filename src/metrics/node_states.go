@@ -31,25 +31,25 @@ func (this NodeStatesMetric) GetEventHandler() func(interface{}) error {
 }
 
 var ankaNodeStatesMetrics = []NodeStatesMetric{
-	NodeStatesMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_states_count", "Count of Nodes in a particular State (label: state)", []string{"state"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, metric *prometheus.GaugeVec) {
 			var stateIntMap = intMapFromStringSlice(types.NodeStates)
 			for _, node := range nodes {
-				stateIntMap[node.State] = stateIntMap[node.State] + 1
+				stateIntMap[node.State]++
 			}
 			for _, state := range types.NodeStates {
 				metric.With(prometheus.Labels{"state": state}).Set(float64(stateIntMap[state]))
 			}
 		},
 	},
-	NodeStatesMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_states", "Node state (1 = current state) (label: id, name, state)", []string{"id", "name", "state"}),
-			event:  events.EVENT_NODE_UPDATED,
+			event:  events.EventNodeUpdated,
 		},
 		HandleData: func(nodes []types.Node, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGuageVecMetric(len(nodes), "anka_node_states", metric)
