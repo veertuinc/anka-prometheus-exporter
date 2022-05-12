@@ -4,7 +4,7 @@
 
 This package retrieves data from your [Anka Build Cloud](https://veertu.com) and exports it for Prometheus at http://localhost/metrics.
 
-## Usage 
+## Usage
 
 ### Available ENVs
 
@@ -12,35 +12,35 @@ This package retrieves data from your [Anka Build Cloud](https://veertu.com) and
 
 | ENV | Flag |
 | --- | ---  |
-| ANKA_PROMETHEUS_EXPORTER_CONTROLLER_ADDRESS | --controller-address |
-| ANKA_PROMETHEUS_EXPORTER_INTERVAL | --interval |
-| ANKA_PROMETHEUS_EXPORTER_PORT | --port |
-| ANKA_PROMETHEUS_EXPORTER_DISABLE_INTERVAL_OPTIMIZER | --disable-interval-optimizer |
-| ANKA_PROMETHEUS_EXPORTER_TLS | -tls |
-| ANKA_PROMETHEUS_EXPORTER_SKIP_TLS_VERIFICATION | --skip-tls-verification |
-| ANKA_PROMETHEUS_EXPORTER_CA_CERT | --ca-cert |
-| ANKA_PROMETHEUS_EXPORTER_CLIENT_CERT | --client-cert |
-| ANKA_PROMETHEUS_EXPORTER_CLIENT_CERT_KEY | --client-cert-key |
+| ANKA_PROMETHEUS_EXPORTER_CONTROLLER_ADDRESS (string) | --controller-address (string) |
+| ANKA_PROMETHEUS_EXPORTER_INTERVAL (int) | --interval (int) |
+| ANKA_PROMETHEUS_EXPORTER_PORT (int) | --port (int) |
+| ANKA_PROMETHEUS_EXPORTER_DISABLE_INTERVAL_OPTIMIZER (bool) | --disable-interval-optimizer |
+| ANKA_PROMETHEUS_EXPORTER_TLS (bool) | --tls |
+| ANKA_PROMETHEUS_EXPORTER_SKIP_TLS_VERIFICATION (bool) | --skip-tls-verification |
+| ANKA_PROMETHEUS_EXPORTER_CA_CERT (string) | --ca-cert (string) |
+| ANKA_PROMETHEUS_EXPORTER_CLIENT_CERT (string) | --client-cert (string) |
+| ANKA_PROMETHEUS_EXPORTER_CLIENT_CERT_KEY (string) | --client-cert-key (string) |
 
 ```bash
 Usage of anka-prometheus-exporter:
-  --controller-address string
-        Controller address to monitor (url as arg) (required)
-  --ca-cert string
+  -ca-cert string
         Path to ca PEM/x509 file (cert file path as arg)
-  --client-cert string
+  -client-cert string
         Path to client cert PEM/x509 file (cert file path as arg)
-  --client-cert-key string
+  -client-cert-key string
         Path to client key PEM/x509 file (cert file path as arg)
-  --disable-interval-optimizer
+  -controller-address string
+        Controller address to monitor (url as arg) (required)
+  -disable-interval-optimizer
         Optimize interval according to /metric api requests receieved (no args)
-  --interval int
+  -interval int
         Seconds to wait between data requests to controller (int as arg) (default 15)
-  --port int
+  -port int
         Port to server /metrics endpoint (int as arg) (default 2112)
-  --skip-tls-verification
+  -skip-tls-verification
         Skip TLS verification (no args)
-  --tls
+  -tls
         Enable TLS (no args)
 ```
 
@@ -83,6 +83,7 @@ scrape_configs:
 ```
 
 ## Using TLS
+
 The `--tls` flag is not required if your controller certificate is valid and no client authentication is configured.
 For all other TLS configuration options, `--tls` must be set.
 
