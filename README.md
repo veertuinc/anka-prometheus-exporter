@@ -83,6 +83,7 @@ scrape_configs:
 ```
 
 ## Using TLS
+
 The `--tls` flag is not required if your controller certificate is valid and no client authentication is configured.
 For all other TLS configuration options, `--tls` must be set.
 
