@@ -152,8 +152,21 @@ anka_registry_template_tags_count | Count of Tags in the Registry for the Templa
 
 ---
 
-# Development
+## Development
 
 ```bash
 make build-and-run
+```
+
+## Releasing
+
+```bash
+make clean
+make build-mac
+make build-linux
+pushd bin
+  zip -9 anka-prometheus-exporter_v$(cat ../VERSION)_darwin_amd64.zip anka-prometheus-exporter_darwin_amd64
+  zip -9 anka-prometheus-exporter_v$(cat ../VERSION)_linux_amd64.zip anka-prometheus-exporter_linux_amd64
+popd
+docker-build-and-push-scratch
 ```

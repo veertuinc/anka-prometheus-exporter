@@ -24,7 +24,7 @@ build-linux:
 build-mac:
 	GOOS=darwin $(MAKE) build RACE="-race"
 
-docker-build-scratch:
-	$(MAKE) build-linux
-	mv ./bin/$(BIN)_linux_$(ARCH) docker/scratch/
-	docker build ./docker/scratch -t $(BIN)-scratch
+docker-build-and-push-scratch:
+	cp -f ./bin/$(BIN)_linux_$(ARCH) docker/scratch/
+	cd ./docker/scratch && \
+	docker buildx build --platform linux/amd64 -t veertu/$(BIN):latest -t veertu/$(BIN):v$(VERSION) --push .
