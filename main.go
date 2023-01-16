@@ -25,6 +25,8 @@ func main() {
 	var log = log.GetLogger()
 
 	var controllerAddress string
+	var controllerUsername string
+	var controllerPassword string
 	var intervalSeconds int
 	var disableOptimizeInterval bool
 	var port int
@@ -46,6 +48,8 @@ func main() {
 
 	envPrefix := "ANKA_PROMETHEUS_EXPORTER_"
 	envflag.StringVar(&controllerAddress, "CONTROLLER_ADDRESS", "", "Controller address to monitor (url as arg) (required)")
+	envflag.StringVar(&controllerUsername, "CONTROLLER_USERNAME", "", "Controller username (username as arg)")
+	envflag.StringVar(&controllerPassword, "CONTROLLER_PASSWORD", "", "Controller password (password as arg)")
 	envflag.IntVar(&intervalSeconds, "INTERVAL", DEFAULT_INTERVAL_SECONDS, "Seconds to wait between data requests to controller (int as arg)")
 	envflag.IntVar(&port, "PORT", 2112, "Port to server /metrics endpoint (int as arg)")
 	envflag.BoolVar(&disableOptimizeInterval, "DISABLE_INTERVAL_OPTIMIZER", false, "Optimize interval according to /metric api requests received (no args)")
@@ -75,7 +79,7 @@ func main() {
 		SkipTLSVerification: skipTLSVerification,
 	}
 
-	client, err := client.NewClient(controllerAddress, intervalSeconds, clientTLSCerts)
+	client, err := client.NewClient(controllerAddress, controllerUsername, controllerPassword, intervalSeconds, clientTLSCerts)
 	if err != nil {
 		log.Fatalf(err.Error())
 	}

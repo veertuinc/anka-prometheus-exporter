@@ -32,6 +32,10 @@ Usage of anka-prometheus-exporter:
         Path to client key PEM/x509 file (cert file path as arg)
   -controller-address string
         Controller address to monitor (url as arg) (required)
+  -controller-username string
+        Controller username with basic root token (username as arg)
+  -controller-password string
+        Controller password with basic root token (password as arg) 
   -disable-interval-optimizer
         Optimize interval according to /metric api requests receieved (no args)
   -interval int
