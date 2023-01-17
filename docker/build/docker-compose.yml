@@ -22,3 +22,5 @@ services:
       # CA_CERT: "--ca-cert /certs/**ENTER CA CERT FILE NAME HERE**"
       # CLIENT_CERT: "--client-cert /certs/**ENTER CLIENT CERT FILE NAME HERE**"
       # CLIENT_KEY: "--client-cert-key /certs/**ENTER CLIENT KEY FILE NAME HERE**"
+      # CONTROLLER_USERNAME: "--controller-username root"
+      # CONTROLLER_PASSWORD: "--controller-password {PASSWORD HERE}"
