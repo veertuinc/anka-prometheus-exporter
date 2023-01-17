@@ -169,5 +169,5 @@ anka_registry_template_tags_count | Count of Tags in the Registry for the Templa
 # Development
 
 ```bash
-make build-and-run
+make build-and-run ARGUMENTS="--controller-username root --controller-password 1111111111"
 ```
