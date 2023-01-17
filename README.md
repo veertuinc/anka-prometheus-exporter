@@ -92,7 +92,17 @@ The `--tls` flag is not required if your controller certificate is valid and no 
 For all other TLS configuration options, `--tls` must be set.
 
 For self signed certificates, you can either use `--skip-tls-verification` or provide your ca-cert with `--ca-cert`.
-If client authentication is set on the controller, use `--client-cert` and `--client-cert-key`
+
+### Using Auth
+
+- If client authentication is set on the controller, use `--client-cert` and `--client-cert-key`.
+- If RTA is enabled, you can use basic auth through:
+    ```bash
+      -controller-username string
+            Controller username with basic root token (username as arg)
+      -controller-password string
+            Controller password with basic root token (password as arg) 
+    ```
 
 ---
 
