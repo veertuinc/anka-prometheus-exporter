@@ -13,9 +13,11 @@ import (
 
 type Communicator struct {
 	controllerAddress string
+	username          string
+	password          string
 }
 
-func NewCommunicator(addr string, certs TLSCerts) (*Communicator, error) {
+func NewCommunicator(addr, username, password string, certs TLSCerts) (*Communicator, error) {
 
 	if err := setUpTLS(certs); err != nil {
 		return nil, err
@@ -23,12 +25,14 @@ func NewCommunicator(addr string, certs TLSCerts) (*Communicator, error) {
 
 	return &Communicator{
 		controllerAddress: addr,
+		username:          username,
+		password:          password,
 	}, nil
 }
 
 func (this *Communicator) TestConnection() error {
 	endpoint := "/api/v1/status"
-	r, err := this.getResponse(endpoint)
+	r, err := this.getResponse(endpoint, this.username, this.password)
 	if err != nil {
 		return err
 	}
@@ -115,7 +119,7 @@ func (this *Communicator) GetRegistryTemplatesData() (interface{}, error) {
 }
 
 func (this *Communicator) getData(endpoint string, repsObject types.Response) (interface{}, error) {
-	r, err := this.getResponse(endpoint)
+	r, err := this.getResponse(endpoint, this.username, this.password)
 	if err != nil {
 		return nil, err
 	}
@@ -133,9 +137,15 @@ func (this *Communicator) getData(endpoint string, repsObject types.Response) (i
 	return repsObject.GetBody(), nil
 }
 
-func (this *Communicator) getResponse(endpoint string) (*http.Response, error) {
+func (this *Communicator) getResponse(endpoint, username, password string) (*http.Response, error) {
 	url := fmt.Sprintf("%s%s", this.controllerAddress, endpoint)
-	r, err := http.Get(url)
+	req, err := http.NewRequest("GET", url, http.NoBody)
+
+	// set auth
+	if username != "" && password != "" {
+		req.SetBasicAuth(username, password)
+	}
+	r, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
