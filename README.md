@@ -6,6 +6,8 @@ This package retrieves data from your [Anka Build Cloud](https://veertu.com) and
 
 ## Usage
 
+Ensure you have a functioning Prometheus instance before using this.
+
 ### Available ENVs
 
 > ENVs take priority over flags
@@ -51,6 +53,7 @@ Usage of anka-prometheus-exporter:
 > `LOG_LEVEL` can be set using an environment variable
 
 ### Using the Binary
+
 1. [Download the appropriate binary (anka-prometheus-exporter) from the releases page](https://github.com/veertuinc/anka-prometheus-exporter/releases)
 2. Execute: `./anka-prometheus-exporter --controller_address http://{controller IP or URL}`
 
@@ -76,7 +79,7 @@ services:
 
 Once running, add the scrape endpoint to your prometheus.yml:
 
-> `host.docker.internal` is only needed if running on the same host as your prometheus container
+> `host.docker.internal` is only needed if running on the same host as your prometheus container and on mac. For linux, use `172.17.0.1`.
 
 ```yaml
 scrape_configs:
