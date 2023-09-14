@@ -25,13 +25,13 @@ func GetState() *State {
 	return state
 }
 
-func (state State) GetTemplatesMap() map[string]types.Template {
+func (state *State) GetTemplatesMap() map[string]types.Template {
 	lock.Lock()
 	defer lock.Unlock()
 	return state.TemplatesMap
 }
 
-func (state State) SetTemplatesMap(templates []types.Template) {
+func (state *State) SetTemplatesMap(templates []types.Template) {
 	lock.Lock()
 	defer lock.Unlock()
 	for _, templateV := range templates {

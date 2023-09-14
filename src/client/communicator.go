@@ -6,10 +6,13 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"sync"
 
 	"github.com/veertuinc/anka-prometheus-exporter/src/state"
 	"github.com/veertuinc/anka-prometheus-exporter/src/types"
 )
+
+var lock = &sync.Mutex{}
 
 type Communicator struct {
 	controllerAddress string
@@ -53,6 +56,8 @@ func (this *Communicator) TestConnection() error {
 }
 
 func (this *Communicator) GetNodesData() (interface{}, error) {
+	lock.Lock()
+	defer lock.Unlock()
 	endpoint := "/api/v1/node"
 	resp := &types.NodesResponse{}
 	d, err := this.getData(endpoint, resp)
@@ -63,6 +68,8 @@ func (this *Communicator) GetNodesData() (interface{}, error) {
 }
 
 func (this *Communicator) GetVmsData() (interface{}, error) {
+	lock.Lock()
+	defer lock.Unlock()
 	endpoint := "/api/v1/vm"
 	resp := &types.InstancesResponse{}
 	d, err := this.getData(endpoint, resp)
@@ -82,6 +89,8 @@ func (this *Communicator) GetVmsData() (interface{}, error) {
 }
 
 func (this *Communicator) GetRegistryDiskData() (interface{}, error) {
+	lock.Lock()
+	defer lock.Unlock()
 	endpoint := "/api/v1/registry/disk"
 	resp := &types.RegistryDiskResponse{}
 	d, err := this.getData(endpoint, resp)
@@ -92,6 +101,8 @@ func (this *Communicator) GetRegistryDiskData() (interface{}, error) {
 }
 
 func (this *Communicator) GetRegistryTemplatesData() (interface{}, error) {
+	lock.Lock()
+	defer lock.Unlock()
 	endpoint := "/api/v1/registry/vm"
 	resp := &types.RegistryTemplateResponse{}
 	templates, err := this.getData(endpoint, resp)
@@ -101,8 +112,11 @@ func (this *Communicator) GetRegistryTemplatesData() (interface{}, error) {
 	templatesArray := templates.([]types.Template)
 	templatesMap := state.GetState().GetTemplatesMap()
 	for i, template := range templatesArray {
+		fmt.Println(template)
+		fmt.Println(templatesMap[template.UUID].Size)
+		fmt.Println(template.Size)
 		if templatesMap[template.UUID].Size != template.Size {
-			endpoint := "/api/v1/registry/vm?apiVer=v1&id=" + template.UUID
+			endpoint := "/api/v1/registry/vm?id=" + template.UUID
 			resp := &types.RegistryTemplateTagsResponse{}
 			tagsData, err := this.getData(endpoint, resp)
 			if err != nil {
