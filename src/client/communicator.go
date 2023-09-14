@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/veertuinc/anka-prometheus-exporter/src/state"
@@ -38,7 +38,7 @@ func (this *Communicator) TestConnection() error {
 	}
 	defer r.Body.Close()
 	resp := &types.DefaultResponse{}
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		return err
 	}
@@ -102,7 +102,7 @@ func (this *Communicator) GetRegistryTemplatesData() (interface{}, error) {
 	templatesMap := state.GetState().GetTemplatesMap()
 	for i, template := range templatesArray {
 		if templatesMap[template.UUID].Size != template.Size {
-			endpoint := "/api/v1/registry/vm?id=" + template.UUID
+			endpoint := "/api/v1/registry/vm?apiVer=v1&id=" + template.UUID
 			resp := &types.RegistryTemplateTagsResponse{}
 			tagsData, err := this.getData(endpoint, resp)
 			if err != nil {
@@ -124,7 +124,7 @@ func (this *Communicator) getData(endpoint string, repsObject types.Response) (i
 		return nil, err
 	}
 	defer r.Body.Close()
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		return nil, err
 	}
