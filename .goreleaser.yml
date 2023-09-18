@@ -9,7 +9,7 @@ before:
 builds:
   # A separated build to run the packer-plugins-check only once for a linux_amd64 binary
   -
-    id: build1
+    id: darwin-amd64
     mod_timestamp: '{{ .CommitTimestamp }}'
     flags:
       - -trimpath #removes all file system paths from the compiled executable
@@ -22,7 +22,7 @@ builds:
     binary: '{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}'
     no_unique_dist_dir: true
   -
-    id: build2
+    id: linux-amd64
     mod_timestamp: '{{ .CommitTimestamp }}'
     flags:
       - -trimpath #removes all file system paths from the compiled executable
@@ -35,7 +35,7 @@ builds:
     binary: '{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}'
     no_unique_dist_dir: true
   -
-    id: build3
+    id: darwin-arm64
     mod_timestamp: '{{ .CommitTimestamp }}'
     flags:
       - -trimpath #removes all file system paths from the compiled executable
@@ -43,6 +43,19 @@ builds:
       - '-s -w -X main.commit={{ .Commit }} -X main.version={{ .Version }}'
     goos:
       - darwin
+    goarch:
+      - arm64
+    binary: '{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+    no_unique_dist_dir: true
+  -
+    id: linux-arm64
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    flags:
+      - -trimpath #removes all file system paths from the compiled executable
+    ldflags:
+      - '-s -w -X main.commit={{ .Commit }} -X main.version={{ .Version }}'
+    goos:
+      - linux
     goarch:
       - arm64
     binary: '{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}'
