@@ -57,7 +57,7 @@ type Instance struct {
 type VmData struct {
 	State        string `json:"instance_state"`
 	TemplateUUID string `json:"vmid"`
-	TemplateNAME string `json:"name"`
+	TemplateName string
 	GroupUUID    string `json:"group_id"`
 	NodeUUID     string `json:"node_id"`
 }

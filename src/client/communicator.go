@@ -83,7 +83,7 @@ func (this *Communicator) GetVmsData() (interface{}, error) {
 		if !ok {
 			continue
 		}
-		instances[i].Vm.TemplateNAME = template.Name
+		instances[i].Vm.TemplateName = template.Name
 	}
 	return instances, nil
 }
@@ -112,9 +112,6 @@ func (this *Communicator) GetRegistryTemplatesData() (interface{}, error) {
 	templatesArray := templates.([]types.Template)
 	templatesMap := state.GetState().GetTemplatesMap()
 	for i, template := range templatesArray {
-		fmt.Println(template)
-		fmt.Println(templatesMap[template.UUID].Size)
-		fmt.Println(template.Size)
 		if templatesMap[template.UUID].Size != template.Size {
 			endpoint := "/api/v1/registry/vm?id=" + template.UUID
 			resp := &types.RegistryTemplateTagsResponse{}

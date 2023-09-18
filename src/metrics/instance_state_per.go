@@ -41,7 +41,7 @@ var ankaInstanceStatePerMetrics = []InstanceStatePerMetric{
 			var instanceTemplatesMap = map[string]string{}
 			for _, instance := range instances {
 				instanceTemplates = append(instanceTemplates, instance.Vm.TemplateUUID)
-				instanceTemplatesMap[instance.Vm.TemplateUUID] = instance.Vm.TemplateNAME
+				instanceTemplatesMap[instance.Vm.TemplateUUID] = instance.Vm.TemplateName
 			}
 			instanceTemplates = uniqueThisStringArray(instanceTemplates)
 			for _, wantedState := range types.InstanceStates {
