@@ -4,6 +4,9 @@ ARCH := $(shell arch)
 ifeq ($(ARCH), i386)
 	ARCH = amd64
 endif
+ifeq ($(ARCH), x86_64)
+	ARCH = amd64
+endif
 OS_TYPE ?= $(shell uname -s | tr '[:upper:]' '[:lower:]')
 
 all: clean go.releaser
