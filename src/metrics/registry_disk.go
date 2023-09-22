@@ -11,17 +11,17 @@ type RegistryDiskMetric struct {
 	HandleData func(*types.RegistryDisk, prometheus.Gauge)
 }
 
-func (this RegistryDiskMetric) GetEventHandler() func(interface{}) error {
+func (rdm RegistryDiskMetric) GetEventHandler() func(interface{}) error {
 	return func(d interface{}) error {
 		registryDiskData, err := ConvertToRegistryDiskData(d)
 		if err != nil {
 			return err
 		}
-		metric, err := ConvertMetricToGauge(this.metric)
+		metric, err := ConvertMetricToGauge(rdm.metric)
 		if err != nil {
 			return err
 		}
-		this.HandleData(
+		rdm.HandleData(
 			registryDiskData,
 			metric,
 		)

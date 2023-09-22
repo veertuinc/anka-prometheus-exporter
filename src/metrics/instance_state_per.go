@@ -11,17 +11,17 @@ type InstanceStatePerMetric struct {
 	HandleData func([]types.Instance, *prometheus.GaugeVec)
 }
 
-func (this InstanceStatePerMetric) GetEventHandler() func(interface{}) error {
+func (ispm InstanceStatePerMetric) GetEventHandler() func(interface{}) error {
 	return func(instancesData interface{}) error {
 		instances, err := ConvertToInstancesData(instancesData)
 		if err != nil {
 			return err
 		}
-		metric, err := ConvertMetricToGaugeVec(this.metric)
+		metric, err := ConvertMetricToGaugeVec(ispm.metric)
 		if err != nil {
 			return err
 		}
-		this.HandleData(
+		ispm.HandleData(
 			instances,
 			metric,
 		)
@@ -30,7 +30,7 @@ func (this InstanceStatePerMetric) GetEventHandler() func(interface{}) error {
 }
 
 var ankaInstanceStatePerMetrics = []InstanceStatePerMetric{
-	InstanceStatePerMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_instance_state_per_template_count", "Count of Instances in a particular state, per Template (label: state, template_uuid, template_name)", []string{"state", "template_uuid", "template_name"}),
 			event:  events.EVENT_VM_DATA_UPDATED,
@@ -62,7 +62,7 @@ var ankaInstanceStatePerMetrics = []InstanceStatePerMetric{
 					}
 				}
 			}
-			checkAndHandleResetOfGuageVecMetric((len(instances) + len(instanceTemplates)), "anka_instance_state_per_template_count", metric)
+			checkAndHandleResetOfGaugeVecMetric((len(instances) + len(instanceTemplates)), "anka_instance_state_per_template_count", metric)
 			for wantedState, wantedStateMap := range InstanceStatePerTemplateCountMap {
 				for wantedTemplateUUID, count := range wantedStateMap {
 					metric.With(prometheus.Labels{"state": wantedState, "template_uuid": wantedTemplateUUID, "template_name": instanceTemplatesMap[wantedTemplateUUID]}).Set(float64(count))
@@ -70,7 +70,7 @@ var ankaInstanceStatePerMetrics = []InstanceStatePerMetric{
 			}
 		},
 	},
-	InstanceStatePerMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_instance_state_per_group_count", "Count of Instances in a particular state, per Group (label: state, group_name)", []string{"state", "group_uuid"}),
 			event:  events.EVENT_VM_DATA_UPDATED,
@@ -102,7 +102,7 @@ var ankaInstanceStatePerMetrics = []InstanceStatePerMetric{
 					}
 				}
 			}
-			checkAndHandleResetOfGuageVecMetric((len(instances) + len(instanceGroups)), "anka_instance_state_per_group_count", metric)
+			checkAndHandleResetOfGaugeVecMetric((len(instances) + len(instanceGroups)), "anka_instance_state_per_group_count", metric)
 			for wantedState, wantedStateMap := range InstanceStatePerGroupCountMap {
 				for wantedGroupUUID, count := range wantedStateMap {
 					metric.With(prometheus.Labels{"state": wantedState, "group_uuid": wantedGroupUUID}).Set(float64(count))
@@ -110,7 +110,7 @@ var ankaInstanceStatePerMetrics = []InstanceStatePerMetric{
 			}
 		},
 	},
-	InstanceStatePerMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_instance_state_per_node_count", "Count of Instances in a particular state, per Node (label: state, node_uuid)", []string{"state", "node_uuid"}),
 			event:  events.EVENT_VM_DATA_UPDATED,
@@ -142,7 +142,7 @@ var ankaInstanceStatePerMetrics = []InstanceStatePerMetric{
 					}
 				}
 			}
-			checkAndHandleResetOfGuageVecMetric((len(instances) + len(instanceNodes)), "anka_instance_state_per_node_count", metric)
+			checkAndHandleResetOfGaugeVecMetric((len(instances) + len(instanceNodes)), "anka_instance_state_per_node_count", metric)
 			for wantedState, wantedStateMap := range InstanceStatePerNodeCountMap {
 				for wantedNodeUUID, count := range wantedStateMap {
 					metric.With(prometheus.Labels{"state": wantedState, "node_uuid": wantedNodeUUID}).Set(float64(count))

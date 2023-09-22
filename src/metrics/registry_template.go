@@ -12,17 +12,17 @@ type RegistryTemplateMetric struct {
 	HandleData func([]types.Template, *prometheus.GaugeVec)
 }
 
-func (this RegistryTemplateMetric) GetEventHandler() func(interface{}) error {
+func (rtm RegistryTemplateMetric) GetEventHandler() func(interface{}) error {
 	return func(d interface{}) error {
 		templates, err := ConvertToRegistryTemplatesData(d)
 		if err != nil {
 			return err
 		}
-		metric, err := ConvertMetricToGaugeVec(this.metric)
+		metric, err := ConvertMetricToGaugeVec(rtm.metric)
 		if err != nil {
 			return err
 		}
-		this.HandleData(
+		rtm.HandleData(
 			templates,
 			metric,
 		)
@@ -37,7 +37,7 @@ var ankaRegistryTemplateMetrics = []RegistryTemplateMetric{
 			event:  events.EVENT_REGISTRY_TEMPLATES_UPDATED,
 		},
 		HandleData: func(templates []types.Template, metric *prometheus.GaugeVec) {
-			checkAndHandleResetOfGuageVecMetric(len(templates), "anka_registry_template_tags_count", metric)
+			checkAndHandleResetOfGaugeVecMetric(len(templates), "anka_registry_template_tags_count", metric)
 			for _, template := range templates {
 				metric.With(prometheus.Labels{"template_uuid": template.UUID, "template_name": template.Name}).Set(float64(len(template.Tags)))
 			}
@@ -49,7 +49,7 @@ var ankaRegistryTemplateMetrics = []RegistryTemplateMetric{
 			event:  events.EVENT_REGISTRY_TEMPLATES_UPDATED,
 		},
 		HandleData: func(templates []types.Template, metric *prometheus.GaugeVec) {
-			checkAndHandleResetOfGuageVecMetric(len(templates), "anka_registry_template_disk_used", metric)
+			checkAndHandleResetOfGaugeVecMetric(len(templates), "anka_registry_template_disk_used", metric)
 			for _, template := range templates {
 				metric.With(prometheus.Labels{"template_uuid": template.UUID, "template_name": template.Name}).Set(float64(template.Size))
 			}
@@ -61,7 +61,7 @@ var ankaRegistryTemplateMetrics = []RegistryTemplateMetric{
 			event:  events.EVENT_REGISTRY_TEMPLATES_UPDATED,
 		},
 		HandleData: func(templates []types.Template, metric *prometheus.GaugeVec) {
-			checkAndHandleResetOfGuageVecMetric(len(templates), "anka_registry_template_tag_disk_used", metric)
+			checkAndHandleResetOfGaugeVecMetric(len(templates), "anka_registry_template_tag_disk_used", metric)
 			for _, template := range templates {
 				for _, tag := range template.Tags {
 					metric.With(prometheus.Labels{"template_uuid": template.UUID, "template_name": template.Name, "tag_name": tag.Name}).Set(float64(tag.Size))

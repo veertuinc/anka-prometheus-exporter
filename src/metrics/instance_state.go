@@ -10,13 +10,13 @@ type InstanceStateMetric struct {
 	BaseAnkaMetric
 }
 
-func (this InstanceStateMetric) GetEventHandler() func(interface{}) error {
+func (ism InstanceStateMetric) GetEventHandler() func(interface{}) error {
 	return func(instancesData interface{}) error {
 		instances, err := ConvertToInstancesData(instancesData)
 		if err != nil {
 			return err
 		}
-		metric, err := ConvertMetricToGaugeVec(this.metric)
+		metric, err := ConvertMetricToGaugeVec(ism.metric)
 		if err != nil {
 			return err
 		}

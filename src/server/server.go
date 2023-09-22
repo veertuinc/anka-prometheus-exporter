@@ -32,40 +32,40 @@ func NewServer(promReg *prometheus.Registry, port int) *Server {
 	}
 }
 
-func (this *Server) Init() {
+func (server *Server) Init() {
 	var log = log.GetLogger()
-	log.Info(fmt.Sprintf("Serving metrics at /metrics and :%d", this.port))
-	http.HandleFunc("/metrics", this.handleRequest())
-	http.ListenAndServe(fmt.Sprintf(":%d", this.port), nil)
+	log.Info(fmt.Sprintf("Serving metrics at /metrics and :%d", server.port))
+	http.HandleFunc("/metrics", server.handleRequest())
+	http.ListenAndServe(fmt.Sprintf(":%d", server.port), nil)
 }
 
-func (this *Server) handleRequest() func(http.ResponseWriter, *http.Request) {
-	handler := promhttp.HandlerFor(this.registry, promhttp.HandlerOpts{})
+func (server *Server) handleRequest() func(http.ResponseWriter, *http.Request) {
+	handler := promhttp.HandlerFor(server.registry, promhttp.HandlerOpts{})
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		if this.intervalChangeFunc != nil {
-			go this.handleInterval()
+		if server.intervalChangeFunc != nil {
+			go server.handleInterval()
 		}
 		handler.ServeHTTP(w, r)
 	}
 }
 
-func (this *Server) handleInterval() {
-	this.lock.Lock()
-	defer this.lock.Unlock()
+func (server *Server) handleInterval() {
+	server.lock.Lock()
+	defer server.lock.Unlock()
 
 	timeStamp := time.Now().Unix()
-	interval := timeStamp - this.lastRequestTime
+	interval := timeStamp - server.lastRequestTime
 
-	if math.Abs(float64(interval-this.lastInterval)) > 1 {
-		this.intervalChangeFunc(interval)
-		this.lastInterval = interval
+	if math.Abs(float64(interval-server.lastInterval)) > 1 {
+		server.intervalChangeFunc(interval)
+		server.lastInterval = interval
 	}
-	this.lastRequestTime = timeStamp
+	server.lastRequestTime = timeStamp
 }
 
-func (this *Server) SetIntervalUpdateFunc(f func(i int64)) {
+func (server *Server) SetIntervalUpdateFunc(f func(i int64)) {
 	if f != nil {
-		this.intervalChangeFunc = f
+		server.intervalChangeFunc = f
 	}
 }

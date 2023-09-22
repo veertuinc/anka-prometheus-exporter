@@ -50,40 +50,40 @@ func NewClient(addr, username, password string, interval int, certs TLSCerts) (*
 	return c, nil
 }
 
-func (this *Client) Init() {
+func (client *Client) Init() {
 	// We must first populate the data from the Controller API that is going to be stored in state before we attempt to create metrics from it
 	// Order matters here since GetVmsData for example relies on RegistryTemplatesData
-	this.communicator.GetRegistryTemplatesData()
-	go this.initDataLoop(this.communicator.GetNodesData, events.EVENT_NODE_UPDATED)
-	go this.initDataLoop(this.communicator.GetVmsData, events.EVENT_VM_DATA_UPDATED)
-	go this.initDataLoop(this.communicator.GetRegistryDiskData, events.EVENT_REGISTRY_DISK_DATA_UPDATED)
-	go this.initDataLoop(this.communicator.GetRegistryTemplatesData, events.EVENT_REGISTRY_TEMPLATES_UPDATED)
+	client.communicator.GetRegistryTemplatesData()
+	go client.initDataLoop(client.communicator.GetNodesData, events.EVENT_NODE_UPDATED)
+	go client.initDataLoop(client.communicator.GetVmsData, events.EVENT_VM_DATA_UPDATED)
+	go client.initDataLoop(client.communicator.GetRegistryDiskData, events.EVENT_REGISTRY_DISK_DATA_UPDATED)
+	go client.initDataLoop(client.communicator.GetRegistryTemplatesData, events.EVENT_REGISTRY_TEMPLATES_UPDATED)
 }
 
-func (this *Client) Register(ev events.Event, eventHandler func(interface{}) error) error {
-	this.eventsMutex.Lock()
-	defer this.eventsMutex.Unlock()
-	val, ok := this.events[ev]
+func (client *Client) Register(ev events.Event, eventHandler func(interface{}) error) error {
+	client.eventsMutex.Lock()
+	defer client.eventsMutex.Unlock()
+	val, ok := client.events[ev]
 	if ok {
-		this.events[ev] = append(val, eventHandler)
+		client.events[ev] = append(val, eventHandler)
 	} else {
-		return fmt.Errorf("no such event id: ", ev)
+		return fmt.Errorf("no such event id: %v", ev)
 	}
 	return nil
 }
 
-func (this *Client) UpdateInterval(i int64) {
+func (client *Client) UpdateInterval(i int64) {
 	if i > 1 {
 		if i > MAX_INTERVAL_SECONDS {
-			atomic.StoreInt64(&this.timeoutSeconds, MAX_INTERVAL_SECONDS)
+			atomic.StoreInt64(&client.timeoutSeconds, MAX_INTERVAL_SECONDS)
 		} else {
-			atomic.StoreInt64(&this.timeoutSeconds, i-1)
+			atomic.StoreInt64(&client.timeoutSeconds, i-1)
 		}
 	}
 }
 
 // Loops over each eventHandler inside of the metrics/metric_*.go files and populates the values for each metric
-func (this *Client) initDataLoop(f func() (interface{}, error), ev events.Event) {
+func (client *Client) initDataLoop(f func() (interface{}, error), ev events.Event) {
 	var log = log.GetLogger()
 	for {
 		if log.GetLevel().String() == "debug" {
@@ -92,17 +92,17 @@ func (this *Client) initDataLoop(f func() (interface{}, error), ev events.Event)
 		data, err := f()
 		if err != nil {
 			log.Errorf("could not get data: %+v", err)
-			time.Sleep(time.Duration(this.errorTimeoutSeconds) * time.Second)
+			time.Sleep(time.Duration(client.errorTimeoutSeconds) * time.Second)
 			continue
 		}
-		this.eventsMutex.Lock()
-		events := this.events[ev]
-		this.eventsMutex.Unlock()
+		client.eventsMutex.Lock()
+		events := client.events[ev]
+		client.eventsMutex.Unlock()
 		for _, eventHandler := range events {
 			if err := eventHandler(data); err != nil {
 				log.Errorf("ignoring event handler failure for event id %+v - Error: %+v", ev, err)
 			}
 		}
-		time.Sleep(time.Duration(atomic.LoadInt64(&this.timeoutSeconds)) * time.Second)
+		time.Sleep(time.Duration(atomic.LoadInt64(&client.timeoutSeconds)) * time.Second)
 	}
 }

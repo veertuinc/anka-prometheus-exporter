@@ -22,16 +22,16 @@ var InstanceStates = []string{
 type Node struct {
 	NodeID         string      `json:"node_id"`
 	NodeName       string      `json:"node_name"`
-	CPU            uint        `json:"cpu_count,omitempty"`
-	RAM            uint        `json:"ram,omitempty"`
-	VMCount        uint        `json:"vm_count,omitempty"`
-	UsedVCPUCount  uint        `json:"vcpu_count,omitempty"`
-	UsedVRAM       uint        `json:"vram,omitempty"`
-	CPUUtilization float32     `json:"cpu_util,omitempty"`
-	RAMUtilization float32     `json:"ram_util,omitempty"`
-	FreeDiskSpace  uint        `json:"free_disk_space,omitempty"`
-	AnkaDiskUsage  uint        `json:"anka_disk_usage,omitempty"`
-	DiskSize       uint        `json:"disk_size,omitempty"`
+	CPU            uint        `json:"cpu_count"`
+	RAM            uint        `json:"ram"`
+	VMCount        uint        `json:"vm_count"`
+	UsedVCPUCount  uint        `json:"vcpu_count"`
+	UsedVRAM       uint        `json:"vram"`
+	CPUUtilization float64     `json:"cpu_util"`
+	RAMUtilization float64     `json:"ram_util"`
+	FreeDiskSpace  uint        `json:"free_disk_space"`
+	AnkaDiskUsage  uint        `json:"anka_disk_usage"`
+	DiskSize       uint        `json:"disk_size"`
 	State          string      `json:"state"`
 	Capacity       uint        `json:"capacity"`
 	Groups         []NodeGroup `json:"groups"`
@@ -73,30 +73,30 @@ type DefaultResponse struct {
 	Message string `json:"message"`
 }
 
-func (this *DefaultResponse) GetStatus() string {
-	return this.Status
+func (dr *DefaultResponse) GetStatus() string {
+	return dr.Status
 }
 
-func (this *DefaultResponse) GetMessage() string {
-	return this.Message
+func (dr *DefaultResponse) GetMessage() string {
+	return dr.Message
 }
 
 type NodesResponse struct {
 	DefaultResponse
-	Body []Node `json:"body,omitempty"`
+	Body []Node `json:"body"`
 }
 
-func (this *NodesResponse) GetBody() interface{} {
-	return this.Body
+func (nr *NodesResponse) GetBody() interface{} {
+	return nr.Body
 }
 
 type RegistryDiskResponse struct {
 	DefaultResponse
-	Body RegistryDisk `json:"body,omitempty"`
+	Body RegistryDisk `json:"body"`
 }
 
-func (this *RegistryDiskResponse) GetBody() interface{} {
-	return this.Body
+func (rdr *RegistryDiskResponse) GetBody() interface{} {
+	return rdr.Body
 }
 
 type Template struct {
@@ -107,11 +107,11 @@ type Template struct {
 }
 type RegistryTemplateResponse struct {
 	DefaultResponse
-	Body []Template `json:"body,omitempty"`
+	Body []Template `json:"body"`
 }
 
-func (this *RegistryTemplateResponse) GetBody() interface{} {
-	return this.Body
+func (rtr *RegistryTemplateResponse) GetBody() interface{} {
+	return rtr.Body
 }
 
 type TemplateTag struct {
@@ -120,22 +120,22 @@ type TemplateTag struct {
 }
 
 type RegistryTemplateTags struct {
-	Versions []TemplateTag `json:"versions,omitempty"`
+	Versions []TemplateTag `json:"versions"`
 }
 type RegistryTemplateTagsResponse struct {
 	DefaultResponse
-	Body RegistryTemplateTags `json:"body,omitempty"`
+	Body RegistryTemplateTags `json:"body"`
 }
 
-func (this *RegistryTemplateTagsResponse) GetBody() interface{} {
-	return this.Body
+func (rttr *RegistryTemplateTagsResponse) GetBody() interface{} {
+	return rttr.Body
 }
 
 type InstancesResponse struct {
 	DefaultResponse
-	Body []Instance `json:"body,omitempty"`
+	Body []Instance `json:"body"`
 }
 
-func (this *InstancesResponse) GetBody() interface{} {
-	return this.Body
+func (ir *InstancesResponse) GetBody() interface{} {
+	return ir.Body
 }

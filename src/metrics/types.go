@@ -16,10 +16,10 @@ type BaseAnkaMetric struct {
 	metric prometheus.Collector
 }
 
-func (this BaseAnkaMetric) GetEvent() events.Event {
-	return this.event
+func (bam BaseAnkaMetric) GetEvent() events.Event {
+	return bam.event
 }
 
-func (this BaseAnkaMetric) GetPrometheusMetric() prometheus.Collector {
-	return this.metric
+func (bam BaseAnkaMetric) GetPrometheusMetric() prometheus.Collector {
+	return bam.metric
 }
