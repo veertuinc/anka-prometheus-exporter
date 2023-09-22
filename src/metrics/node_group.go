@@ -275,7 +275,7 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 				for _, node := range nodes {
 					for _, group := range node.Groups {
 						if group.Id == focusGroup.Id {
-							count = count + node.VCPUCount
+							count = count + node.UsedVCPUCount
 						}
 					}
 				}
@@ -295,7 +295,7 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 				for _, node := range nodes {
 					for _, group := range node.Groups {
 						if group.Id == focusGroup.Id {
-							count = count + node.VRAM
+							count = count + node.UsedVRAM
 						}
 					}
 				}

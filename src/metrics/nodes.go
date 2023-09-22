@@ -158,26 +158,26 @@ var ankaNodesMetrics = []NodesMetric{
 	},
 	NodesMetric{
 		BaseAnkaMetric: BaseAnkaMetric{
-			metric: CreateGaugeMetric("anka_nodes_virtual_cpu_count", "Total Virtual CPU cores across all Nodes"),
+			metric: CreateGaugeMetric("anka_nodes_used_virtual_cpu_count", "Total Used Virtual CPU cores across all Nodes"),
 			event:  events.EVENT_NODE_UPDATED,
 		},
 		HandleData: func(nodes []types.Node, metric prometheus.Gauge) {
 			var count uint = 0
 			for _, node := range nodes { // For each node
-				count = count + node.VCPUCount
+				count = count + node.UsedVCPUCount
 			}
 			metric.Set(float64(count))
 		},
 	},
 	NodesMetric{
 		BaseAnkaMetric: BaseAnkaMetric{
-			metric: CreateGaugeMetric("anka_nodes_virtual_ram_gb", "Total Virtual RAM across all Nodes"),
+			metric: CreateGaugeMetric("anka_nodes_used_virtual_ram_gb", "Total Used Virtual RAM across all Nodes"),
 			event:  events.EVENT_NODE_UPDATED,
 		},
 		HandleData: func(nodes []types.Node, metric prometheus.Gauge) {
 			var count uint = 0
 			for _, node := range nodes { // For each node
-				count = count + node.VRAM
+				count = count + node.UsedVRAM
 			}
 			metric.Set(float64(count))
 		},

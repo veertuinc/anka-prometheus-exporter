@@ -25,8 +25,8 @@ type Node struct {
 	CPU            uint        `json:"cpu_count,omitempty"`
 	RAM            uint        `json:"ram,omitempty"`
 	VMCount        uint        `json:"vm_count,omitempty"`
-	VCPUCount      uint        `json:"vcpu_count,omitempty"`
-	VRAM           uint        `json:"vram,omitempty"`
+	UsedVCPUCount  uint        `json:"vcpu_count,omitempty"`
+	UsedVRAM       uint        `json:"vram,omitempty"`
 	CPUUtilization float32     `json:"cpu_util,omitempty"`
 	RAMUtilization float32     `json:"ram_util,omitempty"`
 	FreeDiskSpace  uint        `json:"free_disk_space,omitempty"`
