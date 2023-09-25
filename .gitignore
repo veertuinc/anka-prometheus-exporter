@@ -1,4 +1,5 @@
 bin/*
 .DS_Store
 dist/
-anka-prometheus-exporter_linux_amd64
+anka-prometheus-exporter_linux*
+anka-prometheus-exporter_darwin*
