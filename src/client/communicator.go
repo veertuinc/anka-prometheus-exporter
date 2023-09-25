@@ -4,12 +4,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
+	"sync"
 
 	"github.com/veertuinc/anka-prometheus-exporter/src/state"
 	"github.com/veertuinc/anka-prometheus-exporter/src/types"
 )
+
+var lock = &sync.Mutex{}
 
 type Communicator struct {
 	controllerAddress string
@@ -30,15 +33,15 @@ func NewCommunicator(addr, username, password string, certs TLSCerts) (*Communic
 	}, nil
 }
 
-func (this *Communicator) TestConnection() error {
+func (comm *Communicator) TestConnection() error {
 	endpoint := "/api/v1/status"
-	r, err := this.getResponse(endpoint, this.username, this.password)
+	r, err := comm.getResponse(endpoint, comm.username, comm.password)
 	if err != nil {
 		return err
 	}
 	defer r.Body.Close()
 	resp := &types.DefaultResponse{}
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		return err
 	}
@@ -52,20 +55,24 @@ func (this *Communicator) TestConnection() error {
 	}
 }
 
-func (this *Communicator) GetNodesData() (interface{}, error) {
+func (comm *Communicator) GetNodesData() (interface{}, error) {
+	lock.Lock()
+	defer lock.Unlock()
 	endpoint := "/api/v1/node"
 	resp := &types.NodesResponse{}
-	d, err := this.getData(endpoint, resp)
+	d, err := comm.getData(endpoint, resp)
 	if err != nil {
 		return nil, fmt.Errorf("getting node data error: %s", err)
 	}
 	return d, nil
 }
 
-func (this *Communicator) GetVmsData() (interface{}, error) {
+func (comm *Communicator) GetVmsData() (interface{}, error) {
+	lock.Lock()
+	defer lock.Unlock()
 	endpoint := "/api/v1/vm"
 	resp := &types.InstancesResponse{}
-	d, err := this.getData(endpoint, resp)
+	d, err := comm.getData(endpoint, resp)
 	if err != nil {
 		return nil, fmt.Errorf("getting vms data error: %s", err)
 	}
@@ -76,25 +83,29 @@ func (this *Communicator) GetVmsData() (interface{}, error) {
 		if !ok {
 			continue
 		}
-		instances[i].Vm.TemplateNAME = template.Name
+		instances[i].Vm.TemplateName = template.Name
 	}
 	return instances, nil
 }
 
-func (this *Communicator) GetRegistryDiskData() (interface{}, error) {
+func (comm *Communicator) GetRegistryDiskData() (interface{}, error) {
+	lock.Lock()
+	defer lock.Unlock()
 	endpoint := "/api/v1/registry/disk"
 	resp := &types.RegistryDiskResponse{}
-	d, err := this.getData(endpoint, resp)
+	d, err := comm.getData(endpoint, resp)
 	if err != nil {
 		return nil, fmt.Errorf("getting registry disk data error: %s", err)
 	}
 	return d, nil
 }
 
-func (this *Communicator) GetRegistryTemplatesData() (interface{}, error) {
+func (comm *Communicator) GetRegistryTemplatesData() (interface{}, error) {
+	lock.Lock()
+	defer lock.Unlock()
 	endpoint := "/api/v1/registry/vm"
 	resp := &types.RegistryTemplateResponse{}
-	templates, err := this.getData(endpoint, resp)
+	templates, err := comm.getData(endpoint, resp)
 	if err != nil {
 		return nil, fmt.Errorf("getting registry templates error: %s", err)
 	}
@@ -104,7 +115,7 @@ func (this *Communicator) GetRegistryTemplatesData() (interface{}, error) {
 		if templatesMap[template.UUID].Size != template.Size {
 			endpoint := "/api/v1/registry/vm?id=" + template.UUID
 			resp := &types.RegistryTemplateTagsResponse{}
-			tagsData, err := this.getData(endpoint, resp)
+			tagsData, err := comm.getData(endpoint, resp)
 			if err != nil {
 				return nil, fmt.Errorf("getting registry template %s/%s tags error: %s", template.UUID, template.Name, err)
 			}
@@ -118,13 +129,13 @@ func (this *Communicator) GetRegistryTemplatesData() (interface{}, error) {
 	return templatesArray, nil
 }
 
-func (this *Communicator) getData(endpoint string, repsObject types.Response) (interface{}, error) {
-	r, err := this.getResponse(endpoint, this.username, this.password)
+func (comm *Communicator) getData(endpoint string, repsObject types.Response) (interface{}, error) {
+	r, err := comm.getResponse(endpoint, comm.username, comm.password)
 	if err != nil {
 		return nil, err
 	}
 	defer r.Body.Close()
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -137,10 +148,12 @@ func (this *Communicator) getData(endpoint string, repsObject types.Response) (i
 	return repsObject.GetBody(), nil
 }
 
-func (this *Communicator) getResponse(endpoint, username, password string) (*http.Response, error) {
-	url := fmt.Sprintf("%s%s", this.controllerAddress, endpoint)
+func (comm *Communicator) getResponse(endpoint, username, password string) (*http.Response, error) {
+	url := fmt.Sprintf("%s%s", comm.controllerAddress, endpoint)
 	req, err := http.NewRequest("GET", url, http.NoBody)
-
+	if err != nil {
+		return nil, err
+	}
 	// set auth
 	if username != "" && password != "" {
 		req.SetBasicAuth(username, password)

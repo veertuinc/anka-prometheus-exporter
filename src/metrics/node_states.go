@@ -12,17 +12,17 @@ type NodeStatesMetric struct {
 	HandleData func([]types.Node, *prometheus.GaugeVec)
 }
 
-func (this NodeStatesMetric) GetEventHandler() func(interface{}) error {
+func (nsm NodeStatesMetric) GetEventHandler() func(interface{}) error {
 	return func(d interface{}) error {
 		nodesData, err := ConvertToNodeData(d)
 		if err != nil {
 			return err
 		}
-		metric, err := ConvertMetricToGaugeVec(this.metric)
+		metric, err := ConvertMetricToGaugeVec(nsm.metric)
 		if err != nil {
 			return err
 		}
-		this.HandleData(
+		nsm.HandleData(
 			nodesData,
 			metric,
 		)
@@ -31,7 +31,7 @@ func (this NodeStatesMetric) GetEventHandler() func(interface{}) error {
 }
 
 var ankaNodeStatesMetrics = []NodeStatesMetric{
-	NodeStatesMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_states_count", "Count of Nodes in a particular State (label: state)", []string{"state"}),
 			event:  events.EVENT_NODE_UPDATED,
@@ -46,13 +46,13 @@ var ankaNodeStatesMetrics = []NodeStatesMetric{
 			}
 		},
 	},
-	NodeStatesMetric{
+	{
 		BaseAnkaMetric: BaseAnkaMetric{
 			metric: CreateGaugeMetricVec("anka_node_states", "Node state (1 = current state) (label: id, name, state)", []string{"id", "name", "state"}),
 			event:  events.EVENT_NODE_UPDATED,
 		},
 		HandleData: func(nodes []types.Node, metric *prometheus.GaugeVec) {
-			checkAndHandleResetOfGuageVecMetric(len(nodes), "anka_node_states", metric)
+			checkAndHandleResetOfGaugeVecMetric(len(nodes), "anka_node_states", metric)
 			for _, node := range nodes {
 				if node.NodeName != "" {
 					for _, state := range types.NodeStates {

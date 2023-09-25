@@ -12,17 +12,17 @@ type RegistryTemplatesMetric struct {
 	HandleData func([]types.Template, prometheus.Gauge)
 }
 
-func (this RegistryTemplatesMetric) GetEventHandler() func(interface{}) error {
+func (rtm RegistryTemplatesMetric) GetEventHandler() func(interface{}) error {
 	return func(d interface{}) error {
 		templates, err := ConvertToRegistryTemplatesData(d)
 		if err != nil {
 			return err
 		}
-		metric, err := ConvertMetricToGauge(this.metric)
+		metric, err := ConvertMetricToGauge(rtm.metric)
 		if err != nil {
 			return err
 		}
-		this.HandleData(
+		rtm.HandleData(
 			templates,
 			metric,
 		)
