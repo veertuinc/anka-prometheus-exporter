@@ -171,7 +171,7 @@ var ankaNodesMetrics = []NodesMetric{
 	},
 	{
 		BaseAnkaMetric: BaseAnkaMetric{
-			metric: CreateGaugeMetric("anka_nodes_used_virtual_ram_gb", "Total Used Virtual RAM across all Nodes"),
+			metric: CreateGaugeMetric("anka_nodes_used_virtual_ram_mb", "Total Used Virtual RAM across all Nodes in MB"),
 			event:  events.EVENT_NODE_UPDATED,
 		},
 		HandleData: func(nodes []types.Node, metric prometheus.Gauge) {

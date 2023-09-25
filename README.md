@@ -141,8 +141,8 @@ anka_node_group_cpu_core_count | Number of CPU Cores for the Group (and Nodes)
 anka_node_group_cpu_util | CPU utilization for the Group (and Nodes)
 anka_node_group_ram_gb | Total RAM available for the Group (and Nodes) in GB
 anka_node_group_ram_util | Total RAM utilized for the Group (and Nodes)
-anka_node_group_virtual_cpu_count | Total Used Virtual CPU cores for the Group (and Nodes)
-anka_node_group_virtual_ram_gb | Total Used Virtual RAM for the Group (and Nodes) in GB
+anka_node_group_used_virtual_cpu_count | Total Used Virtual CPU cores for the Group (and Nodes)
+anka_node_group_used_virtual_ram_mb | Total Used Virtual RAM for the Group (and Nodes) in MB
 anka_node_group_instance_capacity | Total Instance slots (capacity) for the Group (and Nodes)
 -- | --
 anka_nodes_count | Count of total Anka Nodes
@@ -156,7 +156,7 @@ anka_nodes_cpu_util | Total CPU utilization across all Nodes
 anka_nodes_ram_gb | Total RAM available across all Nodes in GB
 anka_nodes_ram_util | Total RAM utilized across all Nodes
 anka_nodes_used_virtual_cpu_count | Total Used Virtual CPU cores across all Nodes
-anka_nodes_used_virtual_ram_gb | Total Used Virtual RAM across all Nodes
+anka_nodes_used_virtual_ram_mb | Total Used Virtual RAM across all Nodes
 -- | --
 anka_registry_disk_total_space | Anka Build Cloud Registry total disk space
 anka_registry_disk_free_space| Anka Build Cloud Registry free disk space

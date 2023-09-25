@@ -1,8 +1,6 @@
 package metrics
 
 import (
-	"fmt"
-
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/veertuinc/anka-prometheus-exporter/src/events"
 	"github.com/veertuinc/anka-prometheus-exporter/src/types"
@@ -255,23 +253,21 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 				for _, node := range nodes {
 					for _, group := range node.Groups {
 						if group.Id == focusGroup.Id {
-							fmt.Println(node.RAMUtilization)
 							count = count + node.RAMUtilization
 						}
 					}
 				}
-				fmt.Println(count)
 				metric.With(prometheus.Labels{"group_name": focusGroup.Name}).Set(count)
 			}
 		},
 	},
 	{
 		BaseAnkaMetric: BaseAnkaMetric{
-			metric: CreateGaugeMetricVec("anka_node_group_virtual_cpu_count", "Total Used Virtual CPU cores for the Group (and Nodes)", []string{"group_name"}),
+			metric: CreateGaugeMetricVec("anka_node_group_used_virtual_cpu_count", "Total Used Virtual CPU cores for the Group (and Nodes)", []string{"group_name"}),
 			event:  events.EVENT_NODE_UPDATED,
 		},
 		HandleData: func(nodes []types.Node, nodeGroups []types.NodeGroup, metric *prometheus.GaugeVec) {
-			checkAndHandleResetOfGaugeVecMetric((len(nodeGroups) + len(nodes)), "anka_node_group_virtual_cpu_count", metric)
+			checkAndHandleResetOfGaugeVecMetric((len(nodeGroups) + len(nodes)), "anka_node_group_used_virtual_cpu_count", metric)
 			for _, focusGroup := range nodeGroups { // EACH GROUP
 				var count uint
 				for _, node := range nodes {
@@ -287,11 +283,11 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 	},
 	{
 		BaseAnkaMetric: BaseAnkaMetric{
-			metric: CreateGaugeMetricVec("anka_node_group_virtual_ram_gb", "Total Used Virtual RAM for the Group (and Nodes) in GB", []string{"group_name"}),
+			metric: CreateGaugeMetricVec("anka_node_group_used_virtual_ram_mb", "Total Used Virtual RAM for the Group (and Nodes) in MB", []string{"group_name"}),
 			event:  events.EVENT_NODE_UPDATED,
 		},
 		HandleData: func(nodes []types.Node, nodeGroups []types.NodeGroup, metric *prometheus.GaugeVec) {
-			checkAndHandleResetOfGaugeVecMetric((len(nodeGroups) + len(nodes)), "anka_node_group_virtual_ram_gb", metric)
+			checkAndHandleResetOfGaugeVecMetric((len(nodeGroups) + len(nodes)), "anka_node_group_used_virtual_ram_mb", metric)
 			for _, focusGroup := range nodeGroups { // EACH GROUP
 				var count uint
 				for _, node := range nodes {
