@@ -267,7 +267,7 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 	},
 	{
 		BaseAnkaMetric: BaseAnkaMetric{
-			metric: CreateGaugeMetricVec("anka_node_group_virtual_cpu_count", "Total Virtual CPU cores for the Group (and Nodes)", []string{"group_name"}),
+			metric: CreateGaugeMetricVec("anka_node_group_virtual_cpu_count", "Total Used Virtual CPU cores for the Group (and Nodes)", []string{"group_name"}),
 			event:  events.EVENT_NODE_UPDATED,
 		},
 		HandleData: func(nodes []types.Node, nodeGroups []types.NodeGroup, metric *prometheus.GaugeVec) {
@@ -287,7 +287,7 @@ var ankaNodeGroupMetrics = []NodeGroupMetric{
 	},
 	{
 		BaseAnkaMetric: BaseAnkaMetric{
-			metric: CreateGaugeMetricVec("anka_node_group_virtual_ram_gb", "Total Virtual RAM for the Group (and Nodes) in GB", []string{"group_name"}),
+			metric: CreateGaugeMetricVec("anka_node_group_virtual_ram_gb", "Total Used Virtual RAM for the Group (and Nodes) in GB", []string{"group_name"}),
 			event:  events.EVENT_NODE_UPDATED,
 		},
 		HandleData: func(nodes []types.Node, nodeGroups []types.NodeGroup, metric *prometheus.GaugeVec) {

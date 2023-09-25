@@ -141,8 +141,8 @@ anka_node_group_cpu_core_count | Number of CPU Cores for the Group (and Nodes)
 anka_node_group_cpu_util | CPU utilization for the Group (and Nodes)
 anka_node_group_ram_gb | Total RAM available for the Group (and Nodes) in GB
 anka_node_group_ram_util | Total RAM utilized for the Group (and Nodes)
-anka_node_group_virtual_cpu_count | Total Virtual CPU cores for the Group (and Nodes)
-anka_node_group_virtual_ram_gb | Total Virtual RAM for the Group (and Nodes) in GB
+anka_node_group_virtual_cpu_count | Total Used Virtual CPU cores for the Group (and Nodes)
+anka_node_group_virtual_ram_gb | Total Used Virtual RAM for the Group (and Nodes) in GB
 anka_node_group_instance_capacity | Total Instance slots (capacity) for the Group (and Nodes)
 -- | --
 anka_nodes_count | Count of total Anka Nodes
