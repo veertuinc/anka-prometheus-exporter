@@ -1,6 +1,6 @@
 VERSION := $(shell cat VERSION)
 BIN := anka-prometheus-exporter
-ARCH := $(shell arch)
+ARCH ?= $(shell arch)
 ifeq ($(ARCH), i386)
 	ARCH = amd64
 endif
