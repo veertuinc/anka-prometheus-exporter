@@ -35,6 +35,8 @@ func main() {
 	var clientCertKeyPath string
 	var skipTLSVerification bool
 	var useTLS bool
+	var uakId string
+	var uak string
 
 	flag.StringVar(&controllerAddress, "controller-address", "", "Controller address to monitor (url as arg) (required)")
 	flag.StringVar(&controllerUsername, "controller-username", "", "Controller basic auth username (username as arg)")
@@ -47,6 +49,8 @@ func main() {
 	flag.StringVar(&caFilePath, "ca-cert", "", "Path to ca PEM/x509 file (cert file path as arg)")
 	flag.StringVar(&clientCertPath, "client-cert", "", "Path to client cert PEM/x509 file (cert file path as arg)")
 	flag.StringVar(&clientCertKeyPath, "client-cert-key", "", "Path to client key PEM/x509 file (cert file path as arg)")
+	flag.StringVar(&uakId, "uak-id", "", "The ID for the UAK")
+	flag.StringVar(&uak, "uak", "", "Path to the UAK file")
 
 	envPrefix := "ANKA_PROMETHEUS_EXPORTER_"
 	envflag.StringVar(&controllerAddress, "CONTROLLER_ADDRESS", "", "Controller address to monitor (url as arg) (required)")
@@ -60,6 +64,8 @@ func main() {
 	envflag.StringVar(&caFilePath, "CA_CERT", "", "Path to ca PEM/x509 file (cert file path as arg)")
 	envflag.StringVar(&clientCertPath, "CLIENT_CERT", "", "Path to client cert PEM/x509 file (cert file path as arg)")
 	envflag.StringVar(&clientCertKeyPath, "CLIENT_CERT_KEY", "", "Path to client key PEM/x509 file (cert file path as arg)")
+	envflag.StringVar(&uakId, "UAK_ID", "", "ID for the UAK")
+	envflag.StringVar(&uak, "UAK", "", "Path to the UAK file")
 	flag.Parse()
 	envflag.ParsePrefix(envPrefix)
 
@@ -81,7 +87,12 @@ func main() {
 		SkipTLSVerification: skipTLSVerification,
 	}
 
-	client, err := client.NewClient(controllerAddress, controllerUsername, controllerPassword, intervalSeconds, clientTLSCerts)
+	clientUAK := client.UAK{
+		ID:  uakId,
+		Key: uak,
+	}
+
+	client, err := client.NewClient(controllerAddress, controllerUsername, controllerPassword, intervalSeconds, clientTLSCerts, clientUAK)
 	if err != nil {
 		log.Fatalf(err.Error())
 	}

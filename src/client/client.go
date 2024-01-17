@@ -24,10 +24,10 @@ type Client struct {
 	eventsMutex         sync.Mutex
 }
 
-func NewClient(addr, username, password string, interval int, certs TLSCerts) (*Client, error) {
+func NewClient(addr, username, password string, interval int, certs TLSCerts, uak UAK) (*Client, error) {
 	var log = log.GetLogger()
 
-	communicator, err := NewCommunicator(addr, username, password, certs)
+	communicator, err := NewCommunicator(addr, username, password, certs, uak)
 	if err != nil {
 		return nil, err
 	}

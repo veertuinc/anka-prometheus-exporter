@@ -18,22 +18,30 @@ type Communicator struct {
 	controllerAddress string
 	username          string
 	password          string
+	encodedTAPData    string
 }
 
-func NewCommunicator(addr, username, password string, certs TLSCerts) (*Communicator, error) {
+func NewCommunicator(addr, username, password string, certs TLSCerts, uak UAK) (*Communicator, error) {
 
 	if err := setUpTLS(certs); err != nil {
 		return nil, err
+	}
+
+	encodedTAPData, err := setUpUAK(uak, addr)
+	if err != nil {
+		return nil, fmt.Errorf("[auth::uak] %v", err)
 	}
 
 	return &Communicator{
 		controllerAddress: addr,
 		username:          username,
 		password:          password,
+		encodedTAPData:    encodedTAPData,
 	}, nil
 }
 
 func (comm *Communicator) TestConnection() error {
+	fmt.Println("here")
 	endpoint := "/api/v1/status"
 	r, err := comm.getResponse(endpoint, comm.username, comm.password)
 	if err != nil {
@@ -157,6 +165,8 @@ func (comm *Communicator) getResponse(endpoint, username, password string) (*htt
 	// set auth
 	if username != "" && password != "" {
 		req.SetBasicAuth(username, password)
+	} else if comm.encodedTAPData != "" {
+		req.Header.Set("Authorization", "Bearer "+comm.encodedTAPData)
 	}
 	r, err := http.DefaultClient.Do(req)
 	if err != nil {
