@@ -22,8 +22,6 @@ var (
 
 func main() {
 
-	var log = log.GetLogger()
-
 	var controllerAddress string
 	var controllerUsername string
 	var controllerPassword string
@@ -36,7 +34,8 @@ func main() {
 	var skipTLSVerification bool
 	var useTLS bool
 	var uakId string
-	var uak string
+	var uakPath string
+	var uakString string
 
 	flag.StringVar(&controllerAddress, "controller-address", "", "Controller address to monitor (url as arg) (required)")
 	flag.StringVar(&controllerUsername, "controller-username", "", "Controller basic auth username (username as arg)")
@@ -49,8 +48,9 @@ func main() {
 	flag.StringVar(&caFilePath, "ca-cert", "", "Path to ca PEM/x509 file (cert file path as arg)")
 	flag.StringVar(&clientCertPath, "client-cert", "", "Path to client cert PEM/x509 file (cert file path as arg)")
 	flag.StringVar(&clientCertKeyPath, "client-cert-key", "", "Path to client key PEM/x509 file (cert file path as arg)")
-	flag.StringVar(&uakId, "uak-id", "", "The ID for the UAK")
-	flag.StringVar(&uak, "uak", "", "Path to the UAK file")
+	flag.StringVar(&uakId, "uak-id", "", "ID for the UAK you wish to use to make Controller requests (string as arg)")
+	flag.StringVar(&uakPath, "uak-path", "", "Path to the UAK you wish to use for Controller requests (path as arg) (takes priority over -uak-string if both are specified)")
+	flag.StringVar(&uakString, "uak-string", "", "String form (cat myUAK.pem | sed '1,1d' | sed '$d' | tr -d '\\n') of the key file contents you wish to use to make Controller requests")
 
 	envPrefix := "ANKA_PROMETHEUS_EXPORTER_"
 	envflag.StringVar(&controllerAddress, "CONTROLLER_ADDRESS", "", "Controller address to monitor (url as arg) (required)")
@@ -64,20 +64,22 @@ func main() {
 	envflag.StringVar(&caFilePath, "CA_CERT", "", "Path to ca PEM/x509 file (cert file path as arg)")
 	envflag.StringVar(&clientCertPath, "CLIENT_CERT", "", "Path to client cert PEM/x509 file (cert file path as arg)")
 	envflag.StringVar(&clientCertKeyPath, "CLIENT_CERT_KEY", "", "Path to client key PEM/x509 file (cert file path as arg)")
-	envflag.StringVar(&uakId, "UAK_ID", "", "ID for the UAK")
-	envflag.StringVar(&uak, "UAK", "", "Path to the UAK file")
+	envflag.StringVar(&uakId, "UAK_ID", "", "ID for the UAK you wish to use to make Controller requests (string as arg)")
+	envflag.StringVar(&uakPath, "UAK_PATH", "", "Path to the UAK you wish to use for Controller requests (takes priority over -uak-string if both are specified)")
+	envflag.StringVar(&uakString, "UAK_STRING", "", "String form (cat myUAK.pem | sed '1,1d' | sed '$d' | tr -d '\\n') of the key file contents you wish to use to make Controller requests")
+
 	flag.Parse()
 	envflag.ParsePrefix(envPrefix)
 
 	if controllerAddress == "" {
-		log.Fatalf(fmt.Errorf("controller address not supplied (%sCONTROLLER_ADDRESS=\"http://{address}:{port}\" or --controller-address http://{address}:{port})", envPrefix).Error())
+		log.Fatal(fmt.Errorf("controller address not supplied (%sCONTROLLER_ADDRESS=\"http://{address}:{port}\" or --controller-address http://{address}:{port})", envPrefix))
 	}
 
 	if len(flag.Args()) > 0 {
-		log.Fatalf("one of your flags included a value when one wasn't needed: %s", flag.Args()[0])
+		log.Fatal(fmt.Errorf("one of your flags included a value when one wasn't needed: %s", flag.Args()[0]))
 	}
 
-	log.Infof("Starting Prometheus Exporter for Anka (%s)", version)
+	log.Info(fmt.Sprintf("Starting Prometheus Exporter for Anka (%s)", version))
 
 	clientTLSCerts := client.TLSCerts{
 		UseTLS:              useTLS,
@@ -88,13 +90,14 @@ func main() {
 	}
 
 	clientUAK := client.UAK{
-		ID:  uakId,
-		Key: uak,
+		ID:        uakId,
+		KeyPath:   uakPath,
+		KeyString: uakString,
 	}
 
 	client, err := client.NewClient(controllerAddress, controllerUsername, controllerPassword, intervalSeconds, clientTLSCerts, clientUAK)
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Fatal(err)
 	}
 	client.Init()
 

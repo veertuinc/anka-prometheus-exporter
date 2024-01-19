@@ -48,6 +48,12 @@ Usage of anka-prometheus-exporter:
         Skip TLS verification (no args)
   -tls
         Enable TLS (no args)
+  -uak-id string
+        ID for the UAK you wish to use to make Controller requests (string as arg)
+  -uak-string string
+        String form (cat myUAK.pem | sed '1,1d' | sed '$d' | tr -d '\n') of the key file contents you wish to use to make Controller requests (string as arg)
+  -uak-path string
+        Path to the UAK you wish to use for Controller requests (path as arg) (takes priority over -uak-string if both are specified)
 ```
 
 > `LOG_LEVEL` can be set using an environment variable

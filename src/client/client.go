@@ -25,13 +25,10 @@ type Client struct {
 }
 
 func NewClient(addr, username, password string, interval int, certs TLSCerts, uak UAK) (*Client, error) {
-	var log = log.GetLogger()
-
 	communicator, err := NewCommunicator(addr, username, password, certs, uak)
 	if err != nil {
 		return nil, err
 	}
-
 	c := &Client{
 		events: map[events.Event][]func(interface{}) error{
 			events.EVENT_NODE_UPDATED:               make([]func(interface{}) error, 0),
@@ -84,14 +81,11 @@ func (client *Client) UpdateInterval(i int64) {
 
 // Loops over each eventHandler inside of the metrics/metric_*.go files and populates the values for each metric
 func (client *Client) initDataLoop(f func() (interface{}, error), ev events.Event) {
-	var log = log.GetLogger()
 	for {
-		if log.GetLevel().String() == "debug" {
-			log.Debugln("Requesting data for: " + runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name())
-		}
+		log.Debug("Requesting data for: " + runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name())
 		data, err := f()
 		if err != nil {
-			log.Errorf("could not get data: %+v", err)
+			log.Error(fmt.Errorf("could not get data: %+v", err))
 			time.Sleep(time.Duration(client.errorTimeoutSeconds) * time.Second)
 			continue
 		}
@@ -100,9 +94,10 @@ func (client *Client) initDataLoop(f func() (interface{}, error), ev events.Even
 		client.eventsMutex.Unlock()
 		for _, eventHandler := range events {
 			if err := eventHandler(data); err != nil {
-				log.Errorf("ignoring event handler failure for event id %+v - Error: %+v", ev, err)
+				log.Error(fmt.Errorf("ignoring event handler failure for event id %+v - Error: %+v", ev, err))
 			}
 		}
+		log.Debug("Finished requesting data for: " + runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name())
 		time.Sleep(time.Duration(atomic.LoadInt64(&client.timeoutSeconds)) * time.Second)
 	}
 }

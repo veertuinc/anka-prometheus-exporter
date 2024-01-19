@@ -14,18 +14,15 @@ import (
 	"io"
 	"net/http"
 	"os"
-
-	"github.com/veertuinc/anka-prometheus-exporter/src/log"
 )
 
 type UAK struct {
-	ID  string
-	Key string
+	ID        string
+	KeyPath   string
+	KeyString string
 }
 
 func setUpUAK(uak UAK, controllerAddress string) (string, error) {
-	var log = log.GetLogger()
-	log.Infof("[auth::uak] Using User API Key | ID: %s | Key: %s", uak.ID, uak.Key)
 	encodedData, err := tap(uak, controllerAddress)
 	return encodedData, err
 }
@@ -52,22 +49,33 @@ func tap(uak UAK, controllerAddress string) (string, error) {
 	}
 
 	// Decrypt the decoded body using the user's private key
-	// Read the private key from the file
-	privateKey, err := os.ReadFile(uak.Key)
-	if err != nil {
-		return "", fmt.Errorf("failed to read private key file: %v", err)
-	}
-	block, _ := pem.Decode(privateKey)
-	if block == nil {
-		return "", errors.New("failed to parse PEM block containing the private key")
+	var privateKey *rsa.PrivateKey
+	var privateKeyBytes []byte
+
+	if uak.KeyPath != "" {
+		privateKeyBytes, err = os.ReadFile(uak.KeyPath)
+		if err != nil {
+			return "", fmt.Errorf("failed to read private key file: %v", err)
+		}
+		block, _ := pem.Decode(privateKeyBytes)
+		if block == nil {
+			return "", errors.New("failed to parse PEM block containing the private key")
+		}
+		privateKeyBytes = block.Bytes
+	} else if uak.KeyString != "" {
+		privateKeyBytes, err = base64.StdEncoding.DecodeString(uak.KeyString)
+		if err != nil {
+			return "", fmt.Errorf("failed decoding private key: %w", err)
+		}
+	} else {
+		return "", fmt.Errorf("no uak path or string specified")
 	}
 
-	rsaPrivateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	privateKey, err = x509.ParsePKCS1PrivateKey(privateKeyBytes)
 	if err != nil {
 		return "", fmt.Errorf("unable to parse RSA private key: %v", err)
 	}
-
-	decryptedBody, err := rsa.DecryptOAEP(sha256.New(), rand.Reader, rsaPrivateKey, decodedBody, nil)
+	decryptedBody, err := rsa.DecryptOAEP(sha256.New(), rand.Reader, privateKey, decodedBody, nil)
 	if err != nil {
 		return "", fmt.Errorf("rsa decryption error: %v", err)
 	}
@@ -122,7 +130,7 @@ func tap(uak UAK, controllerAddress string) (string, error) {
 	// var responseBody map[string]interface{}
 	// json.Unmarshal(body, &responseBody)
 
-	// log.Infof("[auth::uak] Response from /status endpoint: %s", string(body))
+	// log.Info(fmt.Sprintf("[auth::uak] Response from /status endpoint: %s", string(body)))
 
 	return encodedData, nil
 }
