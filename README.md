@@ -23,6 +23,9 @@ Ensure you have a functioning Prometheus instance before using this.
 | ANKA_PROMETHEUS_EXPORTER_CA_CERT (string) | --ca-cert (string) |
 | ANKA_PROMETHEUS_EXPORTER_CLIENT_CERT (string) | --client-cert (string) |
 | ANKA_PROMETHEUS_EXPORTER_CLIENT_CERT_KEY (string) | --client-cert-key (string) |
+| ANKA_PROMETHEUS_EXPORTER_UAK_ID (string) | --uak-id (string) |
+| ANKA_PROMETHEUS_EXPORTER_UAK_PATH (string) | --uak-path (string) |
+| ANKA_PROMETHEUS_EXPORTER_UAK_STRING (string) | --uak-string (string) |
 
 ```bash
 Usage of anka-prometheus-exporter:
@@ -49,11 +52,11 @@ Usage of anka-prometheus-exporter:
   -tls
         Enable TLS (no args)
   -uak-id string
-        ID for the UAK you wish to use to make Controller requests (string as arg)
+        UAK ID you wish to use for Controller requests (string as arg)
   -uak-string string
-        String form (cat myUAK.pem | sed '1,1d' | sed '$d' | tr -d '\n') of the key file contents you wish to use to make Controller requests (string as arg)
+        String form (cat myUAK.pem | sed '1,1d' | sed '$d' | tr -d '\n') of the key file contents for Controller requests (string as arg)
   -uak-path string
-        Path to the UAK you wish to use for Controller requests (path as arg) (takes priority over -uak-string if both are specified)
+        Path to the UAK for Controller requests (path as arg) (takes priority over -uak-string if both are specified)
 ```
 
 > `LOG_LEVEL` can be set using an environment variable

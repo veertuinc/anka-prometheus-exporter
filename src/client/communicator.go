@@ -198,7 +198,6 @@ func (comm *Communicator) getData(endpoint string, repsObject types.Response) (i
 			if err != nil {
 				log.Error(fmt.Errorf("could not get data (after TAP renewal): %+v", err))
 			}
-			fmt.Printf("%+v\n", repsObject.GetBody())
 		} else {
 			return nil, errors.New(repsObject.GetMessage())
 		}

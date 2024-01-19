@@ -48,9 +48,9 @@ func main() {
 	flag.StringVar(&caFilePath, "ca-cert", "", "Path to ca PEM/x509 file (cert file path as arg)")
 	flag.StringVar(&clientCertPath, "client-cert", "", "Path to client cert PEM/x509 file (cert file path as arg)")
 	flag.StringVar(&clientCertKeyPath, "client-cert-key", "", "Path to client key PEM/x509 file (cert file path as arg)")
-	flag.StringVar(&uakId, "uak-id", "", "ID for the UAK you wish to use to make Controller requests (string as arg)")
-	flag.StringVar(&uakPath, "uak-path", "", "Path to the UAK you wish to use for Controller requests (path as arg) (takes priority over -uak-string if both are specified)")
-	flag.StringVar(&uakString, "uak-string", "", "String form (cat myUAK.pem | sed '1,1d' | sed '$d' | tr -d '\\n') of the key file contents you wish to use to make Controller requests")
+	flag.StringVar(&uakId, "uak-id", "", "UAK ID you wish to use for Controller requests (string as arg)")
+	flag.StringVar(&uakPath, "uak-path", "", "Path to the UAK file used for Controller requests (path as arg) (supersedes -uak-string)")
+	flag.StringVar(&uakString, "uak-string", "", "String form (cat myUAK.pem | sed '1,1d' | sed '$d' | tr -d '\n') of the key file contents for Controller requests (string as arg)")
 
 	envPrefix := "ANKA_PROMETHEUS_EXPORTER_"
 	envflag.StringVar(&controllerAddress, "CONTROLLER_ADDRESS", "", "Controller address to monitor (url as arg) (required)")
@@ -64,9 +64,9 @@ func main() {
 	envflag.StringVar(&caFilePath, "CA_CERT", "", "Path to ca PEM/x509 file (cert file path as arg)")
 	envflag.StringVar(&clientCertPath, "CLIENT_CERT", "", "Path to client cert PEM/x509 file (cert file path as arg)")
 	envflag.StringVar(&clientCertKeyPath, "CLIENT_CERT_KEY", "", "Path to client key PEM/x509 file (cert file path as arg)")
-	envflag.StringVar(&uakId, "UAK_ID", "", "ID for the UAK you wish to use to make Controller requests (string as arg)")
-	envflag.StringVar(&uakPath, "UAK_PATH", "", "Path to the UAK you wish to use for Controller requests (takes priority over -uak-string if both are specified)")
-	envflag.StringVar(&uakString, "UAK_STRING", "", "String form (cat myUAK.pem | sed '1,1d' | sed '$d' | tr -d '\\n') of the key file contents you wish to use to make Controller requests")
+	envflag.StringVar(&uakId, "UAK_ID", "", "UAK ID you wish to use for Controller requests (string as arg)")
+	envflag.StringVar(&uakPath, "UAK_PATH", "", "Path to the UAK file used for Controller requests (path as arg) (supersedes -uak-string)")
+	envflag.StringVar(&uakString, "UAK_STRING", "", "String form (cat myUAK.pem | sed '1,1d' | sed '$d' | tr -d '\n') of the key file contents for Controller requests (string as arg)")
 
 	flag.Parse()
 	envflag.ParsePrefix(envPrefix)
