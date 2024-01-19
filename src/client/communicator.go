@@ -8,29 +8,62 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/veertuinc/anka-prometheus-exporter/src/log"
 	"github.com/veertuinc/anka-prometheus-exporter/src/state"
 	"github.com/veertuinc/anka-prometheus-exporter/src/types"
 )
 
 var lock = &sync.Mutex{}
+var updateLock = &sync.Mutex{}
 
 type Communicator struct {
 	controllerAddress string
 	username          string
 	password          string
+	uak               UAK
+	encodedTAPData    string
 }
 
-func NewCommunicator(addr, username, password string, certs TLSCerts) (*Communicator, error) {
+func (comm *Communicator) UpdateEncodedTAPData() error {
+	var err error
+	if updateLock.TryLock() {
+		defer updateLock.Unlock()
+		if err = comm.TestConnection(); err.Error() == "Authentication Required" {
+			data, err := setUpUAK(comm.uak, comm.controllerAddress)
+			if err != nil {
+				return err
+			}
+			comm.encodedTAPData = data
+			err = nil
+		}
+		if err = comm.TestConnection(); err != nil {
+			return err
+		}
+		log.Info("[auth::uak] obtained new UAK session")
+	}
+	return err
+}
+
+func NewCommunicator(addr, username, password string, certs TLSCerts, uak UAK) (*Communicator, error) {
+	comm := &Communicator{
+		controllerAddress: addr,
+		username:          username,
+		password:          password,
+		uak:               uak,
+	}
 
 	if err := setUpTLS(certs); err != nil {
 		return nil, err
 	}
 
-	return &Communicator{
-		controllerAddress: addr,
-		username:          username,
-		password:          password,
-	}, nil
+	if uak.ID != "" {
+		log.Info(fmt.Sprintf("[auth::uak] Using User API Key | ID: %s", uak.ID))
+		if err := comm.UpdateEncodedTAPData(); err != nil {
+			return nil, err
+		}
+	}
+
+	return comm, nil
 }
 
 func (comm *Communicator) TestConnection() error {
@@ -49,6 +82,7 @@ func (comm *Communicator) TestConnection() error {
 		return err
 	}
 	if resp.Status == "OK" {
+		log.Debug("status endpoint communication success")
 		return nil
 	} else {
 		return errors.New(resp.Message)
@@ -129,7 +163,7 @@ func (comm *Communicator) GetRegistryTemplatesData() (interface{}, error) {
 	return templatesArray, nil
 }
 
-func (comm *Communicator) getData(endpoint string, repsObject types.Response) (interface{}, error) {
+func (comm *Communicator) fetchResponseData(endpoint string, repsObject types.Response) (types.Response, error) {
 	r, err := comm.getResponse(endpoint, comm.username, comm.password)
 	if err != nil {
 		return nil, err
@@ -142,8 +176,35 @@ func (comm *Communicator) getData(endpoint string, repsObject types.Response) (i
 	if err = json.Unmarshal(body, &repsObject); err != nil {
 		return nil, err
 	}
-	if repsObject.GetStatus() != "OK" {
-		return nil, errors.New(repsObject.GetMessage())
+	return repsObject, nil
+}
+
+func (comm *Communicator) getData(endpoint string, repsObject types.Response) (interface{}, error) {
+
+	repsObject, err := comm.fetchResponseData(endpoint, repsObject)
+	if err != nil {
+		return nil, err
+	}
+
+	retryCount := 2
+	for repsObject.GetStatus() != "OK" && retryCount < 4 {
+		if comm.uak.ID != "" && repsObject.GetMessage() == "Authentication Required" {
+			log.Warn("[auth::uak] uak session expired")
+			err = comm.UpdateEncodedTAPData()
+			if err != nil {
+				log.Error(fmt.Errorf("could not renew TAP for UAK: %+v", err))
+			}
+			repsObject, err = comm.fetchResponseData(endpoint, repsObject)
+			if err != nil {
+				log.Error(fmt.Errorf("could not get data (after TAP renewal): %+v", err))
+			}
+		} else {
+			return nil, errors.New(repsObject.GetMessage())
+		}
+		retryCount++
+	}
+	if err != nil {
+		return nil, err
 	}
 	return repsObject.GetBody(), nil
 }
@@ -157,6 +218,8 @@ func (comm *Communicator) getResponse(endpoint, username, password string) (*htt
 	// set auth
 	if username != "" && password != "" {
 		req.SetBasicAuth(username, password)
+	} else if comm.encodedTAPData != "" {
+		req.Header.Set("Authorization", "Bearer "+comm.encodedTAPData)
 	}
 	r, err := http.DefaultClient.Do(req)
 	if err != nil {
