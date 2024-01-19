@@ -33,7 +33,6 @@ func NewServer(promReg *prometheus.Registry, port int) *Server {
 }
 
 func (server *Server) Init() {
-	var log = log.GetLogger()
 	log.Info(fmt.Sprintf("Serving metrics at /metrics and :%d", server.port))
 	http.HandleFunc("/metrics", server.handleRequest())
 	http.ListenAndServe(fmt.Sprintf(":%d", server.port), nil)

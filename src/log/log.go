@@ -15,10 +15,31 @@ func getEnv(key, fallback string) string {
 	return value
 }
 
-var log *logrus.Logger
+var Logger = GetLogger()
 var once sync.Once
 
+func Info(message string) {
+	Logger.Infoln(message)
+}
+
+func Warn(message string) {
+	Logger.Warnln(message)
+}
+
+func Error(message error) {
+	Logger.Errorln(message)
+}
+
+func Fatal(message error) {
+	Logger.Fatalln(message)
+}
+
+func Debug(message string) {
+	Logger.Debugln(message)
+}
+
 func GetLogger() *logrus.Logger {
+	var log *logrus.Logger
 	once.Do(func() {
 		log = logrus.New()
 		log.SetFormatter(&logrus.JSONFormatter{})
