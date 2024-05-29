@@ -69,7 +69,7 @@ services:
     ports:
       - "2112:2112"
     environment:
-       - ANKA_PROMETHEUS_EXPORTER_CONTROLLER_ADDRESS # Defaults to using what is under the user executing docker-compose up; you can specify ="http://Your Controller URL and Port Here" if not set in user's env
+       - ANKA_PROMETHEUS_EXPORTER_CONTROLLER_ADDRESS=http://anka.controller:8090 # change this to your url and port
 ```
 2. `docker-compose pull && docker-compose up --remove-orphans -d`
 
