@@ -182,7 +182,7 @@ anka_registry_template_tags_count | Count of Tags in the Registry for the Templa
 
 | current version | target version | notes |
 | --------------- | -------------- | ----- |
-| v2.x | v3.x | The `anka_nodes_instance_capacity` is now split by architecture (label: `arch`). Almost all `anka_node_*` metrics now also include `arch` as a label. You must also be running the Anka Build Cloud Controller >= v1.22.0 as architecture was added in this version. |
+| v2.x | v3.x | The metrics `anka_nodes_instance_capacity` and `anka_node_states_count` are now split by architecture (label: `arch`). Almost all `anka_node_*` metrics now also include `arch` as a label. You must also be running the Anka Build Cloud Controller >= v1.22.0 as architecture was added in this version. |
 
 ---
 

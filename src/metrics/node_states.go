@@ -33,7 +33,7 @@ func (nsm NodeStatesMetric) GetEventHandler() func(interface{}) error {
 var ankaNodeStatesMetrics = []NodeStatesMetric{
 	{
 		BaseAnkaMetric: BaseAnkaMetric{
-			metric: CreateGaugeMetricVec("anka_node_states_count", "Count of Nodes in a particular State (label: arch, state)", []string{"arch", "state"}),
+			metric: CreateGaugeMetricVec("anka_node_states_count", "Count of Nodes in a particular State, per Architecture (label: arch, state)", []string{"arch", "state"}),
 			event:  events.EVENT_NODE_UPDATED,
 		},
 		HandleData: func(nodes []types.Node, metric *prometheus.GaugeVec) {
