@@ -3,3 +3,4 @@ bin/*
 dist/
 anka-prometheus-exporter_linux*
 anka-prometheus-exporter_darwin*
+docker-compose.yml

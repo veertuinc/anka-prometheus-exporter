@@ -35,6 +35,7 @@ type Node struct {
 	State          string      `json:"state"`
 	Capacity       uint        `json:"capacity"`
 	Groups         []NodeGroup `json:"groups"`
+	Architecture   string      `json:"host_arch"`
 }
 
 type NodeGroup struct {
