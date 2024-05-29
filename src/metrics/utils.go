@@ -10,12 +10,15 @@ import (
 	"github.com/veertuinc/anka-prometheus-exporter/src/types"
 )
 
-func intMapFromStringSlice(stringSlice []string) map[string]int {
-	intMap := map[string]int{}
-	for _, item := range stringSlice {
-		intMap[item] = 0
+func intMapFromTwoStringSlices(outerStringSlice []string, innerStringSlice []string) map[string]map[string]int {
+	outerMap := map[string]map[string]int{}
+	for _, outerItem := range outerStringSlice {
+		outerMap[outerItem] = map[string]int{}
+		for _, innerItem := range innerStringSlice {
+			outerMap[outerItem][innerItem] = 0
+		}
 	}
-	return intMap
+	return outerMap
 }
 
 func uniqueThisStringArray(arr []string) []string {

@@ -33,16 +33,18 @@ func (nsm NodeStatesMetric) GetEventHandler() func(interface{}) error {
 var ankaNodeStatesMetrics = []NodeStatesMetric{
 	{
 		BaseAnkaMetric: BaseAnkaMetric{
-			metric: CreateGaugeMetricVec("anka_node_states_count", "Count of Nodes in a particular State (label: state)", []string{"state"}),
+			metric: CreateGaugeMetricVec("anka_node_states_count", "Count of Nodes in a particular State (label: arch, state)", []string{"arch", "state"}),
 			event:  events.EVENT_NODE_UPDATED,
 		},
 		HandleData: func(nodes []types.Node, metric *prometheus.GaugeVec) {
-			var stateIntMap = intMapFromStringSlice(types.NodeStates)
+			var archStateMap = intMapFromTwoStringSlices(types.Architectures, types.NodeStates)
 			for _, node := range nodes {
-				stateIntMap[node.State] = stateIntMap[node.State] + 1
+				archStateMap[node.HostArch][node.State] = archStateMap[node.HostArch][node.State] + 1
 			}
-			for _, state := range types.NodeStates {
-				metric.With(prometheus.Labels{"state": state}).Set(float64(stateIntMap[state]))
+			for _, arch := range types.Architectures {
+				for _, state := range types.NodeStates {
+					metric.With(prometheus.Labels{"arch": arch, "state": state}).Set(float64(archStateMap[arch][state]))
+				}
 			}
 		},
 	},

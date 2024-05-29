@@ -20,12 +20,14 @@ func (ism InstanceStateMetric) GetEventHandler() func(interface{}) error {
 		if err != nil {
 			return err
 		}
-		var stateIntMap = intMapFromStringSlice(types.InstanceStates)
+		var archStateMap = intMapFromTwoStringSlices(types.Architectures, types.InstanceStates)
 		for _, instance := range instances {
-			stateIntMap[instance.Vm.State] = stateIntMap[instance.Vm.State] + 1
+			archStateMap[instance.Vm.Arch][instance.Vm.State] = archStateMap[instance.Vm.Arch][instance.Vm.State] + 1
 		}
-		for _, state := range types.InstanceStates {
-			metric.With(prometheus.Labels{"state": state}).Set(float64(stateIntMap[state]))
+		for _, arch := range types.Architectures {
+			for _, state := range types.InstanceStates {
+				metric.With(prometheus.Labels{"arch": arch, "state": state}).Set(float64(archStateMap[arch][state]))
+			}
 		}
 		return nil
 	}
@@ -34,7 +36,7 @@ func (ism InstanceStateMetric) GetEventHandler() func(interface{}) error {
 func init() { // runs on exporter init only (updates are made with the above EventHandler; triggered by the Client)
 
 	AddMetric(InstanceStateMetric{BaseAnkaMetric{
-		metric: CreateGaugeMetricVec("anka_instance_state_count", "Count of Instances in a particular State (label: state)", []string{"state"}),
+		metric: CreateGaugeMetricVec("anka_instance_state_count", "Count of Instances in a particular State (label: arch, state)", []string{"arch", "state"}),
 		event:  events.EVENT_VM_DATA_UPDATED,
 	}})
 
