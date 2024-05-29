@@ -75,7 +75,7 @@ var ankaNodesMetrics = []NodesMetric{
 			checkAndHandleResetOfGaugeVecMetric(len(nodes), "anka_nodes_instance_capacity", metricVec)
 			var counts = make(map[string]uint)
 			for _, node := range nodes {
-				counts[node.Architecture] = counts[node.Architecture] + node.Capacity
+				counts[node.HostArch] = counts[node.HostArch] + node.Capacity
 			}
 			for arch, count := range counts {
 				metricVec.With(prometheus.Labels{"arch": arch}).Set(float64(count))
