@@ -23,6 +23,9 @@ Ensure you have a functioning Prometheus instance before using this.
 | ANKA_PROMETHEUS_EXPORTER_CA_CERT (string) | --ca-cert (string) |
 | ANKA_PROMETHEUS_EXPORTER_CLIENT_CERT (string) | --client-cert (string) |
 | ANKA_PROMETHEUS_EXPORTER_CLIENT_CERT_KEY (string) | --client-cert-key (string) |
+| ANKA_PROMETHEUS_EXPORTER_UAK_ID (string) | --uak-id (string) |
+| ANKA_PROMETHEUS_EXPORTER_UAK_PATH (string) | --uak-path (string) |
+| ANKA_PROMETHEUS_EXPORTER_UAK_STRING (string) | --uak-string (string) |
 
 ```bash
 Usage of anka-prometheus-exporter:
@@ -48,6 +51,12 @@ Usage of anka-prometheus-exporter:
         Skip TLS verification (no args)
   -tls
         Enable TLS (no args)
+  -uak-id string
+        UAK ID you wish to use for Controller requests (string as arg)
+  -uak-string string
+        String form (cat myUAK.pem | sed '1,1d' | sed '$d' | tr -d '\n') of the key file contents for Controller requests (string as arg)
+  -uak-path string
+        Path to the UAK for Controller requests (path as arg) (takes priority over -uak-string if both are specified)
 ```
 
 > `LOG_LEVEL` can be set using an environment variable
@@ -69,7 +78,8 @@ services:
     ports:
       - "2112:2112"
     environment:
-       - ANKA_PROMETHEUS_EXPORTER_CONTROLLER_ADDRESS # Defaults to using what is under the user executing docker-compose up; you can specify ="http://Your Controller URL and Port Here" if not set in user's env
+      # DO NOT USE QUOTES AROUND VARIABLES
+       - ANKA_PROMETHEUS_EXPORTER_CONTROLLER_ADDRESS=http://anka.controller:8090 # change this to your url and port
 ```
 2. `docker-compose pull && docker-compose up --remove-orphans -d`
 
@@ -91,8 +101,7 @@ scrape_configs:
 
 ## Using TLS
 
-The `--tls` flag is not required if your controller certificate is valid and no client authentication is configured.
-For all other TLS configuration options, `--tls` must be set.
+The `--tls` flag is not required if your controller certificate is signed with a major CA and no client authentication is configured. For all other TLS configuration options, like self signed scenarios, `--tls` must be enabled.
 
 For self signed certificates, you can either use `--skip-tls-verification` or provide your ca-cert with `--ca-cert`.
 
@@ -117,19 +126,19 @@ anka_instance_state_count | Count of Instances in a particular State (label: arc
 anka_instance_state_per_template_count | Count of Instances in a particular state, per Template (label: state, template_uuid, template_name)
 anka_instance_state_per_group_count | Count of Instances in a particular state, per Group (label: state, group_name)
 -- | --
-anka_node_instance_count | Count of Instances running on the Node
-anka_node_instance_capacity | Total Instance slots (capacity) on the Node
+anka_node_instance_count | Count of Instances running on the Node (label: id, name, arch)
+anka_node_instance_capacity | Total Instance slots (capacity) on the Node (label: id, name, arch)
 anka_node_states | Node state (1 = current state) (label: id, name, state)
 anka_node_states_count | Count of Nodes in a particular state (label: arch, state)
-anka_node_disk_free_space | Amount of free disk space on the Node in Bytes
-anka_node_disk_total_space | Amount of total available disk space on the Node in Bytes
-anka_node_disk_anka_used_space | Amount of disk space used by Anka on the Node in Bytes
-anka_node_cpu_core_count | Number of CPU Cores in Node
-anka_node_cpu_util | CPU utilization in node
-anka_node_ram_gb | Total RAM available for the Node in GB
-anka_node_ram_util | Total RAM utilized for the Node
-anka_node_used_virtual_cpu_count | Total Used Virtual CPU cores for the Node
-anka_node_used_virtual_ram_mb | Total Used Virtual RAM for the Node in MB
+anka_node_disk_free_space | Amount of free disk space on the Node in Bytes (label: id, name, arch)
+anka_node_disk_total_space | Amount of total available disk space on the Node in Bytes (label: id, name, arch)
+anka_node_disk_anka_used_space | Amount of disk space used by Anka on the Node in Bytes (label: id, name, arch)
+anka_node_cpu_core_count | Number of CPU Cores in Node (label: id, name, arch)
+anka_node_cpu_util | CPU utilization in node (label: id, name, arch)
+anka_node_ram_gb | Total RAM available for the Node in GB (label: id, name, arch)
+anka_node_ram_util | Total RAM utilized for the Node (label: id, name, arch)
+anka_node_used_virtual_cpu_count | Total Used Virtual CPU cores for the Node (label: id, name, arch)
+anka_node_used_virtual_ram_mb | Total Used Virtual RAM for the Node in MB (label: id, name, arch)
 -- | --
 anka_node_group_nodes_count | Count of Nodes in a particular Group
 anka_node_group_states_count | Count of Groups in a particular State (labels: group, state)
@@ -147,7 +156,7 @@ anka_node_group_instance_capacity | Total Instance slots (capacity) for the Grou
 -- | --
 anka_nodes_count | Count of total Anka Nodes
 anka_nodes_instance_count | Count of Instance slots in use across all Nodes
-anka_nodes_instance_capacity | Count of total Instance Capacity across all Nodes
+anka_nodes_instance_capacity | Count of total Instance Capacity across all Nodes, per Architecture (labels: arch)
 anka_nodes_disk_free_space | Amount of free disk space across all Nodes in Bytes
 anka_nodes_disk_total_space | Amount of total available disk space across all Nodes in Bytes
 anka_nodes_disk_anka_used_space | Amount of disk space used by Anka across all Nodes in Bytes
@@ -166,6 +175,14 @@ anka_registry_template_count | Count of VM Templates in the Registry
 anka_registry_template_disk_used | Total disk usage of the Template in the Registry
 anka_registry_template_tag_disk_used | Total disk used by the Template's Tag in the Registry
 anka_registry_template_tags_count | Count of Tags in the Registry for the Template
+
+---
+
+# Upgrading Considerations
+
+| current version | target version | notes |
+| --------------- | -------------- | ----- |
+| v2.x | v3.x | The `anka_nodes_instance_capacity` is now split by architecture (label: `arch`). Almost all `anka_node_*` metrics now also include `arch` as a label. |
 
 ---
 
