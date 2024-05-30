@@ -8,7 +8,7 @@ import (
 
 type NodesMetric struct {
 	BaseAnkaMetric
-	HandleData func([]types.Node, prometheus.Gauge)
+	HandleData func([]types.Node, prometheus.Gauge, *prometheus.GaugeVec)
 }
 
 func (nm NodesMetric) GetEventHandler() func(interface{}) error {
@@ -17,14 +17,28 @@ func (nm NodesMetric) GetEventHandler() func(interface{}) error {
 		if err != nil {
 			return err
 		}
-		metric, err := ConvertMetricToGauge(nm.metric)
-		if err != nil {
-			return err
+		switch nm.metric.(type) {
+		case *prometheus.GaugeVec:
+			metricVec, err := ConvertMetricToGaugeVec(nm.metric)
+			if err != nil {
+				return err
+			}
+			nm.HandleData(
+				nodes,
+				nil,
+				metricVec,
+			)
+		default:
+			metric, err := ConvertMetricToGauge(nm.metric)
+			if err != nil {
+				return err
+			}
+			nm.HandleData(
+				nodes,
+				metric,
+				nil,
+			)
 		}
-		nm.HandleData(
-			nodes,
-			metric,
-		)
 		return nil
 	}
 }
@@ -35,7 +49,7 @@ var ankaNodesMetrics = []NodesMetric{
 			metric: CreateGaugeMetric("anka_nodes_count", "Count of total Anka Nodes"),
 			event:  events.EVENT_NODE_UPDATED,
 		},
-		HandleData: func(nodes []types.Node, metric prometheus.Gauge) {
+		HandleData: func(nodes []types.Node, metric prometheus.Gauge, metricVec *prometheus.GaugeVec) {
 			metric.Set(float64(len(nodes)))
 		},
 	},
@@ -44,7 +58,7 @@ var ankaNodesMetrics = []NodesMetric{
 			metric: CreateGaugeMetric("anka_nodes_instance_count", "Count of Instance slots in use across all Nodes"),
 			event:  events.EVENT_NODE_UPDATED,
 		},
-		HandleData: func(nodes []types.Node, metric prometheus.Gauge) {
+		HandleData: func(nodes []types.Node, metric prometheus.Gauge, metricVec *prometheus.GaugeVec) {
 			var count uint
 			for _, node := range nodes { // For each node
 				count = count + node.VMCount
@@ -54,15 +68,18 @@ var ankaNodesMetrics = []NodesMetric{
 	},
 	{
 		BaseAnkaMetric: BaseAnkaMetric{
-			metric: CreateGaugeMetric("anka_nodes_instance_capacity", "Count of total Instance Capacity across all Nodes"),
+			metric: CreateGaugeMetricVec("anka_nodes_instance_capacity", "Count of total Instance Capacity across all Nodes, per Architecture", []string{"arch"}),
 			event:  events.EVENT_NODE_UPDATED,
 		},
-		HandleData: func(nodes []types.Node, metric prometheus.Gauge) {
-			var count uint
-			for _, node := range nodes { // For each node
-				count = count + node.Capacity
+		HandleData: func(nodes []types.Node, metric prometheus.Gauge, metricVec *prometheus.GaugeVec) {
+			checkAndHandleResetOfGaugeVecMetric(len(nodes), "anka_nodes_instance_capacity", metricVec)
+			var counts = make(map[string]uint)
+			for _, node := range nodes {
+				counts[node.HostArch] = counts[node.HostArch] + node.Capacity
 			}
-			metric.Set(float64(count))
+			for arch, count := range counts {
+				metricVec.With(prometheus.Labels{"arch": arch}).Set(float64(count))
+			}
 		},
 	},
 	{
@@ -70,7 +87,7 @@ var ankaNodesMetrics = []NodesMetric{
 			metric: CreateGaugeMetric("anka_nodes_disk_free_space", "Amount of free disk space across all Nodes in Bytes"),
 			event:  events.EVENT_NODE_UPDATED,
 		},
-		HandleData: func(nodes []types.Node, metric prometheus.Gauge) {
+		HandleData: func(nodes []types.Node, metric prometheus.Gauge, metricVec *prometheus.GaugeVec) {
 			var count uint
 			for _, node := range nodes { // For each node
 				count = count + node.FreeDiskSpace
@@ -83,7 +100,7 @@ var ankaNodesMetrics = []NodesMetric{
 			metric: CreateGaugeMetric("anka_nodes_disk_total_space", "Amount of total available disk space across all Nodes in Bytes"),
 			event:  events.EVENT_NODE_UPDATED,
 		},
-		HandleData: func(nodes []types.Node, metric prometheus.Gauge) {
+		HandleData: func(nodes []types.Node, metric prometheus.Gauge, metricVec *prometheus.GaugeVec) {
 			var count uint
 			for _, node := range nodes { // For each node
 				count = count + node.DiskSize
@@ -96,7 +113,7 @@ var ankaNodesMetrics = []NodesMetric{
 			metric: CreateGaugeMetric("anka_nodes_disk_anka_used_space", "Amount of disk space used by Anka across all Nodes in Bytes"),
 			event:  events.EVENT_NODE_UPDATED,
 		},
-		HandleData: func(nodes []types.Node, metric prometheus.Gauge) {
+		HandleData: func(nodes []types.Node, metric prometheus.Gauge, metricVec *prometheus.GaugeVec) {
 			var count uint
 			for _, node := range nodes { // For each node
 				count = count + node.AnkaDiskUsage
@@ -109,7 +126,7 @@ var ankaNodesMetrics = []NodesMetric{
 			metric: CreateGaugeMetric("anka_nodes_cpu_core_count", "Count of CPU Cores across all Nodes"),
 			event:  events.EVENT_NODE_UPDATED,
 		},
-		HandleData: func(nodes []types.Node, metric prometheus.Gauge) {
+		HandleData: func(nodes []types.Node, metric prometheus.Gauge, metricVec *prometheus.GaugeVec) {
 			var count uint
 			for _, node := range nodes { // For each node
 				count = count + node.CPU
@@ -122,7 +139,7 @@ var ankaNodesMetrics = []NodesMetric{
 			metric: CreateGaugeMetric("anka_nodes_cpu_util", "Total CPU utilization across all Nodes"),
 			event:  events.EVENT_NODE_UPDATED,
 		},
-		HandleData: func(nodes []types.Node, metric prometheus.Gauge) {
+		HandleData: func(nodes []types.Node, metric prometheus.Gauge, metricVec *prometheus.GaugeVec) {
 			var count float64
 			for _, node := range nodes { // For each node
 				count = count + node.CPUUtilization
@@ -135,7 +152,7 @@ var ankaNodesMetrics = []NodesMetric{
 			metric: CreateGaugeMetric("anka_nodes_ram_gb", "Total RAM available across all Nodes in GB"),
 			event:  events.EVENT_NODE_UPDATED,
 		},
-		HandleData: func(nodes []types.Node, metric prometheus.Gauge) {
+		HandleData: func(nodes []types.Node, metric prometheus.Gauge, metricVec *prometheus.GaugeVec) {
 			var count uint
 			for _, node := range nodes { // For each node
 				count = count + node.RAM
@@ -148,7 +165,7 @@ var ankaNodesMetrics = []NodesMetric{
 			metric: CreateGaugeMetric("anka_nodes_ram_util", "Total RAM utilized across all Nodes"),
 			event:  events.EVENT_NODE_UPDATED,
 		},
-		HandleData: func(nodes []types.Node, metric prometheus.Gauge) {
+		HandleData: func(nodes []types.Node, metric prometheus.Gauge, metricVec *prometheus.GaugeVec) {
 			var count float64
 			for _, node := range nodes { // For each node
 				count = count + node.RAMUtilization
@@ -161,7 +178,7 @@ var ankaNodesMetrics = []NodesMetric{
 			metric: CreateGaugeMetric("anka_nodes_used_virtual_cpu_count", "Total Used Virtual CPU cores across all Nodes"),
 			event:  events.EVENT_NODE_UPDATED,
 		},
-		HandleData: func(nodes []types.Node, metric prometheus.Gauge) {
+		HandleData: func(nodes []types.Node, metric prometheus.Gauge, metricVec *prometheus.GaugeVec) {
 			var count uint
 			for _, node := range nodes { // For each node
 				count = count + node.UsedVCPUCount
@@ -174,7 +191,7 @@ var ankaNodesMetrics = []NodesMetric{
 			metric: CreateGaugeMetric("anka_nodes_used_virtual_ram_mb", "Total Used Virtual RAM across all Nodes in MB"),
 			event:  events.EVENT_NODE_UPDATED,
 		},
-		HandleData: func(nodes []types.Node, metric prometheus.Gauge) {
+		HandleData: func(nodes []types.Node, metric prometheus.Gauge, metricVec *prometheus.GaugeVec) {
 			var count uint
 			for _, node := range nodes { // For each node
 				count = count + node.UsedVRAM

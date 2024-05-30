@@ -5,6 +5,12 @@ var NodeStates = []string{
 	"Inactive (Invalid License)",
 	"Active",
 	"Updating",
+	"Drain Mode",
+}
+
+var Architectures = []string{
+	"amd64",
+	"arm64",
 }
 
 var InstanceStates = []string{
@@ -34,6 +40,7 @@ type Node struct {
 	DiskSize       uint        `json:"disk_size"`
 	State          string      `json:"state"`
 	Capacity       uint        `json:"capacity"`
+	HostArch       string      `json:"host_arch"`
 	Groups         []NodeGroup `json:"groups"`
 }
 
@@ -60,6 +67,7 @@ type VmData struct {
 	TemplateName string
 	GroupUUID    string `json:"group_id"`
 	NodeUUID     string `json:"node_id"`
+	Arch         string `json:"arch"`
 }
 
 type Response interface {
