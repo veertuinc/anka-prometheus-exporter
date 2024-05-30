@@ -5,6 +5,7 @@ var NodeStates = []string{
 	"Inactive (Invalid License)",
 	"Active",
 	"Updating",
+	"Drain Mode",
 }
 
 var Architectures = []string{
