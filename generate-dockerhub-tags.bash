@@ -14,4 +14,7 @@ cp -f ./bin/"${NAME}"_linux* "${DOCKERFILE_PATH}/"
 ls -alht "${DOCKERFILE_PATH}/"
 trap cleanup EXIT
 pushd "${DOCKERFILE_PATH}"
-docker buildx build --no-cache --platform linux/amd64,linux/arm64 -t veertu/"${NAME}":latest -t veertu/"$NAME:v$(cat "${SCRIPT_DIR}"/VERSION)" --push .
+docker buildx create --name mybuilder --use || true
+docker buildx install || true
+# make sure docker login is handled
+docker build --no-cache --platform linux/amd64,linux/arm64 -t veertu/"${NAME}":latest -t veertu/"$NAME:v$(cat "${SCRIPT_DIR}"/VERSION)" --push .
