@@ -47,4 +47,4 @@ build-mac:
 docker-build-scratch:
 	$(MAKE) build-linux
 	mv ./bin/$(BIN)_linux_$(ARCH) docker/scratch/
-	docker build ./docker/scratch -t $(BIN)-scratch
+	docker build --load ./docker/scratch -t $(BIN)-scratch
