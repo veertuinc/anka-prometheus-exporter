@@ -22,7 +22,9 @@ func (ism InstanceStateMetric) GetEventHandler() func(interface{}) error {
 		}
 		var archStateMap = intMapFromTwoStringSlices(types.Architectures, types.InstanceStates)
 		for _, instance := range instances {
-			archStateMap[instance.Vm.Arch][instance.Vm.State] = archStateMap[instance.Vm.Arch][instance.Vm.State] + 1
+			if instance.Vm.Arch != "" && instance.Vm.State != "" { // prevent panic: assignment to entry in nil map when no Arch for instance
+				archStateMap[instance.Vm.Arch][instance.Vm.State] = archStateMap[instance.Vm.Arch][instance.Vm.State] + 1
+			}
 		}
 		for _, arch := range types.Architectures {
 			for _, state := range types.InstanceStates {
