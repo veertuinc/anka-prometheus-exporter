@@ -44,7 +44,7 @@ func (comm *Communicator) UpdateEncodedTAPData() error {
 	return err
 }
 
-func NewCommunicator(addr, username, password string, certs TLSCerts, uak UAK) (*Communicator, error) {
+func NewCommunicator(addr, username, password string, certs ClientTLSCerts, uak UAK) (*Communicator, error) {
 	comm := &Communicator{
 		controllerAddress: addr,
 		username:          username,
@@ -192,11 +192,11 @@ func (comm *Communicator) getData(endpoint string, repsObject types.Response) (i
 			log.Warn("[auth::uak] uak session expired")
 			err = comm.UpdateEncodedTAPData()
 			if err != nil {
-				log.Error(fmt.Errorf("could not renew TAP for UAK: %+v", err))
+				log.Error(fmt.Sprintf("could not renew TAP for UAK: %+v", err))
 			}
 			repsObject, err = comm.fetchResponseData(endpoint, repsObject)
 			if err != nil {
-				log.Error(fmt.Errorf("could not get data (after TAP renewal): %+v", err))
+				log.Error(fmt.Sprintf("could not get data (after TAP renewal): %+v", err))
 			}
 		} else {
 			return nil, errors.New(repsObject.GetMessage())

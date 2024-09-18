@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/prometheus/exporter-toolkit/web"
 	"github.com/veertuinc/anka-prometheus-exporter/src/log"
 )
 
@@ -18,24 +20,60 @@ type Server struct {
 	registry           *prometheus.Registry
 	intervalChangeFunc func(i int64)
 	lock               *sync.Mutex
-	port               int
+	webListenAddress   string
+	version            string
+	configFile         string
 }
 
-func NewServer(promReg *prometheus.Registry, port int) *Server {
+func NewServer(
+	promReg *prometheus.Registry,
+	webListenAddress string,
+	version string,
+	configFile string,
+) *Server {
 	return &Server{
 		lastInterval:       0,
 		lastRequestTime:    time.Now().Unix(),
 		registry:           promReg,
 		intervalChangeFunc: nil,
 		lock:               &sync.Mutex{},
-		port:               port,
+		webListenAddress:   webListenAddress,
+		version:            version,
+		configFile:         configFile,
 	}
 }
 
 func (server *Server) Init() {
-	log.Info(fmt.Sprintf("Serving metrics at /metrics and :%d", server.port))
+	log.Info(fmt.Sprintf("Serving metrics at %s/metrics", server.webListenAddress))
+
 	http.HandleFunc("/metrics", server.handleRequest())
-	http.ListenAndServe(fmt.Sprintf(":%d", server.port), nil)
+
+	landingConfig := web.LandingConfig{
+		HeaderColor: "#7e57c2",
+		Name:        "Anka Prometheus Exporter",
+		Description: "Prometheus Exporter for Anka Build Cloud Controller",
+		Version:     server.version,
+		Links: []web.LandingLinks{
+			{
+				Address: "/metrics",
+				Text:    "Metrics",
+			},
+		},
+	}
+	landingPage, err := web.NewLandingPage(landingConfig)
+	if err != nil {
+		log.Error(fmt.Sprintf("Error creating landing page: %s", err.Error()))
+		os.Exit(1)
+	}
+	http.Handle("/", landingPage)
+
+	if err := web.ListenAndServe(&http.Server{}, &web.FlagConfig{
+		WebListenAddresses: &[]string{server.webListenAddress},
+		WebConfigFile:      &server.configFile,
+	}, log.Logger); err != nil {
+		log.Error(fmt.Sprintf("Error starting web server: %s", err.Error()))
+		os.Exit(1)
+	}
 }
 
 func (server *Server) handleRequest() func(http.ResponseWriter, *http.Request) {

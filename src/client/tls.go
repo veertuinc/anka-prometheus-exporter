@@ -8,10 +8,10 @@ import (
 	"os"
 )
 
-type TLSCerts struct {
+type ClientTLSCerts struct {
 	UseTLS              bool
-	ClientCert          string
-	ClientCertKey       string
+	Cert                string
+	CertKey             string
 	CACert              string
 	SkipTLSVerification bool
 }
@@ -28,7 +28,7 @@ func appendRootCert(certFilePath string, caCertPool *x509.CertPool) error {
 	return nil
 }
 
-func setUpTLS(certs TLSCerts) error {
+func setUpTLS(certs ClientTLSCerts) error {
 	if !certs.UseTLS {
 		return nil
 	}
@@ -45,8 +45,8 @@ func setUpTLS(certs TLSCerts) error {
 		}
 	}
 
-	if certs.ClientCert != "" && certs.ClientCertKey != "" {
-		cert, err := tls.LoadX509KeyPair(certs.ClientCert, certs.ClientCertKey)
+	if certs.Cert != "" && certs.CertKey != "" {
+		cert, err := tls.LoadX509KeyPair(certs.Cert, certs.CertKey)
 		if err != nil {
 			return err
 		}

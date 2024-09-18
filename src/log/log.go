@@ -1,60 +1,52 @@
 package log
 
 import (
+	"log/slog"
 	"os"
-	"sync"
-
-	"github.com/sirupsen/logrus"
 )
 
-func getEnv(key, fallback string) string {
-	value := os.Getenv(key)
-	if len(value) == 0 {
-		return fallback
+var Logger = func() *slog.Logger {
+	var logLevel string
+	if value, exists := os.LookupEnv("LOG_LEVEL"); exists {
+		logLevel = value
+	} else {
+		logLevel = "INFO"
 	}
-	return value
-}
-
-var Logger = GetLogger()
-var once sync.Once
+	var level slog.Level
+	switch logLevel {
+	case "debug":
+		level = slog.LevelDebug
+	case "info":
+		level = slog.LevelInfo
+	case "warn":
+		level = slog.LevelWarn
+	case "error":
+		level = slog.LevelError
+	case "fatal":
+		level = slog.LevelError
+	default:
+		level = slog.LevelInfo
+	}
+	return slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: level}))
+}()
 
 func Info(message string) {
-	Logger.Infoln(message)
+	Logger.Info(message)
 }
 
 func Warn(message string) {
-	Logger.Warnln(message)
+	Logger.Warn(message)
 }
 
-func Error(message error) {
-	Logger.Errorln(message)
+func Error(message string) {
+	Logger.Error(message)
 }
 
-func Fatal(message error) {
-	Logger.Fatalln(message)
+func Fatal(message string) {
+	Logger.Error(message)
+	os.Exit(1)
 }
 
 func Debug(message string) {
-	Logger.Debugln(message)
-}
-
-func GetLogger() *logrus.Logger {
-	var log *logrus.Logger
-	once.Do(func() {
-		log = logrus.New()
-		log.SetFormatter(&logrus.JSONFormatter{})
-		switch getEnv("LOG_LEVEL", "info") {
-		case "debug":
-			log.SetLevel(logrus.DebugLevel)
-		case "info":
-			log.SetLevel(logrus.InfoLevel)
-		case "warn":
-			log.SetLevel(logrus.WarnLevel)
-		case "fatal":
-			log.SetLevel(logrus.FatalLevel)
-		case "panic":
-			log.SetLevel(logrus.PanicLevel)
-		}
-	})
-	return log
+	Logger.Debug(message)
 }
