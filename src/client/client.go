@@ -24,7 +24,7 @@ type Client struct {
 	eventsMutex         sync.Mutex
 }
 
-func NewClient(addr, username, password string, interval int, certs TLSCerts, uak UAK) (*Client, error) {
+func NewClient(addr, username, password string, interval int, certs ClientTLSCerts, uak UAK) (*Client, error) {
 	communicator, err := NewCommunicator(addr, username, password, certs, uak)
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func NewClient(addr, username, password string, interval int, certs TLSCerts, ua
 		errorTimeoutSeconds: 10,
 	}
 	if err := c.communicator.TestConnection(); err != nil {
-		log.Fatal(err)
+		log.Fatal(fmt.Sprintf("Error testing connection: %s", err.Error()))
 		return nil, err
 	}
 	return c, nil
@@ -85,7 +85,7 @@ func (client *Client) initDataLoop(f func() (interface{}, error), ev events.Even
 		log.Debug("Requesting data for: " + runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name())
 		data, err := f()
 		if err != nil {
-			log.Error(fmt.Errorf("could not get data: %+v", err))
+			log.Error(fmt.Sprintf("could not get data: %+v", err))
 			time.Sleep(time.Duration(client.errorTimeoutSeconds) * time.Second)
 			continue
 		}
@@ -94,7 +94,7 @@ func (client *Client) initDataLoop(f func() (interface{}, error), ev events.Even
 		client.eventsMutex.Unlock()
 		for _, eventHandler := range events {
 			if err := eventHandler(data); err != nil {
-				log.Error(fmt.Errorf("ignoring event handler failure for event id %+v - Error: %+v", ev, err))
+				log.Error(fmt.Sprintf("ignoring event handler failure for event id %+v - Error: %+v", ev, err))
 			}
 		}
 		log.Debug("Finished requesting data for: " + runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name())

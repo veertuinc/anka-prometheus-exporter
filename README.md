@@ -18,45 +18,48 @@ Ensure you have a functioning Prometheus instance before using this.
 | ANKA_PROMETHEUS_EXPORTER_INTERVAL (int) | --interval (int) |
 | ANKA_PROMETHEUS_EXPORTER_PORT (int) | --port (int) |
 | ANKA_PROMETHEUS_EXPORTER_DISABLE_INTERVAL_OPTIMIZER (bool) | --disable-interval-optimizer |
-| ANKA_PROMETHEUS_EXPORTER_TLS (bool) | --tls |
-| ANKA_PROMETHEUS_EXPORTER_SKIP_TLS_VERIFICATION (bool) | --skip-tls-verification |
-| ANKA_PROMETHEUS_EXPORTER_CA_CERT (string) | --ca-cert (string) |
+| ANKA_PROMETHEUS_EXPORTER_CLIENT_TLS (bool) | --client-tls |
+| ANKA_PROMETHEUS_EXPORTER_CLIENT_SKIP_TLS_VERIFICATION (bool) | --client-skip-tls-verification |
+| ANKA_PROMETHEUS_EXPORTER_CLIENT_CA_CERT (string) | --client-ca-cert (string) |
 | ANKA_PROMETHEUS_EXPORTER_CLIENT_CERT (string) | --client-cert (string) |
 | ANKA_PROMETHEUS_EXPORTER_CLIENT_CERT_KEY (string) | --client-cert-key (string) |
 | ANKA_PROMETHEUS_EXPORTER_UAK_ID (string) | --uak-id (string) |
 | ANKA_PROMETHEUS_EXPORTER_UAK_PATH (string) | --uak-path (string) |
 | ANKA_PROMETHEUS_EXPORTER_UAK_STRING (string) | --uak-string (string) |
+| ANKA_PROMETHEUS_EXPORTER_WEB_CONFIG_FILE (string) | --web.config.file (string) |
 
 ```bash
 Usage of anka-prometheus-exporter:
-  -ca-cert string
-        Path to ca PEM/x509 file (cert file path as arg)
+  -client-ca-cert string
+        Path to client CA PEM/x509 file (cert file path as arg)
   -client-cert string
         Path to client cert PEM/x509 file (cert file path as arg)
   -client-cert-key string
         Path to client key PEM/x509 file (cert file path as arg)
+  -client-skip-tls-verification
+        Skip client TLS verification (no args)
+  -client-tls
+        Enable client TLS (no args)
   -controller-address string
         Controller address to monitor (url as arg) (required)
-  -controller-username string
-        Controller username with basic root token (username as arg)
   -controller-password string
-        Controller password with basic root token (password as arg) 
+        Controller basic auth password (password as arg)
+  -controller-username string
+        Controller basic auth username (username as arg)
   -disable-interval-optimizer
-        Optimize interval according to /metric api requests receieved (no args)
+        Optimize interval according to /metric api requests received (no args)
   -interval int
         Seconds to wait between data requests to controller (int as arg) (default 15)
-  -port int
-        Port to server /metrics endpoint (int as arg) (default 2112)
-  -skip-tls-verification
-        Skip TLS verification (no args)
-  -tls
-        Enable TLS (no args)
   -uak-id string
         UAK ID you wish to use for Controller requests (string as arg)
+  -uak-path string
+        Path to the UAK file used for Controller requests (path as arg) (supersedes -uak-string)
   -uak-string string
         String form (cat myUAK.pem | sed '1,1d' | sed '$d' | tr -d '\n') of the key file contents for Controller requests (string as arg)
-  -uak-path string
-        Path to the UAK for Controller requests (path as arg) (takes priority over -uak-string if both are specified)
+  -web.config.file string
+        Path to configuration file that can enable server TLS or authentication. See: https://github.com/prometheus/exporter-toolkit/blob/master/docs/web-configuration.md
+  -web.listen-address :2112
+        Address on which to expose metrics and web interface. Examples: :2112 or `[::1]:2112` for http, `vsock://:2112` for vsock
 ```
 
 > `LOG_LEVEL` can be set using an environment variable
@@ -101,20 +104,37 @@ scrape_configs:
 
 ## Using TLS
 
-The `--tls` flag is not required if your controller certificate is signed with a major CA and no client authentication is configured. For all other TLS configuration options, like self signed scenarios, `--tls` must be enabled.
+Protecting your metrics endpoint with TLS is possible using the `web.config.file` flag. It looks something like this:
 
-For self signed certificates, you can either use `--skip-tls-verification` or provide your ca-cert with `--ca-cert`.
+`-web.config.file web.config.yml` or `ANKA_PROMETHEUS_EXPORTER_WEB_CONFIG_FILE=web.config.yml`
 
-### Using Auth
+```yaml
+tls_server_config:
+  cert_file: server.crt
+  key_file: server.key
 
-- If client authentication is set on the controller, use `--client-cert` and `--client-cert-key`.
-- If RTA is enabled, you can use basic auth through:
+# Usernames and passwords required to connect.
+# Passwords are hashed with bcrypt: https://github.com/prometheus/exporter-toolkit/blob/master/docs/web-configuration.md#about-bcrypt.
+# basic_auth_users:
+#   test: $2y$10$Cfzh3pBDQmxAuWyg87p.r.sRJvPkkdhf8iyF.WgXbHWi8BsTbhHWi
+```
+
+This allows you to protect your metrics endpoint with TLS/https. You'd then load your metrics endpoint with `https://{URL}:2112/metrics`.
+
+## Using Auth
+
+You have two options for authentication with the Controller.
+
+1. If [mtls](https://docs.veertu.com/anka/anka-build-cloud/advanced-security-features/certificate-authentication/) is enabled on the controller, use `-client-cert` and `-client-cert-key`.
+2. If RTA is enabled, you can use basic auth through:
     ```bash
       -controller-username string
             Controller username with basic root token (username as arg)
       -controller-password string
-            Controller password with basic root token (password as arg) 
+            Controller password with basic root token (password as arg)
     ```
+
+The `-client-tls` flag is not required if your controller certificate is signed with a major CA and no client authentication is configured. For all other TLS configuration options, like self signed scenarios, `--tls` must be enabled. For self signed certificates, you can either use `-client-skip-tls-verification` or provide your ca-cert with `-client-ca-cert`.
 
 ---
 
@@ -182,6 +202,7 @@ anka_registry_template_tags_count | Count of Tags in the Registry for the Templa
 
 | current version | target version | notes |
 | --------------- | -------------- | ----- |
+| v3.x | v4.x | Client certs for mTLS were changed. You will need to update your config to the new `--client-*` flags. |
 | v2.x | v3.x | The metrics `anka_nodes_instance_capacity` and `anka_node_states_count` are now split by architecture (label: `arch`). Almost all `anka_node_*` metrics now also include `arch` as a label. You must also be running the Anka Build Cloud Controller >= v1.22.0 as architecture was added in this version. |
 
 ---
@@ -190,4 +211,10 @@ anka_registry_template_tags_count | Count of Tags in the Registry for the Templa
 
 ```bash
 make build-and-run ARGUMENTS="--controller-username root --controller-password 1111111111"
+```
+
+or 
+
+```bash
+go run -ldflags="-X main.version=$(cat VERSION) -X main.commit=$(git rev-parse HEAD)" main.go --controller-address http://anka.controller:8090
 ```

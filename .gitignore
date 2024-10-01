@@ -4,3 +4,14 @@ dist/
 anka-prometheus-exporter_linux*
 anka-prometheus-exporter_darwin*
 docker-compose.yml
+*.pem
+*.crt
+*.key
+*.csr
+*.p12
+*.der
+*.cer
+*.pfx
+*.p12
+*.p12
+web.config.yml

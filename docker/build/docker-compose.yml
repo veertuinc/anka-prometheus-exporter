@@ -6,21 +6,16 @@ services:
       - "2112:2112"
     # volumes:
     #   - **HOST CERTS FOLDER**:/certs
+    volumes:
+      - ./web-config.yml:/config/web-config.yml
     environment:
-      CONTROLLER_ADDR: # Replace this with your CONTROLLER URL | Example: "http://host.docker.internal:8090"
-
-      # Controller requests interval is optimized according to incoming /metrics request. To disable, uncomment the next line
-      # DISABLE_INTERVAL_OPTIMIZER: "--disable-optimize-interval"
-
-      # Optional variables:
-      # ANKA_PROMETHEUS_PORT: "--port 2112"
-      # ANKA_PROMETHEUS_INTERVAL: "--interval ***ENTER NUM OF SECONDS HERE***"
-
-      # TLS Options:
-      # USE_TLS: "--tls"
-      # SKIP_TLS: "--skip-tls-verification"
-      # CA_CERT: "--ca-cert /certs/**ENTER CA CERT FILE NAME HERE**"
-      # CLIENT_CERT: "--client-cert /certs/**ENTER CLIENT CERT FILE NAME HERE**"
-      # CLIENT_KEY: "--client-cert-key /certs/**ENTER CLIENT KEY FILE NAME HERE**"
-      # CONTROLLER_USERNAME: "--controller-username root"
-      # CONTROLLER_PASSWORD: "--controller-password {PASSWORD HERE}"
+      - ANKA_PROMETHEUS_EXPORTER_CONTROLLER_ADDRESS=https://host.docker.internal:8090 # change to be your url and port
+      #- ANKA_PROMETHEUS_EXPORTER_INTERVAL=10
+      #- ANKA_PROMETHEUS_EXPORTER_PORT=2112
+      #- ANKA_PROMETHEUS_EXPORTER_DISABLE_INTERVAL_OPTIMIZER=true
+      #- ANKA_PROMETHEUS_EXPORTER_TLS=true
+      #- ANKA_PROMETHEUS_EXPORTER_SKIP_TLS_VERIFICATION=true
+      #- ANKA_PROMETHEUS_EXPORTER_CA_CERT=/certs/ca.crt
+      #- ANKA_PROMETHEUS_EXPORTER_CLIENT_CERT=/certs/client.crt
+      #- ANKA_PROMETHEUS_EXPORTER_CLIENT_KEY=/certs/client.key
+      #- ANKA_PROMETHEUS_EXPORTER_WEB_CONFIG_FILE=/config/web-config.yml

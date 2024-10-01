@@ -5,13 +5,16 @@ services:
     container_name: anka-prometheus-exporter
     ports:
       - "2112:2112"
+    #volumes:
+    #  - web-config.yml:/config/web-config.yml
     environment:
       - ANKA_PROMETHEUS_EXPORTER_CONTROLLER_ADDRESS=https://host.docker.internal:8090 # change to be your url and port
       # - ANKA_PROMETHEUS_EXPORTER_INTERVAL
       # - ANKA_PROMETHEUS_EXPORTER_PORT
       # - ANKA_PROMETHEUS_EXPORTER_DISABLE_INTERVAL_OPTIMIZER
-      # - ANKA_PROMETHEUS_EXPORTER_TLS
-      # - ANKA_PROMETHEUS_EXPORTER_SKIP_TLS_VERIFICATION
-      # - ANKA_PROMETHEUS_EXPORTER_CA_CERT
+      # - ANKA_PROMETHEUS_EXPORTER_CLIENT_TLS
+      # - ANKA_PROMETHEUS_EXPORTER_CLIENT_SKIP_TLS_VERIFICATION
+      # - ANKA_PROMETHEUS_EXPORTER_CLIENT_CA_CERT
       # - ANKA_PROMETHEUS_EXPORTER_CLIENT_CERT
       # - ANKA_PROMETHEUS_EXPORTER_CLIENT_CERT_KEY
+      # - ANKA_PROMETHEUS_EXPORTER_WEB_CONFIG_FILE=/config/web-config.yml
