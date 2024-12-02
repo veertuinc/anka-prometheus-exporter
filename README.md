@@ -27,7 +27,7 @@ Ensure you have a functioning Prometheus instance before using this.
 | ANKA_PROMETHEUS_EXPORTER_UAK_PATH (string) | --uak-path (string) |
 | ANKA_PROMETHEUS_EXPORTER_UAK_STRING (string) | --uak-string (string) |
 | ANKA_PROMETHEUS_EXPORTER_WEB_CONFIG_FILE (string) | --web.config.file (string) |
-| ANKA_PROMETHEUS_EXPORTER_WEB_LISTEN_ADDRESS (string) | -web.listen-address (string) |
+| ANKA_PROMETHEUS_EXPORTER_WEB_LISTEN_ADDRESS (string) | --web.listen-address (string) |
 
 ```bash
 Usage of anka-prometheus-exporter:
