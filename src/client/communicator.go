@@ -89,6 +89,18 @@ func (comm *Communicator) TestConnection() error {
 	}
 }
 
+func (comm *Communicator) GetStatus() (interface{}, error) {
+	lock.Lock()
+	defer lock.Unlock()
+	endpoint := "/api/v1/status"
+	resp := &types.StatusResponse{}
+	d, err := comm.getData(endpoint, resp)
+	if err != nil {
+		return nil, fmt.Errorf("getting status error: %s", err)
+	}
+	return d, nil
+}
+
 func (comm *Communicator) GetNodesData() (interface{}, error) {
 	lock.Lock()
 	defer lock.Unlock()

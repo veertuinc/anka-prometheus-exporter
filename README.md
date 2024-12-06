@@ -142,6 +142,9 @@ The `-client-tls` flag is not required if your controller certificate is signed 
 
 Metric name | Description
 ---- | ----------
+anka_controller_state_count | Status of the Anka Controller (labels: state)
+anka_registry_state_count | Status of the Anka Registry (labels: state)
+-- | --
 anka_instance_state_count | Count of Instances in a particular State (labels: arch, state)
 anka_instance_state_per_template_count | Count of Instances in a particular state, per Template (labels: state, template_uuid, template_name)
 anka_instance_state_per_group_count | Count of Instances in a particular state, per Group (labels: state, group_name)
