@@ -62,6 +62,14 @@ func CreateGaugeMetricVec(name string, help string, labels []string) *prometheus
 		}, labels)
 }
 
+func ConvertToStatusData(d interface{}) (*types.Status, error) {
+	data, ok := d.(types.Status)
+	if !ok {
+		return nil, fmt.Errorf("could not convert incoming data to required status information. original data: %v", d)
+	}
+	return &data, nil
+}
+
 func ConvertToNodeData(d interface{}) ([]types.Node, error) {
 	data, ok := d.([]types.Node)
 	if !ok {

@@ -1,5 +1,14 @@
 package types
 
+var ControllerStates = []string{
+	"Running",
+}
+
+var RegistryStates = []string{
+	"Running",
+	"FAIL",
+}
+
 var NodeStates = []string{
 	"Offline",
 	"Inactive (Invalid License)",
@@ -23,6 +32,14 @@ var InstanceStates = []string{
 	"Terminated",
 	"Error",
 	"Pushing",
+}
+
+type Status struct {
+	Status          string `json:"status"`
+	Version         string `json:"version"`
+	RegistryAddress string `json:"registry_address"`
+	RegistryStatus  string `json:"registry_status"`
+	License         string `json:"license"`
 }
 
 type Node struct {
@@ -87,6 +104,15 @@ func (dr *DefaultResponse) GetStatus() string {
 
 func (dr *DefaultResponse) GetMessage() string {
 	return dr.Message
+}
+
+type StatusResponse struct {
+	DefaultResponse
+	Body Status `json:"body"`
+}
+
+func (sr *StatusResponse) GetBody() interface{} {
+	return sr.Body
 }
 
 type NodesResponse struct {
