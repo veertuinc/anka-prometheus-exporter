@@ -35,6 +35,7 @@ func NewClient(addr, username, password string, interval int, certs ClientTLSCer
 			events.EVENT_REGISTRY_DISK_DATA_UPDATED: make([]func(interface{}) error, 0),
 			events.EVENT_VM_DATA_UPDATED:            make([]func(interface{}) error, 0),
 			events.EVENT_REGISTRY_TEMPLATES_UPDATED: make([]func(interface{}) error, 0),
+			events.EVENT_STATUS_UPDATED:             make([]func(interface{}) error, 0),
 		},
 		communicator:        communicator,
 		timeoutSeconds:      int64(interval),
@@ -55,6 +56,7 @@ func (client *Client) Init() {
 	go client.initDataLoop(client.communicator.GetVmsData, events.EVENT_VM_DATA_UPDATED)
 	go client.initDataLoop(client.communicator.GetRegistryDiskData, events.EVENT_REGISTRY_DISK_DATA_UPDATED)
 	go client.initDataLoop(client.communicator.GetRegistryTemplatesData, events.EVENT_REGISTRY_TEMPLATES_UPDATED)
+	go client.initDataLoop(client.communicator.GetStatus, events.EVENT_STATUS_UPDATED)
 }
 
 func (client *Client) Register(ev events.Event, eventHandler func(interface{}) error) error {

@@ -27,6 +27,7 @@ Ensure you have a functioning Prometheus instance before using this.
 | ANKA_PROMETHEUS_EXPORTER_UAK_PATH (string) | --uak-path (string) |
 | ANKA_PROMETHEUS_EXPORTER_UAK_STRING (string) | --uak-string (string) |
 | ANKA_PROMETHEUS_EXPORTER_WEB_CONFIG_FILE (string) | --web.config.file (string) |
+| ANKA_PROMETHEUS_EXPORTER_WEB_LISTEN_ADDRESS (string) | --web.listen-address (string) |
 
 ```bash
 Usage of anka-prometheus-exporter:
@@ -142,6 +143,9 @@ The `-client-tls` flag is not required if your controller certificate is signed 
 
 Metric name | Description
 ---- | ----------
+anka_controller_state_count | Status of the Anka Controller (labels: state)
+anka_registry_state_count | Status of the Anka Registry (labels: state)
+-- | --
 anka_instance_state_count | Count of Instances in a particular State (labels: arch, state)
 anka_instance_state_per_template_count | Count of Instances in a particular state, per Template (labels: state, template_uuid, template_name)
 anka_instance_state_per_group_count | Count of Instances in a particular state, per Group (labels: state, group_name)
