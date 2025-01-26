@@ -85,6 +85,7 @@ type VmData struct {
 	GroupUUID    string `json:"group_id"`
 	NodeUUID     string `json:"node_id"`
 	Arch         string `json:"arch"`
+	CreationTime string `json:"cr_time"`
 }
 
 type Response interface {

@@ -1,8 +1,12 @@
 package metrics
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/veertuinc/anka-prometheus-exporter/src/events"
+	"github.com/veertuinc/anka-prometheus-exporter/src/log"
 	"github.com/veertuinc/anka-prometheus-exporter/src/types"
 )
 
@@ -146,6 +150,53 @@ var ankaInstanceStatePerMetrics = []InstanceStatePerMetric{
 			for wantedState, wantedStateMap := range InstanceStatePerNodeCountMap {
 				for wantedNodeUUID, count := range wantedStateMap {
 					metric.With(prometheus.Labels{"state": wantedState, "node_uuid": wantedNodeUUID}).Set(float64(count))
+				}
+			}
+		},
+	},
+	{
+		BaseAnkaMetric: BaseAnkaMetric{
+			metric: CreateGaugeMetricVec("anka_instance_max_age_per_template_seconds", "Age of oldest Instance in a particular state, per Template (label: state, template_uuid, template_name)", []string{"state", "template_uuid", "template_name"}),
+			event:  events.EVENT_VM_DATA_UPDATED,
+		},
+		HandleData: func(instances []types.Instance, metric *prometheus.GaugeVec) {
+			var InstanceAgePerTemplateMaximumMap = map[string]map[string]int{}
+			var instanceTemplates []string
+			var instanceTemplatesMap = map[string]string{}
+			now := time.Now()
+			for _, instance := range instances {
+				instanceTemplates = append(instanceTemplates, instance.Vm.TemplateUUID)
+				instanceTemplatesMap[instance.Vm.TemplateUUID] = instance.Vm.TemplateName
+			}
+			instanceTemplates = uniqueThisStringArray(instanceTemplates)
+			for _, wantedState := range types.InstanceStates {
+				if _, ok := InstanceAgePerTemplateMaximumMap[wantedState]; !ok {
+					InstanceAgePerTemplateMaximumMap[wantedState] = make(map[string]int)
+				}
+				for _, wantedInstanceTemplate := range instanceTemplates {
+					age := 0.0
+					for _, instance := range instances {
+						if instance.Vm.State == wantedState {
+							if instance.Vm.TemplateUUID == wantedInstanceTemplate {
+								instanceTime, err := time.Parse(time.RFC3339, instance.Vm.CreationTime)
+								if err != nil {
+									log.Warn(fmt.Sprintf("Error parsing CreationTime %s: %s", instance.Vm.CreationTime, err.Error()))
+								} else {
+									thisAge := now.Sub(instanceTime).Seconds()
+									age = max(age, thisAge)
+								}
+							}
+						}
+					}
+					if _, ok := InstanceAgePerTemplateMaximumMap[wantedState][wantedInstanceTemplate]; !ok {
+						InstanceAgePerTemplateMaximumMap[wantedState][wantedInstanceTemplate] = int(age)
+					}
+				}
+			}
+			checkAndHandleResetOfGaugeVecMetric((len(instances) + len(instanceTemplates)), "anka_instance_max_age_per_template_seconds", metric)
+			for wantedState, wantedStateMap := range InstanceAgePerTemplateMaximumMap {
+				for wantedTemplateUUID, age := range wantedStateMap {
+					metric.With(prometheus.Labels{"state": wantedState, "template_uuid": wantedTemplateUUID, "template_name": instanceTemplatesMap[wantedTemplateUUID]}).Set(float64(age))
 				}
 			}
 		},
