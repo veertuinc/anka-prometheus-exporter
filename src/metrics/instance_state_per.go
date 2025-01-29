@@ -182,15 +182,17 @@ var ankaInstanceStatePerMetrics = []InstanceStatePerMetric{
 								var err error
 								if instance.Vm.State != "Started" {
 									instanceTime, err = time.Parse(time.RFC3339, instance.Vm.LastUpdateTime) // can't use CreationTime because it's not updated for non-started instances
+									if err != nil {
+										log.Error(fmt.Sprintf("Error parsing LastUpdateTime %s for template %s: %s", instance.Vm.LastUpdateTime, wantedInstanceTemplate, err.Error()))
+									}
 								} else {
 									instanceTime, err = time.Parse(time.RFC3339, instance.Vm.CreationTime)
+									if err != nil {
+										log.Error(fmt.Sprintf("Error parsing CreationTime %s for template %s: %s", instance.Vm.CreationTime, wantedInstanceTemplate, err.Error()))
+									}
 								}
-								if err != nil {
-									log.Warn(fmt.Sprintf("Error parsing CreationTime %s: %s", instance.Vm.CreationTime, err.Error()))
-								} else {
-									thisAge := now.Sub(instanceTime).Seconds()
-									age = max(age, thisAge)
-								}
+								thisAge := now.Sub(instanceTime).Seconds()
+								age = max(age, thisAge)
 							}
 						}
 					}
