@@ -156,7 +156,7 @@ var ankaInstanceStatePerMetrics = []InstanceStatePerMetric{
 	},
 	{
 		BaseAnkaMetric: BaseAnkaMetric{
-			metric: CreateGaugeMetricVec("anka_instance_max_age_per_template_seconds", "Age of oldest Instance in a particular state, per Template (label: state, template_uuid, template_name)", []string{"state", "template_uuid", "template_name"}),
+			metric: CreateGaugeMetricVec("anka_instance_max_age_per_template_seconds", "Age of oldest Instance in a particular state, per Template. Visible only for templates with at least one instance (label: state, template_uuid, template_name)", []string{"state", "template_uuid", "template_name"}),
 			event:  events.EVENT_VM_DATA_UPDATED,
 		},
 		HandleData: func(instances []types.Instance, metric *prometheus.GaugeVec) {
@@ -178,7 +178,13 @@ var ankaInstanceStatePerMetrics = []InstanceStatePerMetric{
 					for _, instance := range instances {
 						if instance.Vm.State == wantedState {
 							if instance.Vm.TemplateUUID == wantedInstanceTemplate {
-								instanceTime, err := time.Parse(time.RFC3339, instance.Vm.CreationTime)
+								var instanceTime time.Time
+								var err error
+								if instance.Vm.State != "Started" {
+									instanceTime, err = time.Parse(time.RFC3339, instance.Vm.LastUpdateTime) // can't use CreationTime because it's not updated for non-started instances
+								} else {
+									instanceTime, err = time.Parse(time.RFC3339, instance.Vm.CreationTime)
+								}
 								if err != nil {
 									log.Warn(fmt.Sprintf("Error parsing CreationTime %s: %s", instance.Vm.CreationTime, err.Error()))
 								} else {
