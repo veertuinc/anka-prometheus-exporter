@@ -2,6 +2,7 @@ package client
 
 import (
 	"fmt"
+	"io"
 	"reflect"
 	"runtime"
 	"sync"
@@ -26,8 +27,9 @@ type Client struct {
 
 func NewClient(addr, username, password string, interval int, certs ClientTLSCerts, uak UAK) (*Client, error) {
 	communicator, err := NewCommunicator(addr, username, password, certs, uak)
-	if err != nil {
-		return nil, err
+	if err != nil || communicator == nil {
+		log.Error("Failed to create communicator")
+		return nil, fmt.Errorf("failed to create communicator: %v", err)
 	}
 	c := &Client{
 		events: map[events.Event][]func(interface{}) error{
@@ -42,7 +44,26 @@ func NewClient(addr, username, password string, interval int, certs ClientTLSCer
 		errorTimeoutSeconds: 10,
 	}
 	if err := c.communicator.TestConnection(); err != nil {
-		log.Fatal(fmt.Sprintf("Error testing connection: %s", err.Error()))
+		response, err := c.communicator.getResponse("/api/v1/status", "", "")
+		if err != nil {
+			log.Error(fmt.Sprintf("Error getting response: %s", err.Error()))
+		} else {
+			bodyBytes := make([]byte, 1024)
+			for {
+				n, err := response.Body.Read(bodyBytes)
+				if n > 0 {
+					log.Error(fmt.Sprintf("call to %s returned %d code and body of '%s'", response.Request.URL, response.StatusCode, string(bodyBytes[:n])))
+					return nil, fmt.Errorf("failed to test connection")
+				}
+				if err != nil {
+					if err != io.EOF {
+						log.Error(fmt.Sprintf("Error reading response body: %s", err.Error()))
+						return nil, fmt.Errorf("failed to test connection")
+					}
+					break
+				}
+			}
+		}
 		return nil, err
 	}
 	return c, nil
@@ -51,7 +72,10 @@ func NewClient(addr, username, password string, interval int, certs ClientTLSCer
 func (client *Client) Init() {
 	// We must first populate the data from the Controller API that is going to be stored in state before we attempt to create metrics from it
 	// Order matters here since GetVmsData for example relies on RegistryTemplatesData
-	client.communicator.GetRegistryTemplatesData()
+	_, err := client.communicator.GetRegistryTemplatesData()
+	if err != nil {
+		log.Error(fmt.Sprintf("Error getting registry templates data: %v", err))
+	}
 	go client.initDataLoop(client.communicator.GetNodesData, events.EVENT_NODE_UPDATED)
 	go client.initDataLoop(client.communicator.GetVmsData, events.EVENT_VM_DATA_UPDATED)
 	go client.initDataLoop(client.communicator.GetRegistryDiskData, events.EVENT_REGISTRY_DISK_DATA_UPDATED)

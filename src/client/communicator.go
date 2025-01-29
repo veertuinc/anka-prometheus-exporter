@@ -153,7 +153,7 @@ func (comm *Communicator) GetRegistryTemplatesData() (interface{}, error) {
 	resp := &types.RegistryTemplateResponse{}
 	templates, err := comm.getData(endpoint, resp)
 	if err != nil {
-		return nil, fmt.Errorf("getting registry templates error: %s", err)
+		return nil, fmt.Errorf("getting registry templates error: %s", err.Error())
 	}
 	templatesArray := templates.([]types.Template)
 	templatesMap := state.GetState().GetTemplatesMap()
@@ -163,7 +163,7 @@ func (comm *Communicator) GetRegistryTemplatesData() (interface{}, error) {
 			resp := &types.RegistryTemplateTagsResponse{}
 			tagsData, err := comm.getData(endpoint, resp)
 			if err != nil {
-				return nil, fmt.Errorf("getting registry template %s/%s tags error: %s", template.UUID, template.Name, err)
+				return nil, fmt.Errorf("getting registry template %s/%s tags error: %s", template.UUID, template.Name, err.Error())
 			}
 			tags := tagsData.(types.RegistryTemplateTags)
 			templatesArray[i].Tags = tags.Versions
