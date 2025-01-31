@@ -180,8 +180,11 @@ var ankaInstanceStatePerMetrics = []InstanceStatePerMetric{
 							if instance.Vm.TemplateUUID == wantedInstanceTemplate {
 								var instanceTime time.Time
 								var err error
-								if instance.Vm.State != "Started" {
-									instanceTime, err = time.Parse(time.RFC3339, instance.Vm.LastUpdateTime) // can't use CreationTime because it's not updated for non-started instances
+								// cr_time only set on an instance creation (in the DB) and never changed
+								// ts gets updated from time to time due to different events, like save image, termination etc
+								// both ts and cr_time are members of an Instance object, they do not depend on the vm (regardless if the vm has started or not)
+								if instance.Vm.State != "Started" && instance.Vm.State != "Scheduling" { // can't use CreationTime because it doesn't change after Scheduling happens
+									instanceTime, err = time.Parse(time.RFC3339, instance.Vm.LastUpdateTime)
 									if err != nil {
 										log.Error(fmt.Sprintf("Error parsing LastUpdateTime %s for template %s: %s", instance.Vm.LastUpdateTime, wantedInstanceTemplate, err.Error()))
 									}
