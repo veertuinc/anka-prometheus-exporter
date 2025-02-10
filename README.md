@@ -150,6 +150,8 @@ anka_instance_state_count | Count of Instances in a particular State (labels: ar
 anka_instance_state_per_template_count | Count of Instances in a particular state, per Template (labels: state, template_uuid, template_name)
 anka_instance_state_per_group_count | Count of Instances in a particular state, per Group (labels: state, group_name)
 -- | --
+anka_instance_max_age_per_template_seconds | Age of oldest Instance in a particular state, per Template (labels: state, template_uuid, template_name)
+-- | --
 anka_node_instance_count | Count of Instances running on the Node (labels: id, name, arch)
 anka_node_instance_capacity | Total Instance slots (capacity) on the Node (labels: id, name, arch)
 anka_node_states | Node state (1 = current state) (labels: id, name, state)

@@ -79,12 +79,14 @@ type Instance struct {
 }
 
 type VmData struct {
-	State        string `json:"instance_state"`
-	TemplateUUID string `json:"vmid"`
-	TemplateName string
-	GroupUUID    string `json:"group_id"`
-	NodeUUID     string `json:"node_id"`
-	Arch         string `json:"arch"`
+	State          string `json:"instance_state"`
+	TemplateUUID   string `json:"vmid"`
+	TemplateName   string
+	GroupUUID      string `json:"group_id"`
+	NodeUUID       string `json:"node_id"`
+	Arch           string `json:"arch"`
+	CreationTime   string `json:"cr_time"`
+	LastUpdateTime string `json:"ts"`
 }
 
 type Response interface {
