@@ -2,13 +2,13 @@
 // a license that can be found at https://github.com/ianschenck/envflag/blob/master/LICENSE
 
 /*
-	Package envflag adds environment variable flags to the flag package.
-	Usage:
-	Define flags using envflag.String(), Bool(), Int(), etc. This package
-	works nearly the same as the stdlib flag package. Parsing the
-	Environment flags is done by calling envflag.Parse()
-	It will *not* attempt to parse any normally-defined command-line
-	flags. Command-line flags are explicitly left alone and separate.
+Package envflag adds environment variable flags to the flag package.
+Usage:
+Define flags using envflag.String(), Bool(), Int(), etc. This package
+works nearly the same as the stdlib flag package. Parsing the
+Environment flags is done by calling envflag.Parse()
+It will *not* attempt to parse any normally-defined command-line
+flags. Command-line flags are explicitly left alone and separate.
 */
 package envflag
 
@@ -18,6 +18,8 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/veertuinc/anka-prometheus-exporter/src/log"
 )
 
 // VisitAll visits the environment flags in lexicographical order,
@@ -189,7 +191,10 @@ func ParsePrefix(prefix string) {
 		}
 		args = append(args, fmt.Sprintf("-%s", value))
 	}
-	EnvironmentFlags.Parse(args)
+	if err := EnvironmentFlags.Parse(args); err != nil {
+		// Handle parse error if needed
+		log.Warn(fmt.Sprintf("Error parsing environment flags: %v", err))
+	}
 }
 
 // Parsed returns true if the environment flags have been parsed.

@@ -18,8 +18,10 @@ go.build:
 
 #go.lint:		@ Run `golangci-lint run` against the current code
 go.lint:
-  curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sudo sh -s -- -b /usr/local/bin v1.40.1
-	golangci-lint run --fast
+	go vet ./...
+	curl -SfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v2.4.0
+	echo "golangci-lint run"
+	golangci-lint run
 
 #go.releaser 	@ Run goreleaser release --clean for current version
 go.releaser:

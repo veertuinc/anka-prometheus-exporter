@@ -34,7 +34,9 @@ func tap(uak UAK, controllerAddress string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("error while sending request to /hand endpoint: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close() // Ignore close errors for HTTP response bodies
+	}()
 
 	// Read the response body
 	body, err := io.ReadAll(resp.Body)
@@ -85,7 +87,9 @@ func tap(uak UAK, controllerAddress string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("error while sending request to /shake endpoint: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close() // Ignore close errors for HTTP response bodies
+	}()
 
 	// Read the response body
 	body, err = io.ReadAll(resp.Body)
@@ -95,7 +99,9 @@ func tap(uak UAK, controllerAddress string) (string, error) {
 
 	// Extract the data field from the response body
 	var result map[string]interface{}
-	json.Unmarshal([]byte(body), &result)
+	if err := json.Unmarshal([]byte(body), &result); err != nil {
+		return "", fmt.Errorf("error unmarshaling JSON response: %v", err)
+	}
 	data := result["data"]
 
 	// Convert the data field to a JSON string

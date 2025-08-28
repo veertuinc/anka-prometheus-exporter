@@ -116,8 +116,12 @@ func main() {
 
 	// Create each metric that we later populate
 	for _, m := range metrics.MetricsHolder {
-		prometheusRegistry.Register(m.GetPrometheusMetric())
-		client.Register(m.GetEvent(), m.GetEventHandler())
+		if err := prometheusRegistry.Register(m.GetPrometheusMetric()); err != nil {
+			log.Fatal(fmt.Sprintf("Failed to register prometheus metric: %v", err))
+		}
+		if err := client.Register(m.GetEvent(), m.GetEventHandler()); err != nil {
+			log.Fatal(fmt.Sprintf("Failed to register client event: %v", err))
+		}
 	}
 
 	srv := server.NewServer(
