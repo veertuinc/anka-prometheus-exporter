@@ -34,11 +34,11 @@ func uniqueThisStringArray(arr []string) []string {
 }
 
 func uniqueNodeGroupsArray(arr []types.NodeGroup) []types.NodeGroup {
-	occurred := map[types.NodeGroup]bool{}
+	occurred := map[string]bool{}
 	result := []types.NodeGroup{}
 	for e := range arr {
-		if !occurred[arr[e]] {
-			occurred[arr[e]] = true
+		if !occurred[arr[e].Id] {
+			occurred[arr[e].Id] = true
 			result = append(result, arr[e])
 		}
 	}

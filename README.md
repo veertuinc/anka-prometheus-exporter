@@ -215,6 +215,8 @@ anka_registry_template_tags_count | Count of Tags in the Registry for the Templa
 
 # Development
 
+1. `git config --local core.hooksPath .githooks/`
+
 ```bash
 make build-and-run ARGUMENTS="--controller-username root --controller-password 1111111111"
 ```

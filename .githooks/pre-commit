@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+
+echo "Running pre-commit checks..."
+
+# Run linter
+echo "🔍 Running linter..."
+make go.lint
+
+echo "✅ Pre-commit checks passed!"
