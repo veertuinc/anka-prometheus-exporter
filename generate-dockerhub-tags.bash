@@ -1,5 +1,6 @@
 #!/bin/bash
 set -exo pipefail
+docker login -u veertuserviceuser
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 DOCKERFILE_PATH="$SCRIPT_DIR/docker/scratch"
 NAME="anka-prometheus-exporter"
