@@ -34,7 +34,6 @@ func (comm *Communicator) UpdateEncodedTAPData() error {
 				return err
 			}
 			comm.encodedTAPData = data
-			err = nil
 		}
 		if err = comm.TestConnection(); err != nil {
 			return err
@@ -72,7 +71,11 @@ func (comm *Communicator) TestConnection() error {
 	if err != nil {
 		return err
 	}
-	defer r.Body.Close()
+	defer func() {
+		if err := r.Body.Close(); err != nil {
+			log.Warn(fmt.Sprintf("Error closing response body: %v", err))
+		}
+	}()
 	resp := &types.DefaultResponse{}
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -180,7 +183,11 @@ func (comm *Communicator) fetchResponseData(endpoint string, repsObject types.Re
 	if err != nil {
 		return nil, err
 	}
-	defer r.Body.Close()
+	defer func() {
+		if err := r.Body.Close(); err != nil {
+			log.Warn(fmt.Sprintf("Error closing response body: %v", err))
+		}
+	}()
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		return nil, err

@@ -54,8 +54,7 @@ var ankaRegistryDiskMetrics = []RegistryDiskMetric{
 			event:  events.EVENT_REGISTRY_DISK_DATA_UPDATED,
 		},
 		HandleData: func(registry *types.RegistryDisk, metric prometheus.Gauge) {
-			var used uint64 = 0
-			used = registry.Total - registry.Free
+			used := registry.Total - registry.Free
 			metric.Set(float64(used))
 		},
 	},
