@@ -18,7 +18,13 @@ go.build:
 
 #go.test:		@ Run `go test` against the current code
 go.test:
-	go test -v ./...
+	@echo "=========================================="
+	@echo "Running Go Tests"
+	@echo "=========================================="
+	go test -v -count=1 ./...
+	@echo "=========================================="
+	@echo "All tests passed!"
+	@echo "=========================================="
 
 #go.lint:		@ Run `golangci-lint run` against the current code
 go.lint:
