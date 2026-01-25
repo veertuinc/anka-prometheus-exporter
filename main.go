@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/veertuinc/anka-prometheus-exporter/envflag"
@@ -20,11 +22,21 @@ var (
 	version string
 )
 
+// loadPasswordFromFile reads a password from a file and returns it trimmed of whitespace
+func loadPasswordFromFile(filePath string) (string, error) {
+	passwordBytes, err := os.ReadFile(filePath)
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(string(passwordBytes)), nil
+}
+
 func main() {
 
 	var controllerAddress string
 	var controllerUsername string
 	var controllerPassword string
+	var controllerPasswordFile string
 	var intervalSeconds int
 	var disableOptimizeInterval bool
 	var clientCaFilePath string
@@ -47,6 +59,7 @@ func main() {
 	flag.StringVar(&controllerAddress, "controller-address", "", "Controller address to monitor (url as arg) (required)")
 	flag.StringVar(&controllerUsername, "controller-username", "", "Controller basic auth username (username as arg)")
 	flag.StringVar(&controllerPassword, "controller-password", "", "Controller basic auth password (password as arg)")
+	flag.StringVar(&controllerPasswordFile, "controller-password-file", "", "Path to file containing controller basic auth password (file path as arg) (supersedes -controller-password)")
 	flag.IntVar(&intervalSeconds, "interval", DEFAULT_INTERVAL_SECONDS, "Seconds to wait between data requests to controller (int as arg)")
 	// flag.IntVar(&port, "port", 2112, "Port to server /metrics endpoint (int as arg)")
 	flag.BoolVar(&disableOptimizeInterval, "disable-interval-optimizer", false, "Optimize interval according to /metric api requests received (no args)")
@@ -63,6 +76,7 @@ func main() {
 	envflag.StringVar(&controllerAddress, "CONTROLLER_ADDRESS", "", "Controller address to monitor (url as arg) (required)")
 	envflag.StringVar(&controllerUsername, "CONTROLLER_USERNAME", "", "Controller basic auth username (username as arg)")
 	envflag.StringVar(&controllerPassword, "CONTROLLER_PASSWORD", "", "Controller basic auth password (password as arg)")
+	envflag.StringVar(&controllerPasswordFile, "CONTROLLER_PASSWORD_FILE", "", "Path to file containing controller basic auth password (file path as arg) (supersedes -controller-password)")
 	envflag.IntVar(&intervalSeconds, "INTERVAL", DEFAULT_INTERVAL_SECONDS, "Seconds to wait between data requests to controller (int as arg)")
 	// envflag.IntVar(&port, "PORT", 2112, "Port to server /metrics endpoint (int as arg)")
 	envflag.BoolVar(&disableOptimizeInterval, "DISABLE_INTERVAL_OPTIMIZER", false, "Optimize interval according to /metric api requests received (no args)")
@@ -84,6 +98,15 @@ func main() {
 
 	if controllerAddress == "" {
 		log.Fatal(fmt.Sprintf("controller address not supplied (%sCONTROLLER_ADDRESS=\"http://{address}:{port}\" or --controller-address http://{address}:{port})", envPrefix))
+	}
+
+	// Load password from file if specified (supersedes password string)
+	if controllerPasswordFile != "" {
+		password, err := loadPasswordFromFile(controllerPasswordFile)
+		if err != nil {
+			log.Fatal(fmt.Sprintf("failed to read controller password file: %s", err.Error()))
+		}
+		controllerPassword = password
 	}
 
 	if len(flag.Args()) > 0 {

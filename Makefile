@@ -16,6 +16,16 @@ go.build:
 	GOARCH=$(ARCH) go build $(RACE) -ldflags "-X main.version=$(VERSION)" -o bin/$(BIN)_$(OS_TYPE)_$(ARCH)
 	chmod +x bin/$(BIN)_$(OS_TYPE)_$(ARCH)
 
+#go.test:		@ Run `go test` against the current code
+go.test:
+	@echo "=========================================="
+	@echo "Running Go Tests"
+	@echo "=========================================="
+	go test -v -count=1 ./...
+	@echo "=========================================="
+	@echo "All tests passed!"
+	@echo "=========================================="
+
 #go.lint:		@ Run `golangci-lint run` against the current code
 go.lint:
 	go vet ./...
@@ -28,7 +38,7 @@ go.releaser:
 	git tag -d "$(VERSION)" 2>/dev/null || true
 	git tag -a "$(VERSION)" -m "Version $(VERSION)"
 	echo "LATEST TAG: $$(git describe --tags --abbrev=0)"
-	goreleaser release --clean
+	curl -SfL https://goreleaser.com/static/run | DISTRIBUTION=oss VERSION=v2.9.0 bash -s -- release --clean
 
 build-and-run:
 	kill -15 $$(pgrep "[a]nka-prometheus") || true

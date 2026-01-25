@@ -15,6 +15,7 @@ Ensure you have a functioning Prometheus instance before using this.
 | ENV | Flag |
 | --- | ---  |
 | ANKA_PROMETHEUS_EXPORTER_CONTROLLER_ADDRESS (string) | --controller-address (string) |
+| ANKA_PROMETHEUS_EXPORTER_CONTROLLER_PASSWORD_FILE (string) | --controller-password-file (string) |
 | ANKA_PROMETHEUS_EXPORTER_INTERVAL (int) | --interval (int) |
 | ANKA_PROMETHEUS_EXPORTER_PORT (int) | --port (int) |
 | ANKA_PROMETHEUS_EXPORTER_DISABLE_INTERVAL_OPTIMIZER (bool) | --disable-interval-optimizer |
@@ -45,6 +46,8 @@ Usage of anka-prometheus-exporter:
         Controller address to monitor (url as arg) (required)
   -controller-password string
         Controller basic auth password (password as arg)
+  -controller-password-file string
+        Path to file containing controller basic auth password (file path as arg) (supersedes -controller-password)
   -controller-username string
         Controller basic auth username (username as arg)
   -disable-interval-optimizer
@@ -133,6 +136,8 @@ You have two options for authentication with the Controller.
             Controller username with basic root token (username as arg)
       -controller-password string
             Controller password with basic root token (password as arg)
+      -controller-password-file string
+            Path to file containing controller password with basic root token (file path as arg) (supersedes -controller-password)
     ```
 
 The `-client-tls` flag is not required if your controller certificate is signed with a major CA and no client authentication is configured. For all other TLS configuration options, like self signed scenarios, `--tls` must be enabled. For self signed certificates, you can either use `-client-skip-tls-verification` or provide your ca-cert with `-client-ca-cert`.
@@ -156,10 +161,10 @@ anka_node_instance_count | Count of Instances running on the Node (labels: id, n
 anka_node_instance_capacity | Total Instance slots (capacity) on the Node (labels: id, name, arch)
 anka_node_states | Node state (1 = current state) (labels: id, name, state)
 anka_node_states_count | Count of Nodes in a particular state, per Architecture (labels: arch, state)
-anka_node_disk_free_space | Amount of free disk space on the Node in Bytes (labels: id, name, arch)
-anka_node_disk_total_space | Amount of total available disk space on the Node in Bytes (labels: id, name, arch)
-anka_node_disk_anka_used_space | Amount of disk space used by Anka on the Node in Bytes (labels: id, name, arch)
-anka_node_cpu_core_count | Number of CPU Cores in Node (labels: id, name, arch)
+anka_node_disk_free_space | Amount of free disk space on the Node in Bytes (labels: id, name, arch, state)
+anka_node_disk_total_space | Amount of total available disk space on the Node in Bytes (labels: id, name, arch, state)
+anka_node_disk_anka_used_space | Amount of disk space used by Anka on the Node in Bytes (labels: id, name, arch, state)
+anka_node_cpu_core_count | Number of CPU Cores in Node (labels: id, name, arch, state)
 anka_node_cpu_util | CPU utilization in node (labels: id, name, arch)
 anka_node_ram_gb | Total RAM available for the Node in GB (labels: id, name, arch)
 anka_node_ram_util | Total RAM utilized for the Node (labels: id, name, arch)
