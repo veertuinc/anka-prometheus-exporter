@@ -6,6 +6,7 @@ env:
 before:
   hooks:
     - make go.lint
+    - make go.test
 
 builds:
   # A separated build to run the packer-plugins-check only once for a linux_amd64 binary

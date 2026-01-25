@@ -1,18 +1,13 @@
 name: Tests
 
 on:
-  pull_request:
-    branches:
-      - main
-      - master
-      - release/v*
   push:
     branches:
       - main
       - master
 
 jobs:
-  test:
+  test: 
     name: Run Tests
     runs-on: ubuntu-latest
 
