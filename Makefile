@@ -16,6 +16,10 @@ go.build:
 	GOARCH=$(ARCH) go build $(RACE) -ldflags "-X main.version=$(VERSION)" -o bin/$(BIN)_$(OS_TYPE)_$(ARCH)
 	chmod +x bin/$(BIN)_$(OS_TYPE)_$(ARCH)
 
+#go.test:		@ Run `go test` against the current code
+go.test:
+	go test -v ./...
+
 #go.lint:		@ Run `golangci-lint run` against the current code
 go.lint:
 	go vet ./...
