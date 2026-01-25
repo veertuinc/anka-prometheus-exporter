@@ -103,14 +103,14 @@ var ankaNodeMetrics = []NodeMetric{
 	},
 	{
 		BaseAnkaMetric: BaseAnkaMetric{
-			metric: CreateGaugeMetricVec("anka_node_cpu_core_count", "Number of CPU Cores in Node", []string{"id", "name", "arch"}),
+			metric: CreateGaugeMetricVec("anka_node_cpu_core_count", "Number of CPU Cores in Node", []string{"id", "name", "arch", "state"}),
 			event:  events.EVENT_NODE_UPDATED,
 		},
 		HandleData: func(nodes []types.Node, metric *prometheus.GaugeVec) {
 			checkAndHandleResetOfGaugeVecMetric(len(nodes), "anka_node_cpu_core_count", metric)
 			for _, node := range nodes {
 				if node.NodeName != "" {
-					metric.With(prometheus.Labels{"id": node.NodeID, "name": node.NodeName, "arch": node.HostArch}).Set(float64(node.CPU))
+					metric.With(prometheus.Labels{"id": node.NodeID, "name": node.NodeName, "arch": node.HostArch, "state": node.State}).Set(float64(node.CPU))
 				}
 			}
 		},

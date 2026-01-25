@@ -159,7 +159,7 @@ anka_node_states_count | Count of Nodes in a particular state, per Architecture 
 anka_node_disk_free_space | Amount of free disk space on the Node in Bytes (labels: id, name, arch, state)
 anka_node_disk_total_space | Amount of total available disk space on the Node in Bytes (labels: id, name, arch, state)
 anka_node_disk_anka_used_space | Amount of disk space used by Anka on the Node in Bytes (labels: id, name, arch, state)
-anka_node_cpu_core_count | Number of CPU Cores in Node (labels: id, name, arch)
+anka_node_cpu_core_count | Number of CPU Cores in Node (labels: id, name, arch, state)
 anka_node_cpu_util | CPU utilization in node (labels: id, name, arch)
 anka_node_ram_gb | Total RAM available for the Node in GB (labels: id, name, arch)
 anka_node_ram_util | Total RAM utilized for the Node (labels: id, name, arch)
