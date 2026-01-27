@@ -7,11 +7,15 @@ import (
 	"io"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/veertuinc/anka-prometheus-exporter/src/log"
 	"github.com/veertuinc/anka-prometheus-exporter/src/state"
 	"github.com/veertuinc/anka-prometheus-exporter/src/types"
 )
+
+// Cache expiry duration for template tags
+const templateTagsCacheExpiry = 1 * time.Minute
 
 var lock = &sync.Mutex{}
 var updateLock = &sync.Mutex{}
@@ -161,7 +165,11 @@ func (comm *Communicator) GetRegistryTemplatesData() (interface{}, error) {
 	templatesArray := templates.([]types.Template)
 	templatesMap := state.GetState().GetTemplatesMap()
 	for i, template := range templatesArray {
-		if templatesMap[template.UUID].Size != template.Size {
+		cachedTemplate, exists := templatesMap[template.UUID]
+		lastFetch := state.GetState().GetTemplateTagsFetchTime(template.UUID)
+		cacheExpired := time.Since(lastFetch) > templateTagsCacheExpiry
+		// Fetch tags if: template not cached, size changed, no tags cached, or cache expired
+		if !exists || cachedTemplate.Size != template.Size || len(cachedTemplate.Tags) == 0 || cacheExpired {
 			endpoint := "/api/v1/registry/vm?id=" + template.UUID
 			resp := &types.RegistryTemplateTagsResponse{}
 			tagsData, err := comm.getData(endpoint, resp)
@@ -170,8 +178,9 @@ func (comm *Communicator) GetRegistryTemplatesData() (interface{}, error) {
 			}
 			tags := tagsData.(types.RegistryTemplateTags)
 			templatesArray[i].Tags = tags.Versions
+			state.GetState().SetTemplateTagsFetchTime(template.UUID, time.Now())
 		} else {
-			templatesArray[i].Tags = templatesMap[template.UUID].Tags
+			templatesArray[i].Tags = cachedTemplate.Tags
 		}
 	}
 	state.GetState().SetTemplatesMap(templatesArray)

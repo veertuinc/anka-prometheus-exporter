@@ -68,7 +68,13 @@ var ankaNodeMetrics = []NodeMetric{
 			checkAndHandleResetOfGaugeVecMetric(len(nodes), "anka_node_disk_free_space", metric)
 			for _, node := range nodes {
 				if node.NodeName != "" {
-					metric.With(prometheus.Labels{"id": node.NodeID, "name": node.NodeName, "arch": node.HostArch, "state": node.State}).Set(float64(node.FreeDiskSpace))
+					for _, state := range types.NodeStates {
+						value := float64(0)
+						if state == node.State {
+							value = float64(node.FreeDiskSpace)
+						}
+						metric.With(prometheus.Labels{"id": node.NodeID, "name": node.NodeName, "arch": node.HostArch, "state": state}).Set(value)
+					}
 				}
 			}
 		},
@@ -82,7 +88,13 @@ var ankaNodeMetrics = []NodeMetric{
 			checkAndHandleResetOfGaugeVecMetric(len(nodes), "anka_node_disk_total_space", metric)
 			for _, node := range nodes {
 				if node.NodeName != "" {
-					metric.With(prometheus.Labels{"id": node.NodeID, "name": node.NodeName, "arch": node.HostArch, "state": node.State}).Set(float64(node.DiskSize))
+					for _, state := range types.NodeStates {
+						value := float64(0)
+						if state == node.State {
+							value = float64(node.DiskSize)
+						}
+						metric.With(prometheus.Labels{"id": node.NodeID, "name": node.NodeName, "arch": node.HostArch, "state": state}).Set(value)
+					}
 				}
 			}
 		},
@@ -96,7 +108,13 @@ var ankaNodeMetrics = []NodeMetric{
 			checkAndHandleResetOfGaugeVecMetric(len(nodes), "anka_node_disk_anka_used_space", metric)
 			for _, node := range nodes {
 				if node.NodeName != "" {
-					metric.With(prometheus.Labels{"id": node.NodeID, "name": node.NodeName, "arch": node.HostArch, "state": node.State}).Set(float64(node.AnkaDiskUsage))
+					for _, state := range types.NodeStates {
+						value := float64(0)
+						if state == node.State {
+							value = float64(node.AnkaDiskUsage)
+						}
+						metric.With(prometheus.Labels{"id": node.NodeID, "name": node.NodeName, "arch": node.HostArch, "state": state}).Set(value)
+					}
 				}
 			}
 		},
@@ -110,7 +128,13 @@ var ankaNodeMetrics = []NodeMetric{
 			checkAndHandleResetOfGaugeVecMetric(len(nodes), "anka_node_cpu_core_count", metric)
 			for _, node := range nodes {
 				if node.NodeName != "" {
-					metric.With(prometheus.Labels{"id": node.NodeID, "name": node.NodeName, "arch": node.HostArch, "state": node.State}).Set(float64(node.CPU))
+					for _, state := range types.NodeStates {
+						value := float64(0)
+						if state == node.State {
+							value = float64(node.CPU)
+						}
+						metric.With(prometheus.Labels{"id": node.NodeID, "name": node.NodeName, "arch": node.HostArch, "state": state}).Set(value)
+					}
 				}
 			}
 		},
