@@ -7,11 +7,11 @@ NAME="anka-prometheus-exporter"
 cleanup() {
   popd
   rm -f "${DOCKERFILE_PATH}/${NAME}"*
-  rm -f ./bin/"${NAME}"*
+  rm -f "$SCRIPT_DIR"/bin/"${NAME}"*
 }
-ARCH=amd64 make build-linux
-ARCH=arm64 make build-linux
-cp -f ./bin/"${NAME}"_linux* "${DOCKERFILE_PATH}/"
+ARCH=amd64 make -C "$SCRIPT_DIR" build-linux
+ARCH=arm64 make -C "$SCRIPT_DIR" build-linux
+cp -f "$SCRIPT_DIR"/bin/"${NAME}"_linux* "${DOCKERFILE_PATH}/"
 ls -alht "${DOCKERFILE_PATH}/"
 trap cleanup EXIT
 pushd "${DOCKERFILE_PATH}"
