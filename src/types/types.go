@@ -75,7 +75,12 @@ type RegistryDisk struct {
 
 type Instance struct {
 	InstanceID string `json:"instance_id"`
+	ExternalID string `json:"external_id"`
 	Vm         VmData `json:"vm"`
+}
+
+type VmInfo struct {
+	IP string `json:"ip"`
 }
 
 type VmData struct {
@@ -87,6 +92,7 @@ type VmData struct {
 	Arch           string `json:"arch"`
 	CreationTime   string `json:"cr_time"`
 	LastUpdateTime string `json:"ts"`
+	VmInfo         VmInfo `json:"vminfo"`
 }
 
 type Response interface {

@@ -204,11 +204,13 @@ func TestInstancesResponse_GetBody(t *testing.T) {
 		Body: []Instance{
 			{
 				InstanceID: "instance-1",
+				ExternalID: "job-123",
 				Vm: VmData{
 					State:        "Started",
 					TemplateUUID: "template-uuid-1",
 					TemplateName: "macos-ventura",
 					Arch:         "arm64",
+					VmInfo:       VmInfo{IP: "192.168.64.4"},
 				},
 			},
 		},
@@ -224,6 +226,68 @@ func TestInstancesResponse_GetBody(t *testing.T) {
 	}
 	if instances[0].Vm.State != "Started" {
 		t.Errorf("Expected state Started, got %s", instances[0].Vm.State)
+	}
+	if instances[0].ExternalID != "job-123" {
+		t.Errorf("Expected external_id job-123, got %s", instances[0].ExternalID)
+	}
+	if instances[0].Vm.VmInfo.IP != "192.168.64.4" {
+		t.Errorf("Expected IP 192.168.64.4, got %s", instances[0].Vm.VmInfo.IP)
+	}
+}
+
+func TestInstancesResponse_JSONUnmarshal_ExternalIDAndVmInfoIP(t *testing.T) {
+	jsonData := `{
+		"status": "OK",
+		"message": "",
+		"body": [
+			{
+				"external_id": "TEST123",
+				"instance_id": "e51259fe-6277-4776-4de0-016ea5971c7e",
+				"vm": {
+					"instance_state": "Started",
+					"vmid": "template-uuid-1",
+					"arch": "arm64",
+					"cr_time": "2024-01-24T11:44:59.489699-05:00",
+					"ts": "2024-01-24T11:45:30.000000-05:00",
+					"vminfo": {
+						"ip": "192.168.69.15"
+					}
+				}
+			},
+			{
+				"external_id": "",
+				"instance_id": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+				"vm": {
+					"instance_state": "Started",
+					"vmid": "template-uuid-2",
+					"arch": "arm64",
+					"cr_time": "2024-01-24T11:44:59.489699-05:00",
+					"ts": "2024-01-24T11:45:10.000000-05:00",
+					"vminfo": {
+						"ip": ""
+					}
+				}
+			}
+		]
+	}`
+
+	var ir InstancesResponse
+	if err := json.Unmarshal([]byte(jsonData), &ir); err != nil {
+		t.Fatalf("Failed to unmarshal: %v", err)
+	}
+
+	instances := ir.GetBody().([]Instance)
+	if len(instances) != 2 {
+		t.Fatalf("Expected 2 instances, got %d", len(instances))
+	}
+	if instances[0].ExternalID != "TEST123" {
+		t.Errorf("Expected external_id TEST123, got %s", instances[0].ExternalID)
+	}
+	if instances[0].Vm.VmInfo.IP != "192.168.69.15" {
+		t.Errorf("Expected IP 192.168.69.15, got %s", instances[0].Vm.VmInfo.IP)
+	}
+	if instances[1].Vm.VmInfo.IP != "" {
+		t.Errorf("Expected empty IP, got %s", instances[1].Vm.VmInfo.IP)
 	}
 }
 
