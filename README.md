@@ -156,6 +156,8 @@ anka_instance_state_per_template_count | Count of Instances in a particular stat
 anka_instance_state_per_group_count | Count of Instances in a particular state, per Group (labels: state, group_name)
 -- | --
 anka_instance_max_age_per_template_seconds | Age of oldest Instance in a particular state, per Template (labels: state, template_uuid, template_name)
+anka_instance_start_duration_seconds | Histogram of seconds from instance creation (`cr_time`) to first observed non-empty `vminfo.ip` (labels: template_uuid, template_name, arch, external_id). Poll interval can add measurement noise.
+anka_instance_start_failures_total | Count of instances that reached Error before a non-empty `vminfo.ip` was observed (labels: template_uuid, template_name, arch, external_id)
 -- | --
 anka_node_instance_count | Count of Instances running on the Node (labels: id, name, arch)
 anka_node_instance_capacity | Total Instance slots (capacity) on the Node (labels: id, name, arch)
@@ -207,6 +209,23 @@ anka_registry_template_disk_used | Total disk usage of the Template in the Regis
 anka_registry_template_tag_disk_used | Total disk used by the Template's Tag in the Registry
 anka_registry_template_tags_count | Count of Tags in the Registry for the Template
 
+### Instance start duration (PromQL examples)
+
+`anka_instance_start_duration_seconds` is a histogram. Average and percentiles are derived from it (no separate average metric):
+
+```promql
+# average start duration over the last hour
+rate(anka_instance_start_duration_seconds_sum[1h])
+/
+rate(anka_instance_start_duration_seconds_count[1h])
+
+# 95th percentile over the last hour
+histogram_quantile(
+  0.95,
+  sum by (le) (rate(anka_instance_start_duration_seconds_bucket[1h]))
+)
+```
+
 ---
 
 # Upgrading Considerations
@@ -220,7 +239,11 @@ anka_registry_template_tags_count | Count of Tags in the Registry for the Templa
 
 # Development
 
-1. `git config --local core.hooksPath .githooks/`
+Enable git hooks once per clone so `make go.lint` runs on every commit (blocks the commit on failure):
+
+```bash
+make setup
+```
 
 ```bash
 make build-and-run ARGUMENTS="--controller-username root --controller-password 1111111111"

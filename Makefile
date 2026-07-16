@@ -1,5 +1,7 @@
 VERSION := $(shell cat VERSION)
 BIN := anka-prometheus-exporter
+GOLANGCI_LINT_VERSION := v2.4.0
+GOLANGCI_LINT := $(shell go env GOPATH)/bin/golangci-lint
 ARCH ?= $(shell arch)
 ifeq ($(ARCH), i386)
 	ARCH = amd64
@@ -10,6 +12,11 @@ endif
 OS_TYPE ?= $(shell uname -s | tr '[:upper:]' '[:lower:]')
 
 all: clean go.releaser
+
+#setup:		@ Enable repo git hooks (required once per clone for pre-commit lint)
+setup:
+	git config --local core.hooksPath .githooks/
+	@echo "Git hooks enabled (core.hooksPath=.githooks/). Pre-commit runs: make go.lint"
 
 # CGO_ENABLED=0 needed to fix "sh: anka-prometheus-exporter: not found" in docker
 go.build:
@@ -29,9 +36,10 @@ go.test:
 #go.lint:		@ Run `golangci-lint run` against the current code
 go.lint:
 	go vet ./...
-	curl -SfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v2.4.0
-	echo "golangci-lint run"
-	golangci-lint run
+	@if ! "$(GOLANGCI_LINT)" version 2>/dev/null | grep -qF "$(GOLANGCI_LINT_VERSION:v%=%)"; then \
+		curl -SfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b "$$(go env GOPATH)/bin" $(GOLANGCI_LINT_VERSION); \
+	fi
+	"$(GOLANGCI_LINT)" run
 
 #go.releaser 	@ Run goreleaser release --clean for current version
 go.releaser:

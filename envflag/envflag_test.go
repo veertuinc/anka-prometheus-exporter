@@ -16,6 +16,7 @@ func TestStringVar(t *testing.T) {
 	f := EnvironmentFlags.Lookup("TEST_STRING")
 	if f == nil {
 		t.Fatal("Flag TEST_STRING not registered")
+		return
 	}
 	if f.DefValue != "default" {
 		t.Errorf("Expected default value 'default', got '%s'", f.DefValue)
@@ -29,6 +30,7 @@ func TestString(t *testing.T) {
 
 	if value == nil {
 		t.Fatal("String() returned nil")
+		return
 	}
 	if *value != "default_ptr" {
 		t.Errorf("Expected default value 'default_ptr', got '%s'", *value)
@@ -44,6 +46,7 @@ func TestIntVar(t *testing.T) {
 	f := EnvironmentFlags.Lookup("TEST_INT")
 	if f == nil {
 		t.Fatal("Flag TEST_INT not registered")
+		return
 	}
 	if f.DefValue != "42" {
 		t.Errorf("Expected default value '42', got '%s'", f.DefValue)
@@ -57,6 +60,7 @@ func TestInt(t *testing.T) {
 
 	if value == nil {
 		t.Fatal("Int() returned nil")
+		return
 	}
 	if *value != 100 {
 		t.Errorf("Expected default value 100, got %d", *value)
@@ -72,6 +76,7 @@ func TestBoolVar(t *testing.T) {
 	f := EnvironmentFlags.Lookup("TEST_BOOL")
 	if f == nil {
 		t.Fatal("Flag TEST_BOOL not registered")
+		return
 	}
 	if f.DefValue != "true" {
 		t.Errorf("Expected default value 'true', got '%s'", f.DefValue)
@@ -85,6 +90,7 @@ func TestBool(t *testing.T) {
 
 	if value == nil {
 		t.Fatal("Bool() returned nil")
+		return
 	}
 	if *value != false {
 		t.Errorf("Expected default value false, got %v", *value)
@@ -180,6 +186,10 @@ func TestSet(t *testing.T) {
 
 	// After parsing, the value should be updated
 	f := Lookup("SET_TEST")
+	if f == nil {
+		t.Fatal("Lookup returned nil for SET_TEST")
+		return
+	}
 	if f.Value.String() != "new_value" {
 		t.Errorf("Expected 'new_value', got '%s'", f.Value.String())
 	}

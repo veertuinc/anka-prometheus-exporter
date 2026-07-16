@@ -62,6 +62,23 @@ func CreateGaugeMetricVec(name string, help string, labels []string) *prometheus
 		}, labels)
 }
 
+func CreateHistogramMetricVec(name string, help string, labels []string, buckets []float64) *prometheus.HistogramVec {
+	return prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Name:    name,
+			Help:    help,
+			Buckets: buckets,
+		}, labels)
+}
+
+func CreateCounterMetricVec(name string, help string, labels []string) *prometheus.CounterVec {
+	return prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: name,
+			Help: help,
+		}, labels)
+}
+
 func ConvertToStatusData(d interface{}) (*types.Status, error) {
 	data, ok := d.(types.Status)
 	if !ok {
@@ -114,6 +131,22 @@ func ConvertMetricToGaugeVec(m prometheus.Collector) (*prometheus.GaugeVec, erro
 	data, ok := m.(*prometheus.GaugeVec)
 	if !ok {
 		return nil, fmt.Errorf("could not convert metric to gauge vector type")
+	}
+	return data, nil
+}
+
+func ConvertMetricToHistogramVec(m prometheus.Collector) (*prometheus.HistogramVec, error) {
+	data, ok := m.(*prometheus.HistogramVec)
+	if !ok {
+		return nil, fmt.Errorf("could not convert metric to histogram vector type")
+	}
+	return data, nil
+}
+
+func ConvertMetricToCounterVec(m prometheus.Collector) (*prometheus.CounterVec, error) {
+	data, ok := m.(*prometheus.CounterVec)
+	if !ok {
+		return nil, fmt.Errorf("could not convert metric to counter vector type")
 	}
 	return data, nil
 }
