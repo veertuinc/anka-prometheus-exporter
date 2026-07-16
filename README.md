@@ -239,7 +239,11 @@ histogram_quantile(
 
 # Development
 
-1. `git config --local core.hooksPath .githooks/`
+Enable git hooks once per clone so `make go.lint` runs on every commit (blocks the commit on failure):
+
+```bash
+make setup
+```
 
 ```bash
 make build-and-run ARGUMENTS="--controller-username root --controller-password 1111111111"

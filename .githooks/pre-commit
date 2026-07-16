@@ -1,10 +1,9 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
 
 echo "Running pre-commit checks..."
-
-# Run linter
-echo "🔍 Running linter..."
+echo "Running linter (make go.lint)..."
 make go.lint
-
-echo "✅ Pre-commit checks passed!"
+echo "Pre-commit checks passed."
