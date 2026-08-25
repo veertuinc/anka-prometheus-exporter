@@ -1,6 +1,6 @@
 VERSION := $(shell cat VERSION)
 BIN := anka-prometheus-exporter
-GOLANGCI_LINT_VERSION := v2.4.0
+GOLANGCI_LINT_VERSION := v2.13.1
 GOLANGCI_LINT := $(shell go env GOPATH)/bin/golangci-lint
 ARCH ?= $(shell arch)
 ifeq ($(ARCH), i386)
