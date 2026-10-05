@@ -163,9 +163,11 @@ func (comm *Communicator) GetRegistryTemplatesData() (interface{}, error) {
 		return nil, fmt.Errorf("getting registry templates error: %s", err.Error())
 	}
 	templatesArray := templates.([]types.Template)
-	templatesMap := state.GetState().GetTemplatesMap()
+	previousTemplates := copyTemplatesMap(state.GetState().GetTemplatesMap())
+	// Store id and name before tag requests. A failed tag request must not drop them.
+	state.GetState().SetTemplatesMap(templatesKeepingCachedTags(templatesArray, previousTemplates))
 	for i, template := range templatesArray {
-		cachedTemplate, exists := templatesMap[template.UUID]
+		cachedTemplate, exists := previousTemplates[template.UUID]
 		lastFetch := state.GetState().GetTemplateTagsFetchTime(template.UUID)
 		cacheExpired := time.Since(lastFetch) > templateTagsCacheExpiry
 		// Fetch tags if: template not cached, size changed, no tags cached, or cache expired
@@ -179,12 +181,32 @@ func (comm *Communicator) GetRegistryTemplatesData() (interface{}, error) {
 			tags := tagsData.(types.RegistryTemplateTags)
 			templatesArray[i].Tags = tags.Versions
 			state.GetState().SetTemplateTagsFetchTime(template.UUID, time.Now())
+			state.GetState().SetTemplatesMap([]types.Template{templatesArray[i]})
 		} else {
 			templatesArray[i].Tags = cachedTemplate.Tags
 		}
 	}
 	state.GetState().SetTemplatesMap(templatesArray)
 	return templatesArray, nil
+}
+
+func copyTemplatesMap(templates map[string]types.Template) map[string]types.Template {
+	copied := make(map[string]types.Template, len(templates))
+	for id, template := range templates {
+		copied[id] = template
+	}
+	return copied
+}
+
+func templatesKeepingCachedTags(templates []types.Template, cached map[string]types.Template) []types.Template {
+	stored := make([]types.Template, len(templates))
+	for i, template := range templates {
+		stored[i] = template
+		if previous, ok := cached[template.UUID]; ok {
+			stored[i].Tags = previous.Tags
+		}
+	}
+	return stored
 }
 
 func (comm *Communicator) fetchResponseData(endpoint string, repsObject types.Response) (types.Response, error) {
