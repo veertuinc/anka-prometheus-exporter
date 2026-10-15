@@ -1,6 +1,6 @@
 VERSION := $(shell cat VERSION)
 BIN := anka-prometheus-exporter
-GOLANGCI_LINT_VERSION := v2.13.1
+GOLANGCI_LINT_VERSION := v2.14.0
 GOLANGCI_LINT := $(shell go env GOPATH)/bin/golangci-lint
 ARCH ?= $(shell arch)
 ifeq ($(ARCH), i386)
@@ -37,7 +37,7 @@ go.test:
 go.lint:
 	go vet ./...
 	@if ! "$(GOLANGCI_LINT)" version 2>/dev/null | grep -qF "$(GOLANGCI_LINT_VERSION:v%=%)"; then \
-		curl -SfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b "$$(go env GOPATH)/bin" $(GOLANGCI_LINT_VERSION); \
+		go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION); \
 	fi
 	"$(GOLANGCI_LINT)" run
 
