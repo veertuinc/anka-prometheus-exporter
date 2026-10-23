@@ -42,7 +42,7 @@ go.lint:
 	fi
 	"$(GOLANGCI_LINT)" run
 
-#go.releaser 	@ Requires VERSION (Jenkins sets it). Prefer: tag vX.Y.Z on edge after Jenkins is green.
+#go.releaser 	@ Build + package only (no GitHub publish). Jenkins uses this; GHA publishes on tag push.
 go.releaser:
 	@if [ -z "$(VERSION)" ] || [ "$(VERSION)" = "dev" ]; then \
 		echo "ERROR: VERSION is required for go.releaser (example: make VERSION=4.3.6 go.releaser)"; \
@@ -51,7 +51,7 @@ go.releaser:
 	git tag -d "v$(VERSION)" 2>/dev/null || true
 	git tag -a "v$(VERSION)" -m "v$(VERSION)"
 	echo "LATEST TAG: $$(git describe --tags --abbrev=0)"
-	curl -SfL https://goreleaser.com/static/run | DISTRIBUTION=oss VERSION=v2.9.0 bash -s -- release --clean
+	curl -SfL https://goreleaser.com/static/run | DISTRIBUTION=oss VERSION=v2.9.0 bash -s -- release --clean --skip=publish
 
 build-and-run:
 	kill -15 $$(pgrep "[a]nka-prometheus") || true
