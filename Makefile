@@ -41,10 +41,10 @@ go.lint:
 	fi
 	"$(GOLANGCI_LINT)" run
 
-#go.releaser 	@ Run goreleaser release --clean for current version
+#go.releaser 	@ Local goreleaser only. Prefer: update VERSION, tag v$(VERSION), push tag (CI releases).
 go.releaser:
-	git tag -d "$(VERSION)" 2>/dev/null || true
-	git tag -a "$(VERSION)" -m "Version $(VERSION)"
+	git tag -d "v$(VERSION)" 2>/dev/null || true
+	git tag -a "v$(VERSION)" -m "v$(VERSION)"
 	echo "LATEST TAG: $$(git describe --tags --abbrev=0)"
 	curl -SfL https://goreleaser.com/static/run | DISTRIBUTION=oss VERSION=v2.9.0 bash -s -- release --clean
 

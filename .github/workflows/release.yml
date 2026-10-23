@@ -1,0 +1,74 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build, GitHub Release, Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+
+      - name: Check VERSION matches tag
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          EXPECTED="v$(cat VERSION | tr -d '[:space:]')"
+          if [[ "${TAG}" != "${EXPECTED}" ]]; then
+            echo "Tag ${TAG} does not match VERSION file (${EXPECTED})."
+            echo "Update VERSION on edge, then tag that commit."
+            exit 1
+          fi
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          version: "~> v2"
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Prepare scratch image binaries
+        run: |
+          VERSION="$(cat VERSION | tr -d '[:space:]')"
+          for arch in amd64 arm64; do
+            src="dist/anka-prometheus-exporter_v${VERSION}_linux_${arch}"
+            dest="docker/scratch/anka-prometheus-exporter_linux_${arch}"
+            cp -f "${src}" "${dest}"
+            chmod +x "${dest}"
+          done
+          ls -alht docker/scratch/
+
+      - name: Build and push multi-arch image
+        uses: docker/build-push-action@v6
+        with:
+          context: docker/scratch
+          file: docker/scratch/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            veertu/anka-prometheus-exporter:latest
+            veertu/anka-prometheus-exporter:${{ github.ref_name }}

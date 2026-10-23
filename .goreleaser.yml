@@ -68,29 +68,13 @@ archives:
     files:
       - none*
     name_template: '{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}'
-# checksum:
-#   name_template: '{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
-#   algorithm: sha256
-# signs:
-#   - artifacts: checksum
-#     args:
-#       # if you are using this is in a GitHub action or some other automated pipeline, you
-#       # need to pass the batch flag to indicate its not interactive.
-#       - "--batch"
-#       - "--local-user"
-#       - "{{ .Env.GPG_FINGERPRINT }}"
-#       - "--output"
-#       - "${signature}"
-#       - "--detach-sign"
-#       - "${artifact}"
+checksum:
+  name_template: '{{ .ProjectName }}_v{{ .Version }}_SHA256SUMS'
+  algorithm: sha256
 release:
-  # If you want to manually examine the release before its live, uncomment this line:
-  # draft: true
-  # As part of the release doc files are included as a separate deliverable for consumption by Packer.io.
-  # To include a separate docs.zip uncomment the extra_files config and the docs.zip command hook above.
-  #extra_files:
-  #- glob: ./docs.zip
-  disable: true
+  # Tag push (vX.Y.Z) creates the GitHub Release and uploads archives.
+  draft: false
+  prerelease: auto
 
 changelog:
   disable: true

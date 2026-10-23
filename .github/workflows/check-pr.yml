@@ -3,10 +3,12 @@ name: Check PR
 on:
   workflow_dispatch:
   pull_request:
-    branches: [ master ]
+    branches:
+      - edge
+      - master
+      - main
 
 jobs:
-
   goreleaser:
     runs-on: ubuntu-latest
     steps:
@@ -14,7 +16,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
-      - run: git tag $(cat VERSION)
+      - run: git tag "v$(cat VERSION | tr -d '[:space:]')"
       - name: Set up Go
         uses: actions/setup-go@v5
         with:

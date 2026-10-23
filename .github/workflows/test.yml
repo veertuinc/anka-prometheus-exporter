@@ -3,12 +3,13 @@ name: Tests
 on:
   push:
     branches:
+      - edge
       - main
       - master
     workflow_dispatch:
 
 jobs:
-  test: 
+  test:
     name: Run Tests
     runs-on: ubuntu-latest
 
