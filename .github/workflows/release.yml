@@ -24,15 +24,16 @@ jobs:
           go-version-file: go.mod
           cache-dependency-path: go.sum
 
-      - name: Check VERSION matches tag
+      - name: Resolve version from tag
+        id: version
         run: |
           TAG="${GITHUB_REF_NAME}"
-          EXPECTED="v$(cat VERSION | tr -d '[:space:]')"
-          if [[ "${TAG}" != "${EXPECTED}" ]]; then
-            echo "Tag ${TAG} does not match VERSION file (${EXPECTED})."
-            echo "Update VERSION on edge, then tag that commit."
+          VERSION="${TAG#v}"
+          if [[ ! "${VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][A-Za-z0-9.]+)?$ ]]; then
+            echo "Tag ${TAG} must be vMAJOR.MINOR.PATCH"
             exit 1
           fi
+          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
@@ -53,7 +54,7 @@ jobs:
 
       - name: Prepare scratch image binaries
         run: |
-          VERSION="$(cat VERSION | tr -d '[:space:]')"
+          VERSION="${{ steps.version.outputs.version }}"
           for arch in amd64 arm64; do
             src="dist/anka-prometheus-exporter_v${VERSION}_linux_${arch}"
             dest="docker/scratch/anka-prometheus-exporter_linux_${arch}"

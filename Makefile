@@ -1,4 +1,5 @@
-VERSION := $(shell cat VERSION)
+# Set by Jenkins Version param / release tag. Local: make VERSION=4.3.6 ...
+VERSION ?= dev
 BIN := anka-prometheus-exporter
 GOLANGCI_LINT_VERSION := v2.14.0
 GOLANGCI_LINT := $(shell go env GOPATH)/bin/golangci-lint
@@ -7,7 +8,7 @@ ifeq ($(ARCH), i386)
 	ARCH = amd64
 endif
 ifeq ($(ARCH), x86_64)
-	ARCH = amd64
+    ARCH = amd64
 endif
 OS_TYPE ?= $(shell uname -s | tr '[:upper:]' '[:lower:]')
 
@@ -41,8 +42,12 @@ go.lint:
 	fi
 	"$(GOLANGCI_LINT)" run
 
-#go.releaser 	@ Local goreleaser only. Prefer: update VERSION, tag v$(VERSION), push tag (CI releases).
+#go.releaser 	@ Requires VERSION (Jenkins sets it). Prefer: tag vX.Y.Z on edge after Jenkins is green.
 go.releaser:
+	@if [ -z "$(VERSION)" ] || [ "$(VERSION)" = "dev" ]; then \
+		echo "ERROR: VERSION is required for go.releaser (example: make VERSION=4.3.6 go.releaser)"; \
+		exit 1; \
+	fi
 	git tag -d "v$(VERSION)" 2>/dev/null || true
 	git tag -a "v$(VERSION)" -m "v$(VERSION)"
 	echo "LATEST TAG: $$(git describe --tags --abbrev=0)"

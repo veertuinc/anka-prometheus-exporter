@@ -252,5 +252,5 @@ make build-and-run ARGUMENTS="--controller-username root --controller-password 1
 or 
 
 ```bash
-go run -ldflags="-X main.version=$(cat VERSION) -X main.commit=$(git rev-parse HEAD)" main.go --controller-address http://anka.controller:8090
+go run -ldflags="-X main.version=dev -X main.commit=$(git rev-parse HEAD)" main.go --controller-address http://anka.controller:8090
 ```
