@@ -73,8 +73,10 @@ checksum:
   algorithm: sha256
 release:
   # Tag push (vX.Y.Z) creates the GitHub Release and uploads archives.
+  # replace lets Jenkins overwrite an existing edge/prerelease tag safely.
   draft: false
   prerelease: auto
+  mode: replace
 
 changelog:
   disable: true
