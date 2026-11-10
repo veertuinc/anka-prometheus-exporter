@@ -34,6 +34,22 @@ jobs:
             exit 1
           fi
           echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+          if [[ "${VERSION}" == "0.0.0-edge" ]]; then
+            # Floating edge channel: publish :edge and :v0.0.0-edge, never :latest.
+            {
+              echo "docker_tags<<EOF"
+              echo "veertu/anka-prometheus-exporter:edge"
+              echo "veertu/anka-prometheus-exporter:${TAG}"
+              echo "EOF"
+            } >> "${GITHUB_OUTPUT}"
+          else
+            {
+              echo "docker_tags<<EOF"
+              echo "veertu/anka-prometheus-exporter:latest"
+              echo "veertu/anka-prometheus-exporter:${TAG}"
+              echo "EOF"
+            } >> "${GITHUB_OUTPUT}"
+          fi
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
@@ -70,6 +86,4 @@ jobs:
           file: docker/scratch/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: |
-            veertu/anka-prometheus-exporter:latest
-            veertu/anka-prometheus-exporter:${{ github.ref_name }}
+          tags: ${{ steps.version.outputs.docker_tags }}
