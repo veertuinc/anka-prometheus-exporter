@@ -1,12 +1,14 @@
 name: Tests
 
 on:
+  # workflow_dispatch lets govulncheck.yml start tests on a fix branch.
+  # GITHUB_TOKEN does not start a pull_request workflow.
+  workflow_dispatch:
   push:
     branches:
       - edge
       - main
       - master
-    workflow_dispatch:
 
 jobs:
   test:
