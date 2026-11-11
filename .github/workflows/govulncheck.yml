@@ -48,6 +48,8 @@ name: govulncheck
 # Also skip a finding when an open pull request head sets every affected module
 # to the fixed version or a newer version. The workflow reads go.mod on that branch.
 # The job summary names the pull request that covers the finding.
+# When branch govulncheck/<GO-ID> exists and no open pull request uses it,
+# the workflow overwrites that branch with a force push.
 
 on:
   schedule:
@@ -919,7 +921,9 @@ jobs:
                   ],
                   cwd=root,
               )
-              run(["git", "push", "--set-upstream", "origin", vuln.branch()], cwd=root)
+              # open_one skips a finding with an open pull request on this branch.
+              # A remote branch with this name is from a closed pull request or a failed run.
+              run(["git", "push", "--force", "--set-upstream", "origin", vuln.branch()], cwd=root)
           
           
           def create_pr(vuln: Vuln, base: str) -> str:
